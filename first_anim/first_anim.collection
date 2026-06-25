@@ -1,0 +1,48 @@
+name: "first_anim"
+scale_along_z: 0
+instances {
+  id: "body"
+  prototype: "/first_anim/body.go"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+instances {
+  id: "head"
+  prototype: "/first_anim/head.go"
+  position {
+    x: 0.0
+    y: 250.0
+    z: 0.01
+  }
+}
+instances {
+  id: "melee_weapon"
+  prototype: "/first_anim/melee_weapon.go"
+  position {
+    x: 90.0
+    y: 80.0
+    z: 0.02
+  }
+}
+embedded_instances {
+  id: "human"
+  children: "body"
+  children: "head"
+  children: "melee_weapon"
+  data: ""
+  position {
+    x: 480.0
+    y: 320.0
+  }
+}
+embedded_instances {
+  id: "system"
+  data: "components {\n"
+  "  id: \"first_anim\"\n"
+  "  component: \"/first_anim/first_anim.script\"\n"
+  "}\n"
+  ""
+}

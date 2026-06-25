@@ -1,0 +1,98 @@
+local panthera = require("panthera.panthera")
+local animation = require("first_anim.first_anim_panthera")
+
+function init(self)
+	-- Create independent animation states for player and enemy
+	self.player_anim = panthera.create_go(animation, "player")
+	self.enemy_anim = panthera.create_go(animation, "enemy")
+
+	-- Initial states: both idle
+	panthera.play(self.player_anim, "default", { is_loop = true })
+	panthera.play(self.enemy_anim, "default", { is_loop = true })
+
+	self.battle_step = 0
+	self.is_animating = false
+
+	msg.post(".", "acquire_input_focus")
+end
+
+function final(self)
+	-- Clean up timers if any
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and action.pressed and not self.is_animating then
+		self.battle_step = self.battle_step + 1
+		self.is_animating = true
+
+		if self.battle_step == 1 then
+			-- STEP 1: Player walks forward to the enemy
+			print("Step 1: Player walks to Enemy")
+			panthera.play(self.player_anim, "walk", { is_loop = true })
+			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 480, go.EASING_LINEAR, 1.2, 0, function()
+				panthera.play(self.player_anim, "default", { is_loop = true })
+				self.is_animating = false
+			end)
+
+		elseif self.battle_step == 2 then
+			-- STEP 2: Player attacks, Enemy gets damaged
+			print("Step 2: Player attacks, Enemy takes damage")
+			panthera.play(self.player_anim, "attack", { is_loop = false })
+			
+			-- Delay damage animation to sync with the slash strike
+			timer.delay(0.3, false, function()
+				panthera.play(self.enemy_anim, "damage", { is_loop = false })
+				timer.delay(0.4, false, function()
+					panthera.play(self.enemy_anim, "default", { is_loop = true })
+					self.is_animating = false
+				end)
+			end)
+
+		elseif self.battle_step == 3 then
+			-- STEP 3: Enemy walks closer and counter-attacks, Player gets damaged
+			print("Step 3: Enemy approaches and counter-attacks")
+			panthera.play(self.enemy_anim, "walk", { is_loop = true })
+			go.animate("/enemy/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 560, go.EASING_LINEAR, 0.8, 0, function()
+				panthera.play(self.enemy_anim, "attack", { is_loop = false })
+				
+				-- Delay damage to sync with the strike
+				timer.delay(0.3, false, function()
+					panthera.play(self.player_anim, "damage", { is_loop = false })
+					timer.delay(0.4, false, function()
+						panthera.play(self.player_anim, "default", { is_loop = true })
+						panthera.play(self.enemy_anim, "default", { is_loop = true })
+						self.is_animating = false
+					end)
+				end)
+			end)
+
+		elseif self.battle_step == 4 then
+			-- STEP 4: Player finishes the Enemy, Enemy dies
+			print("Step 4: Player slashes and Enemy dies")
+			panthera.play(self.player_anim, "attack", { is_loop = false })
+			
+			-- Delay death animation to sync with strike
+			timer.delay(0.3, false, function()
+				panthera.play(self.enemy_anim, "death", { is_loop = false })
+				timer.delay(0.7, false, function()
+					self.is_animating = false
+				end)
+			end)
+
+		elseif self.battle_step == 5 then
+			-- STEP 5: Reset fight (Player walks back, Enemy revives)
+			print("Step 5: Resetting scene")
+			panthera.play(self.player_anim, "walk", { is_loop = true })
+			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 320, go.EASING_LINEAR, 1.2, 0, function()
+				panthera.play(self.player_anim, "default", { is_loop = true })
+				
+				-- Reset positions and revive Enemy
+				go.set_position(vmath.vector3(640, 280, 0), "/enemy/root")
+				panthera.play(self.enemy_anim, "default", { is_loop = true })
+				
+				self.battle_step = 0
+				self.is_animating = false
+			end)
+		end
+	end
+end

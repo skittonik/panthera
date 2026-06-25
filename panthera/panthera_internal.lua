@@ -810,7 +810,10 @@ function M.get_current_game_project_folder()
 		return nil
 	end
 
-	local file = io.popen("pwd")
+	local is_windows = sys.get_sys_info().system_name == "Windows"
+	local cmd = is_windows and "cd" or "pwd"
+
+	local file = io.popen(cmd)
 	if not file then
 		return nil
 	end
@@ -821,6 +824,9 @@ function M.get_current_game_project_folder()
 	if not pwd then
 		return nil
 	end
+
+	-- Clean trailing whitespace/carriage returns
+	pwd = pwd:gsub("%s+$", "")
 
 	-- Check the game.project file exists in this folder
 	local game_project_path = pwd .. "/game.project"

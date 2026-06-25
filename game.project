@@ -1,5 +1,5 @@
 [bootstrap]
-main_collection = /example/example.collectionc
+main_collection = /first_anim/battle.collectionc
 render = /example/default.renderc
 
 [script]

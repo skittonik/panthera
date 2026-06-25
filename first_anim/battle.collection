@@ -1,0 +1,50 @@
+name: "battle"
+scale_along_z: 0
+collection_instances {
+  id: "player"
+  collection: "/first_anim/human.collection"
+  position {
+    x: 320.0
+    y: 280.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+collection_instances {
+  id: "enemy"
+  collection: "/first_anim/human.collection"
+  position {
+    x: 640.0
+    y: 280.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: -1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "system"
+  data: "components {\n"
+  "  id: \"battle\"\n"
+  "  component: \"/first_anim/battle.script\"\n"
+  "}\n"
+  ""
+}

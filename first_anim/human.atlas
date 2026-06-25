@@ -1,0 +1,10 @@
+images {
+  image: "/first_anim/assets/body.png"
+}
+images {
+  image: "/first_anim/assets/head.png"
+}
+images {
+  image: "/first_anim/assets/melee_weapon.png"
+}
+extrude_borders: 2

@@ -1,0 +1,36 @@
+name: "human"
+scale_along_z: 0
+instances {
+  id: "body"
+  prototype: "/first_anim/body.go"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+instances {
+  id: "head"
+  prototype: "/first_anim/head.go"
+  position {
+    x: 0.0
+    y: 350.0
+    z: 0.01
+  }
+}
+instances {
+  id: "melee_weapon"
+  prototype: "/first_anim/melee_weapon.go"
+  position {
+    x: 70.0
+    y: 150.0
+    z: 0.02
+  }
+}
+embedded_instances {
+  id: "root"
+  children: "body"
+  children: "head"
+  children: "melee_weapon"
+  data: ""
+}
