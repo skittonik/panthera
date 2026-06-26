@@ -650,10 +650,10 @@ function M.crossfade(animation_state, target_anim_id, duration, play_options)
 		end
 	end
 
-	animation_state.target_animation_id = target_anim_id
-
 	-- 2. Gather active properties from current animation and child animations.
 	-- If they are not in the target animation, we blend them to their resting values.
+	-- Resolve the current animation BEFORE we tag the state with the target id,
+	-- otherwise we'd pointlessly gather the target's own keys as "active".
 	local active_properties = {}
 	local current_anim_id = animation_state.animation_id or animation_state.target_animation_id
 	if current_anim_id then
@@ -729,11 +729,12 @@ function M.crossfade(animation_state, target_anim_id, duration, play_options)
 		end
 	end
 
-	-- 3. Stop the currently running animation (leaves nodes in their current poses, skip reset to prevent snaps)
+	-- 3. Tag the state with the target, then stop the current animation
+	-- (leaves nodes in their current poses, skip reset to prevent snaps).
+	animation_state.target_animation_id = target_anim_id
 	M.stop(animation_state, true)
 
 	-- 4. Transition nodes to the start frame of the target animation using Defold's native easing
-	adapter = animation_state.adapter
 	local easing = adapter.get_easing("outquad") -- smooth transition easing
 	for _, target in pairs(targets) do
 		local node = panthera_internal.get_node(animation_state, target.node_id)

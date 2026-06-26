@@ -152,8 +152,8 @@ return {
             },
             -- =========================================================
             -- DAMAGE - sharp hit reaction, authored as an OVERLAY so it can be
-            -- play_detached over idle / walk / attack. It only touches dedicated
-            -- layer nodes the base clips never use:
+            -- played on a separate Panthera state over idle / walk / attack. It
+            -- only touches dedicated layer nodes the base clips never use:
             --   "hit"        - whole-body recoil (slide + jolt), carries every
             --                  part (head included) so the neck can't separate
             --   "head_pivot" - extra head snap about the neck, on top of the body
@@ -251,7 +251,7 @@ return {
             { node_id = "root", node_index = 1, node_type = "box", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
 
             -- HIT - dedicated overlay layer for the damage flinch. Base clips never
-            -- touch it, so "damage" can play_detached on top of idle/walk/attack.
+            -- touch it, so "damage" can overlay on top of idle/walk/attack.
             { node_id = "hit", node_index = 14, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
 
             -- SHADOW (stays under root, outside hit, so the flinch never tilts it)

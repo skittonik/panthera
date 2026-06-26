@@ -2,30 +2,16 @@ local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
 local skins = require("first_anim.skins")
 
--- Rest pose values for the parts the walk moves, used to settle out of the walk
-local WALK_REST = {
-	{ "left_leg", "euler.z", 0 },
-	{ "right_leg", "euler.z", 0 },
-	{ "body", "position.y", 70 },
-	{ "head", "position.y", 240 },
-	{ "head", "euler.z", 0 },
-	{ "baseball_bat", "euler.z", 0 },
-	{ "baseball_bat", "position.y", 129 },
-}
+local BLEND = 0.15
 
--- Quickly ease the walk pose back to rest, then start idle.
--- Fast (0.15s) and smooth - avoids Panthera's instant reset snap.
-local function blend_walk_to_idle(anim, prefix, on_done)
-	panthera.stop(anim)
-	local blend = 0.15
-	for i = 1, #WALK_REST do
-		local r = WALK_REST[i]
-		go.animate("/" .. prefix .. "/" .. r[1], r[2], go.PLAYBACK_ONCE_FORWARD, r[3], go.EASING_OUTQUAD, blend)
+-- Smoothly blend the live walk pose into looping idle. crossfade reads the
+-- current node values and eases them into idle's start frame over BLEND
+-- seconds, so there's no reset snap and no hardcoded rest table to maintain.
+local function blend_walk_to_idle(anim, on_done)
+	panthera.crossfade(anim, "default", BLEND, { is_loop = true })
+	if on_done then
+		timer.delay(BLEND, false, on_done)
 	end
-	timer.delay(blend, false, function()
-		panthera.play(anim, "default", { is_loop = true })
-		if on_done then on_done() end
-	end)
 end
 
 function init(self)
@@ -35,6 +21,13 @@ function init(self)
 	-- Create independent animation states for player and enemy
 	self.player_anim = panthera.create_go(animation, "player")
 	self.enemy_anim = panthera.create_go(animation, "enemy")
+
+	-- Independent overlay states for the "damage" hit-reaction. It only drives
+	-- the dedicated "hit" / "head_pivot" nodes (untouched by any base clip), so
+	-- it layers on top of idle / walk / attack without being clobbered by the
+	-- base state's loop/stop cycle.
+	self.player_overlay = panthera.create_go(animation, "player")
+	self.enemy_overlay = panthera.create_go(animation, "enemy")
 
 	-- Apply default skin attachments
 	skins.apply_defaults("player")
@@ -64,7 +57,7 @@ function on_input(self, action_id, action)
 			print("Step 1: Player steps toward Enemy")
 			panthera.play(self.player_anim, "walk", { is_loop = true, speed = 0.65 })
 			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 180, go.EASING_LINEAR, 0.8, 0, function()
-				blend_walk_to_idle(self.player_anim, "player", function()
+				blend_walk_to_idle(self.player_anim, function()
 					self.is_animating = false
 				end)
 			end)
@@ -76,7 +69,7 @@ function on_input(self, action_id, action)
 
 			-- Delay damage animation to sync with the bat strike (impact ~0.42)
 			timer.delay(0.42, false, function()
-				panthera.play_detached(self.enemy_anim, "damage")
+				panthera.play(self.enemy_overlay, "damage", { is_loop = false })
 				timer.delay(0.55, false, function()
 					self.is_animating = false
 				end)
@@ -92,7 +85,7 @@ function on_input(self, action_id, action)
 
 				-- Delay damage to sync with the bat strike (impact ~0.42)
 				timer.delay(0.42, false, function()
-					panthera.play_detached(self.player_anim, "damage")
+					panthera.play(self.player_overlay, "damage", { is_loop = false })
 					timer.delay(0.55, false, function()
 						self.is_animating = false
 					end)
@@ -127,7 +120,7 @@ function on_input(self, action_id, action)
 				go.set_position(vmath.vector3(0, 0, 0), "/enemy/root")
 				panthera.play(self.enemy_anim, "default", { is_loop = true })
 
-				blend_walk_to_idle(self.player_anim, "player", function()
+				blend_walk_to_idle(self.player_anim, function()
 					self.battle_step = 0
 					self.is_animating = false
 				end)
