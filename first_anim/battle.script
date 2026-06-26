@@ -71,9 +71,8 @@ function on_input(self, action_id, action)
 
 			-- Delay damage animation to sync with the bat strike (impact ~0.42)
 			timer.delay(0.42, false, function()
-				panthera.play(self.enemy_anim, "damage", { is_loop = false })
+				panthera.play_detached(self.enemy_anim, "damage")
 				timer.delay(0.55, false, function()
-					panthera.play(self.enemy_anim, "default", { is_loop = true })
 					self.is_animating = false
 				end)
 			end)
@@ -88,10 +87,8 @@ function on_input(self, action_id, action)
 
 				-- Delay damage to sync with the bat strike (impact ~0.42)
 				timer.delay(0.42, false, function()
-					panthera.play(self.player_anim, "damage", { is_loop = false })
+					panthera.play_detached(self.player_anim, "damage")
 					timer.delay(0.55, false, function()
-						panthera.play(self.player_anim, "default", { is_loop = true })
-						panthera.play(self.enemy_anim, "default", { is_loop = true })
 						self.is_animating = false
 					end)
 				end)
