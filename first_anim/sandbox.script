@@ -43,7 +43,7 @@ function on_message(self, message_id, message)
 					callback = function()
 						self.is_playing_action = false
 						-- Return to the base state (which will be "default")
-						panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
+						panthera.crossfade(self.anim, self.base_anim, 0.15, { is_loop = self.base_loop })
 					end
 				})
 			else
@@ -57,7 +57,7 @@ function on_message(self, message_id, message)
 			self.base_anim = "death"
 			self.base_loop = false
 			self.is_playing_action = false
-			panthera.play(self.anim, "death", { is_loop = false })
+			panthera.crossfade(self.anim, "death", 0.15, { is_loop = false })
 			return
 		end
 
@@ -68,7 +68,7 @@ function on_message(self, message_id, message)
 
 		-- Only update the current active animation if we aren't mid-attack
 		if not self.is_playing_action then
-			panthera.play(self.anim, message.anim, { is_loop = true })
+			panthera.crossfade(self.anim, message.anim, 0.15, { is_loop = true })
 		end
 	end
 end

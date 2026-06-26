@@ -571,4 +571,83 @@ function M.reload_animation(animation_path)
 end
 
 
+---Blend from the current pose to a target animation over a duration using native easing.
+---@param animation_state panthera.animation The animation state object
+---@param target_anim_id string The ID of the target animation to blend into
+---@param duration number? The blend duration in seconds (default: 0.15)
+---@param play_options panthera.options? Options for playing the target animation after crossfade completes
+---@return boolean result True if the crossfade was successfully initiated, false otherwise
+function M.crossfade(animation_state, target_anim_id, duration, play_options)
+	assert(animation_state, "Can't crossfade animation, animation_state is nil")
+	play_options = play_options or EMPTY_OPTIONS
+	duration = duration or 0.15
+
+	local animation_data = panthera_internal.get_animation_data(animation_state)
+	if not animation_data then
+		panthera_internal.logger:warn("Can't crossfade animation, animation_data is nil", {
+			animation_path = animation_state.animation_path,
+			animation_id = target_anim_id
+		})
+		return false
+	end
+
+	local animation = panthera_internal.get_animation_by_animation_id(animation_data, target_anim_id)
+	if not animation then
+		panthera_internal.logger:warn("Can't crossfade animation, target animation not found", {
+			animation_path = animation_state.animation_path,
+			animation_id = target_anim_id
+		})
+		return false
+	end
+
+	-- 1. Gather starting values at t=0 for all tween keys in the target animation.
+	-- We want to find the first tween key for each unique node + property combination.
+	local targets = {}
+	local keys = animation.animation_keys
+	for i = 1, #keys do
+		local key = keys[i]
+		if key.key_type == panthera_internal.KEY_TYPE.TWEEN then
+			local id = key.node_id .. "/" .. key.property_id
+			-- Store the key with the minimum start time (usually t=0)
+			if not targets[id] or key.start_time < targets[id].start_time then
+				targets[id] = {
+					node_id = key.node_id,
+					property_id = key.property_id,
+					start_value = key.start_value,
+					start_time = key.start_time
+				}
+			end
+		end
+	end
+
+	-- 2. Stop the currently running animation (leaves nodes in their current poses)
+	M.stop(animation_state)
+
+	-- 3. Transition nodes to the start frame of the target animation using Defold's native easing
+	local adapter = animation_state.adapter
+	local easing = adapter.get_easing("outquad") -- smooth transition easing
+	for _, target in pairs(targets) do
+		local node = panthera_internal.get_node(animation_state, target.node_id)
+		if node then
+			adapter.tween_animation_key(node, target.property_id, easing, duration, target.start_value)
+		end
+	end
+
+	-- 4. Set the timer to start the actual animation once the crossfade finishes.
+	-- We use `is_skip_init = true` to prevent resetting properties back to default
+	-- which would cause snapping (we want to seamlessly play from the blended state).
+	local timer_id = timer.delay(duration, false, function()
+		local opts = {
+			is_loop = play_options.is_loop,
+			speed = play_options.speed,
+			callback = play_options.callback,
+			is_skip_init = true
+		}
+		M.play(animation_state, target_anim_id, opts)
+	end)
+
+	return true
+end
+
+
 return M
