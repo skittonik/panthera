@@ -6,9 +6,13 @@ images {
 }
 images {
   image: "/first_anim/assets/body_armor.png"
+  pivot_x: 0.512
+  pivot_y: 0.469
 }
 images {
   image: "/first_anim/assets/head_gasmask.png"
+  pivot_x: 0.45
+  pivot_y: 0.45
 }
 images {
   image: "/first_anim/assets/baseball_bat.png"
