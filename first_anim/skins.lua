@@ -28,7 +28,6 @@ function M.get_attachments_for_slot(slot_name)
 end
 
 -- Returns the weapon "type" string for an attachment (e.g. "impact", "pistol").
--- Returns nil for non-weapon attachments.
 function M.get_weapon_type(attachment_id)
 	ensure_loaded()
 	local slot = skins_data.slots["weapon"]
@@ -38,6 +37,7 @@ function M.get_weapon_type(attachment_id)
 end
 
 -- Apply a single attachment to a character.
+-- For slots with typed_nodes (weapon): enables the active typed GO, disables the rest.
 function M.apply_attachment(character_prefix, slot_name, attachment_id)
 	ensure_loaded()
 	local slot = skins_data.slots[slot_name]
@@ -50,7 +50,17 @@ function M.apply_attachment(character_prefix, slot_name, attachment_id)
 		print("Warning: Attachment not found: " .. tostring(attachment_id) .. " in slot " .. tostring(slot_name))
 		return
 	end
-	local sprite_url = msg.url(nil, "/" .. character_prefix .. "/" .. slot.node, slot.component)
+
+	-- Weapon slot: enable only the active typed GO, disable all others.
+	if slot.typed_nodes then
+		local active_node = attachment.node
+		for _, node_id in ipairs(slot.typed_nodes) do
+			go.set_enabled("/" .. character_prefix .. "/" .. node_id, node_id == active_node)
+		end
+	end
+
+	local node = attachment.node or slot.node
+	local sprite_url = msg.url(nil, "/" .. character_prefix .. "/" .. node, slot.component)
 	sprite.play_flipbook(sprite_url, attachment.animation)
 end
 

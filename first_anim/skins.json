@@ -5,12 +5,8 @@
       "component": "sprite",
       "default": "body_default",
       "attachments": {
-        "body_default": {
-          "animation": "body"
-        },
-        "body_armor": {
-          "animation": "body_armor"
-        }
+        "body_default": { "animation": "body" },
+        "body_armor":   { "animation": "body_armor" }
       }
     },
     "head": {
@@ -18,29 +14,25 @@
       "component": "sprite",
       "default": "head_default",
       "attachments": {
-        "head_default": {
-          "animation": "head"
-        },
-        "head_gasmask": {
-          "animation": "head_gasmask"
-        }
+        "head_default":  { "animation": "head" },
+        "head_gasmask":  { "animation": "head_gasmask" }
       }
     },
     "weapon": {
-      "node": "weapon",
       "component": "sprite",
       "default": "impact_bat",
+      "typed_nodes": ["weapon_impact", "weapon_stabbing", "weapon_pistol", "weapon_rifle", "weapon_shotgun"],
       "attachments": {
-        "impact_bat":       { "animation": "impact_bat",       "type": "impact" },
-        "impact_tire_iron": { "animation": "impact_tire_iron",  "type": "impact" },
-        "stabbing_common":  { "animation": "stabbing_common",   "type": "stabbing" },
-        "stabbing_black":   { "animation": "stabbing_black",    "type": "stabbing" },
-        "pistol_deagle":    { "animation": "pistol_deagle",     "type": "pistol" },
-        "pistol_pm":        { "animation": "pistol_pm",         "type": "pistol" },
-        "rifle_ak":         { "animation": "rifle_ak",          "type": "rifle" },
-        "rifle_m4":         { "animation": "rifle_m4",          "type": "rifle" },
-        "shotgun_long":     { "animation": "shotgun_long",      "type": "shotgun" },
-        "shotgun_short":    { "animation": "shotgun_short",     "type": "shotgun" }
+        "impact_bat":       { "node": "weapon_impact",   "animation": "impact_bat",       "type": "impact"   },
+        "impact_tire_iron": { "node": "weapon_impact",   "animation": "impact_tire_iron",  "type": "impact"   },
+        "stabbing_common":  { "node": "weapon_stabbing", "animation": "stabbing_common",   "type": "stabbing" },
+        "stabbing_black":   { "node": "weapon_stabbing", "animation": "stabbing_black",    "type": "stabbing" },
+        "pistol_deagle":    { "node": "weapon_pistol",   "animation": "pistol_deagle",     "type": "pistol"   },
+        "pistol_pm":        { "node": "weapon_pistol",   "animation": "pistol_pm",         "type": "pistol"   },
+        "rifle_ak":         { "node": "weapon_rifle",    "animation": "rifle_ak",          "type": "rifle"    },
+        "rifle_m4":         { "node": "weapon_rifle",    "animation": "rifle_m4",          "type": "rifle"    },
+        "shotgun_long":     { "node": "weapon_shotgun",  "animation": "shotgun_long",      "type": "shotgun"  },
+        "shotgun_short":    { "node": "weapon_shotgun",  "animation": "shotgun_short",     "type": "shotgun"  }
       }
     }
   }

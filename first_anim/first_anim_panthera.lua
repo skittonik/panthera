@@ -395,7 +395,6 @@ return {
                     -- Fade everything out
                     { key_type = "tween", node_id = "body#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "head#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "weapon#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "left_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "right_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "shadow#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
@@ -442,9 +441,8 @@ return {
             { node_id = "head", node_index = 10, node_type = "box", parent = "head_pivot", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 218, size_y = 219, visible = true, enabled = true },
             { node_id = "head#sprite", node_index = 11, node_type = "box", parent = "head", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 218, size_y = 219, visible = true, enabled = true },
 
-            -- WEAPON (replaces baseball_bat - sprite uses weapons.atlas)
-            { node_id = "weapon", node_index = 12, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 289, size_y = 302, visible = true, enabled = true },
-            { node_id = "weapon#sprite", node_index = 13, node_type = "box", parent = "weapon", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 289, size_y = 302, visible = true, enabled = true },
+            -- WEAPON pivot (no sprite — sprite lives on weapon_impact/stabbing/pistol/rifle/shotgun children)
+            { node_id = "weapon", node_index = 12, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
         }
     },
     format = "json",
