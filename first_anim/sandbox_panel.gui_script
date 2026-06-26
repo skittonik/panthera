@@ -4,6 +4,14 @@ local function play(anim)
 	msg.post(CONTROLLER, "play_anim", { anim = anim })
 end
 
+local function update_visuals(self)
+	for anim, node in pairs(self.states) do
+		-- Selected state is fully bright (alpha=1.0), others are dimmed (alpha=0.45)
+		local alpha = (anim == self.active_state) and 1.0 or 0.45
+		gui.animate(node, "color.w", alpha, gui.EASING_OUTQUAD, 0.2)
+	end
+end
+
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
@@ -23,15 +31,7 @@ function init(self)
 	self.active_state = "default"
 	
 	-- Apply initial selection visuals
-	self:update_visuals()
-end
-
-function update_visuals(self)
-	for anim, node in pairs(self.states) do
-		-- Selected state is fully bright (alpha=1.0), others are dimmed (alpha=0.45)
-		local alpha = (anim == self.active_state) and 1.0 or 0.45
-		gui.animate(node, "color.w", alpha, gui.EASING_OUTQUAD, 0.2)
-	end
+	update_visuals(self)
 end
 
 function on_input(self, action_id, action)
@@ -44,7 +44,7 @@ function on_input(self, action_id, action)
 		if gui.pick_node(node, action.x, action.y) then
 			if self.active_state ~= anim then
 				self.active_state = anim
-				self:update_visuals()
+				update_visuals(self)
 				play(anim)
 			end
 			return
