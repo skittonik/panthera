@@ -55,20 +55,20 @@ function on_message(self, message_id, message)
 		-- "death" is a TERMINAL STATE: it permanently overrides action state
 		if message.anim == "death" then
 			self.base_anim = "death"
-			self.base_loop = message.loop
+			self.base_loop = false
 			self.is_playing_action = false
-			panthera.play(self.anim, "death", { is_loop = message.loop })
+			panthera.play(self.anim, "death", { is_loop = false })
 			return
 		end
 
-		-- Otherwise, we are changing the base state (default/walk)
-		local loop = message.loop and not NO_LOOP[message.anim]
+		-- Otherwise, we are changing the base state (default/walk).
+		-- Both walk and default (idle) should always loop.
 		self.base_anim = message.anim
-		self.base_loop = loop
+		self.base_loop = true
 
 		-- Only update the current active animation if we aren't mid-attack
 		if not self.is_playing_action then
-			panthera.play(self.anim, message.anim, { is_loop = loop })
+			panthera.play(self.anim, message.anim, { is_loop = true })
 		end
 	end
 end
