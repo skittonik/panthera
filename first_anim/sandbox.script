@@ -5,7 +5,6 @@ local animation = require("first_anim.first_anim_panthera")
 -- They are authored to look good when replayed rapidly.
 local NO_LOOP = {
 	attack = true,
-	damage = true,
 }
 
 function init(self)
@@ -19,6 +18,15 @@ end
 
 function on_message(self, message_id, message)
 	if message_id == hash("play_anim") then
+		-- "damage" is an OVERLAY: it only drives the "hit" / "head_pivot" layer
+		-- nodes, which no base clip touches, so we play it detached on top of
+		-- whatever is currently running (idle / walk / attack) without
+		-- interrupting it. It returns to rest and cleans itself up on finish.
+		if message.anim == "damage" then
+			panthera.play_detached(self.anim, "damage")
+			return
+		end
+
 		local loop = message.loop and not NO_LOOP[message.anim]
 		panthera.play(self.anim, message.anim, { is_loop = loop })
 	end

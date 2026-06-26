@@ -22,8 +22,8 @@ return {
                     { key_type = "tween", node_id = "body", property_id = "scale_y", start_time = 1.5, duration = 1.5, start_value = 1.03, end_value = 1.0, easing = "inoutsine" },
 
                     -- Head bobs with a slight lag (secondary motion)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 1.7, start_value = 240.0, end_value = 244.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 1.7, duration = 1.3, start_value = 244.0, end_value = 240.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 1.7, start_value = 109.0, end_value = 113.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 1.7, duration = 1.3, start_value = 113.0, end_value = 109.0, easing = "inoutsine" },
 
                     -- Gentle head tilt in time with the breath (single slow ease, not a sway)
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 1.5, start_value = 0.0, end_value = -1.5, easing = "inoutsine" },
@@ -75,10 +75,10 @@ return {
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
 
                     -- Head bob (secondary, follows the torso)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
 
                     -- Head counter-tilt sway: one full sway/cycle, extreme at the seam
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = -1.5, end_value = 1.5, easing = "inoutsine" },
@@ -151,55 +151,36 @@ return {
                 }
             },
             -- =========================================================
-            -- DAMAGE - sharp hit reaction: instant recoil, then an
-            -- overshoot wobble back to rest. The whole body jolts via
-            -- "root"; the head snaps hardest.
+            -- DAMAGE - sharp hit reaction, authored as an OVERLAY so it can be
+            -- play_detached over idle / walk / attack. It only touches dedicated
+            -- layer nodes the base clips never use:
+            --   "hit"        - whole-body recoil (slide + jolt), carries every
+            --                  part (head included) so the neck can't separate
+            --   "head_pivot" - extra head snap about the neck, on top of the body
+            -- The shadow sits outside "hit", so it stays flat with no counter-key.
+            -- Everything returns to 0, so the layer resets itself when it ends.
             -- =========================================================
             {
                 animation_id = "damage",
                 duration = 0.55,
                 animation_keys = {
-                    -- Recoil LEFT: the body slides -x, so the lean must tip the same
-                    -- way (top to the left = +rotation_z). Previously root tipped the
-                    -- opposite way to the slide, so the jolt read as the wrong direction.
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 12.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = 12.0, end_value = -4.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Whole body recoils LEFT and leans the same way (coherent jolt)
+                    { key_type = "tween", node_id = "hit", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hit", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -32.0, end_value = 6.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "hit", property_id = "position_x", start_time = 0.3, duration = 0.25, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Keep the shadow flat on the ground (cancels the root jolt)
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -12.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = -12.0, end_value = 4.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "position_y", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -6.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hit", property_id = "position_y", start_time = 0.07, duration = 0.23, start_value = -6.0, end_value = 2.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "hit", property_id = "position_y", start_time = 0.3, duration = 0.25, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
 
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -32.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -32.0, end_value = 6.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.3, duration = 0.25, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = 12.0, end_value = -4.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
 
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.07, start_value = 70.0, end_value = 64.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.07, duration = 0.23, start_value = 64.0, end_value = 72.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.3, duration = 0.25, start_value = 72.0, end_value = 70.0, easing = "inoutsine" },
-
-                    -- Head rides WITH the torso (it's a sibling of body, not a child),
-                    -- otherwise the body slides out from under it and the neck shows.
-                    -- Tracks body's x/y at slightly reduced amplitude for a touch of lag.
-                    { key_type = "tween", node_id = "head", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -28.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -28.0, end_value = 5.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "head", property_id = "position_x", start_time = 0.3, duration = 0.25, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.07, start_value = 240.0, end_value = 234.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.07, duration = 0.23, start_value = 234.0, end_value = 242.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.3, duration = 0.25, start_value = 242.0, end_value = 240.0, easing = "inoutsine" },
-
-                    -- Head snaps in the hit direction (top-left, +z, matching the recoil)
-                    -- then settles. Reduced from 22 so its pivot swing keeps the head
-                    -- bottom inside the torso overlap and never bares the neck.
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 16.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.07, duration = 0.23, start_value = 16.0, end_value = -4.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.3, duration = 0.25, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Bat jolts loosely with the hit
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -18.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.07, duration = 0.28, start_value = -18.0, end_value = 8.0, easing = "outcubic" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.35, duration = 0.2, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Head snaps harder than the body, pivoting about the neck
+                    { key_type = "tween", node_id = "head_pivot", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 18.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head_pivot", property_id = "rotation_z", start_time = 0.07, duration = 0.23, start_value = 18.0, end_value = -5.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "head_pivot", property_id = "rotation_z", start_time = 0.3, duration = 0.25, start_value = -5.0, end_value = 0.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
@@ -234,11 +215,12 @@ return {
                     { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.12, duration = 0.38, start_value = -20.0, end_value = -120.0, easing = "outquad" },
                     { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.5, start_value = 129.0, end_value = 90.0, easing = "outquad" },
 
-                    -- Legs kick up from the fall
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 32.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 32.0, end_value = 24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 20.0, end_value = 14.0, easing = "outsine" },
+                    -- Legs kick up from the fall, swinging the SAME way as the
+                    -- topple (root falls clockwise, so the legs go negative too)
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -32.0, end_value = -24.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -20.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -20.0, end_value = -14.0, easing = "outsine" },
 
                     -- Shadow shrinks as the body lifts off the ground
                     { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 0.62, start_value = 1.0, end_value = 0.6, easing = "inoutsine" },
@@ -268,28 +250,36 @@ return {
             -- ROOT
             { node_id = "root", node_index = 1, node_type = "box", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
 
-            -- SHADOW
+            -- HIT - dedicated overlay layer for the damage flinch. Base clips never
+            -- touch it, so "damage" can play_detached on top of idle/walk/attack.
+            { node_id = "hit", node_index = 14, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
+
+            -- SHADOW (stays under root, outside hit, so the flinch never tilts it)
             { node_id = "shadow", node_index = 2, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 227, size_y = 52, visible = true, enabled = true },
             { node_id = "shadow#sprite", node_index = 3, node_type = "box", parent = "shadow", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 227, size_y = 52, visible = true, enabled = true },
 
             -- LEFT LEG
-            { node_id = "left_leg", node_index = 4, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 87, size_y = 150, visible = true, enabled = true },
+            { node_id = "left_leg", node_index = 4, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 87, size_y = 150, visible = true, enabled = true },
             { node_id = "left_leg#sprite", node_index = 5, node_type = "box", parent = "left_leg", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 87, size_y = 150, visible = true, enabled = true },
 
             -- RIGHT LEG
-            { node_id = "right_leg", node_index = 6, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 86, size_y = 148, visible = true, enabled = true },
+            { node_id = "right_leg", node_index = 6, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 86, size_y = 148, visible = true, enabled = true },
             { node_id = "right_leg#sprite", node_index = 7, node_type = "box", parent = "right_leg", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 86, size_y = 148, visible = true, enabled = true },
 
             -- BODY
-            { node_id = "body", node_index = 8, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 221, size_y = 228, visible = true, enabled = true },
+            { node_id = "body", node_index = 8, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 221, size_y = 228, visible = true, enabled = true },
             { node_id = "body#sprite", node_index = 9, node_type = "box", parent = "body", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 221, size_y = 228, visible = true, enabled = true },
 
-            -- HEAD
-            { node_id = "head", node_index = 10, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 218, size_y = 219, visible = true, enabled = true },
+            -- HEAD_PIVOT - sits at the neck (y=131). "damage" rotates this for a
+            -- sharp head snap about the neck, independent of the head's base bob.
+            { node_id = "head_pivot", node_index = 15, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
+
+            -- HEAD (now child of head_pivot; local y dropped 131 to keep world y=240)
+            { node_id = "head", node_index = 10, node_type = "box", parent = "head_pivot", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 218, size_y = 219, visible = true, enabled = true },
             { node_id = "head#sprite", node_index = 11, node_type = "box", parent = "head", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 218, size_y = 219, visible = true, enabled = true },
 
             -- BASEBALL BAT
-            { node_id = "baseball_bat", node_index = 12, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 289, size_y = 302, visible = true, enabled = true },
+            { node_id = "baseball_bat", node_index = 12, node_type = "box", parent = "hit", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 289, size_y = 302, visible = true, enabled = true },
             { node_id = "baseball_bat#sprite", node_index = 13, node_type = "box", parent = "baseball_bat", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 289, size_y = 302, visible = true, enabled = true },
         }
     },

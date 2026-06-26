@@ -21,7 +21,7 @@ instances {
   position {
     x: 40.0
     y: 145.0
-    z: -0.01
+    z: -0.02
   }
 }
 instances {
@@ -35,7 +35,7 @@ instances {
   id: "head"
   prototype: "/first_anim/head.go"
   position {
-    y: 240.0
+    y: 109.0
     z: 0.01
   }
 }
@@ -51,11 +51,24 @@ instances {
 scale_along_z: 0
 embedded_instances {
   id: "root"
-  children: "baseball_bat"
-  children: "body"
-  children: "head"
-  children: "left_leg"
-  children: "right_leg"
+  children: "hit"
   children: "shadow"
   data: ""
+}
+embedded_instances {
+  id: "hit"
+  children: "baseball_bat"
+  children: "body"
+  children: "head_pivot"
+  children: "left_leg"
+  children: "right_leg"
+  data: ""
+}
+embedded_instances {
+  id: "head_pivot"
+  children: "head"
+  data: ""
+  position {
+    y: 131.0
+  }
 }
