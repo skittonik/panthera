@@ -23,4 +23,10 @@ images {
 images {
   image: "/first_anim/assets/shadow.png"
 }
+images {
+  image: "/first_anim/assets/hand_left.png"
+}
+images {
+  image: "/first_anim/assets/hand_right.png"
+}
 extrude_borders: 2

@@ -43,8 +43,8 @@ instances {
   id: "weapon"
   prototype: "/first_anim/weapon.go"
   position {
-    x: -15.0
-    y: 129.0
+    x: -41.0
+    y: 168.0
     z: 0.02
   }
 }
@@ -57,11 +57,11 @@ embedded_instances {
 }
 embedded_instances {
   id: "hit"
-  children: "weapon"
   children: "body"
   children: "head_pivot"
   children: "left_leg"
   children: "right_leg"
+  children: "weapon"
   data: ""
 }
 embedded_instances {
