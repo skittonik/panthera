@@ -42,10 +42,26 @@ instances {
 instances {
   id: "weapon"
   prototype: "/first_anim/weapon.go"
+  children: "hand_left"
+  children: "hand_right"
   position {
-    x: -41.0
-    y: 168.0
+    x: -15.0
+    y: 129.0
     z: 0.02
+  }
+}
+instances {
+  id: "hand_left"
+  prototype: "/first_anim/hand_left.go"
+  position {
+    z: 0.01
+  }
+}
+instances {
+  id: "hand_right"
+  prototype: "/first_anim/hand_right.go"
+  position {
+    z: -0.025
   }
 }
 scale_along_z: 0
