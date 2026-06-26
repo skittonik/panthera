@@ -1,139 +1,242 @@
 return {
     data = {
         animations = {
-            -- IDLE (default)
+            -- =========================================================
+            -- IDLE (default) - calm combat-ready breathing + weight shift
+            -- Whole-body sway is driven by "root" so the character feels
+            -- alive as one piece; head/bat add lagged secondary motion.
+            -- Loops cleanly: every property starts and ends at rest.
+            -- =========================================================
             {
                 animation_id = "default",
-                duration = 2.0,
+                duration = 3.0,
                 animation_keys = {
-                    -- Body breathing bob (base y = 70.0)
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 1.0, start_value = 70.0, end_value = 67.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 1.0, duration = 1.0, start_value = 67.0, end_value = 70.0, easing = "inoutquad" },
-                    
-                    -- Body breathing squash
-                    { key_type = "tween", node_id = "body", property_id = "scale_y", start_time = 0.0, duration = 1.0, start_value = 1.0, end_value = 0.95, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "scale_y", start_time = 1.0, duration = 1.0, start_value = 0.95, end_value = 1.0, easing = "inoutquad" },
+                    -- Breathing: torso rises on the inhale, settles on the exhale
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 1.5, start_value = 70.0, end_value = 73.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 1.5, duration = 1.5, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
 
-                    -- Head relative bob (base y = 240.0)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 1.0, start_value = 240.0, end_value = 237.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 1.0, duration = 1.0, start_value = 237.0, end_value = 240.0, easing = "inoutquad" },
+                    -- Chest expands subtly with the breath
+                    { key_type = "tween", node_id = "body", property_id = "scale_x", start_time = 0.0, duration = 1.5, start_value = 1.0, end_value = 1.02, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "scale_x", start_time = 1.5, duration = 1.5, start_value = 1.02, end_value = 1.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "scale_y", start_time = 0.0, duration = 1.5, start_value = 1.0, end_value = 1.03, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "scale_y", start_time = 1.5, duration = 1.5, start_value = 1.03, end_value = 1.0, easing = "inoutsine" },
 
-                    -- Head relative tilt
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 1.0, start_value = 0.0, end_value = -2.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 1.0, duration = 1.0, start_value = -2.0, end_value = 0.0, easing = "inoutquad" },
+                    -- Head bobs with a slight lag (secondary motion)
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 1.7, start_value = 240.0, end_value = 244.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 1.7, duration = 1.3, start_value = 244.0, end_value = 240.0, easing = "inoutsine" },
 
-                    -- Baseball bat idle swing (base y = 129.0)
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 1.0, start_value = 0.0, end_value = 5.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 1.0, duration = 1.0, start_value = 5.0, end_value = 0.0, easing = "inoutquad" },
+                    -- Gentle head tilt in time with the breath (single slow ease, not a sway)
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 1.5, start_value = 0.0, end_value = -1.5, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 1.5, duration = 1.5, start_value = -1.5, end_value = 0.0, easing = "inoutsine" },
 
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 1.0, start_value = 129.0, end_value = 126.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 1.0, duration = 1.0, start_value = 126.0, end_value = 129.0, easing = "inoutquad" },
+                    -- Legs settle weight: a slow symmetric splay so the stance feels alive
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 1.5, start_value = 0.0, end_value = 2.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 1.5, duration = 1.5, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 1.5, start_value = 0.0, end_value = -2.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 1.5, duration = 1.5, start_value = -2.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Shadow breathing stretch
-                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 1.0, start_value = 1.0, end_value = 1.05, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 1.0, duration = 1.0, start_value = 1.05, end_value = 1.0, easing = "inoutquad" },
+                    -- Bat idles with a slow sway and a soft bob
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 1.5, start_value = 0.0, end_value = 4.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 1.5, duration = 1.5, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 1.5, start_value = 129.0, end_value = 131.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 1.5, duration = 1.5, start_value = 131.0, end_value = 129.0, easing = "inoutsine" },
+
+                    -- Shadow pulses smaller as the body lifts (less ground contact)
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 1.5, start_value = 1.0, end_value = 0.97, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 1.5, duration = 1.5, start_value = 0.97, end_value = 1.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_y", start_time = 0.0, duration = 1.5, start_value = 1.0, end_value = 0.97, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_y", start_time = 1.5, duration = 1.5, start_value = 0.97, end_value = 1.0, easing = "inoutsine" },
                 }
             },
-            -- WALK
+            -- =========================================================
+            -- WALK - two steps. Legs pendulum from the hips (the rotation
+            -- itself lifts the foot off the ground), torso bobs twice per
+            -- cycle, root sways toward each stance leg. Loops cleanly.
+            -- =========================================================
             {
                 animation_id = "walk",
                 duration = 0.8,
                 animation_keys = {
-                    -- Right leg swing (walk cycle phase 1)
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = 20.0, end_value = 0.0, easing = "inquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -20.0, end_value = 0.0, easing = "inquad" },
+                    -- Right leg stride (forward -> back -> forward)
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 24.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = 24.0, end_value = 0.0, easing = "insine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = -24.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -24.0, end_value = 0.0, easing = "insine" },
 
-                    -- Left leg swing (walk cycle phase 2 - opposite)
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = -20.0, end_value = 0.0, easing = "inquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = 20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = 20.0, end_value = 0.0, easing = "inquad" },
+                    -- Left leg stride (opposite phase)
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -24.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = -24.0, end_value = 0.0, easing = "insine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = 24.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = 24.0, end_value = 0.0, easing = "insine" },
 
-                    -- Body bobbing (base y = 70.0)
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 70.0, end_value = 64.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 64.0, end_value = 70.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 70.0, end_value = 64.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 64.0, end_value = 70.0, easing = "inoutquad" },
+                    -- Torso bob: low at each footfall, high at each pass
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
 
-                    -- Head bobbing (base y = 240.0)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 240.0, end_value = 234.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 234.0, end_value = 240.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 240.0, end_value = 234.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 234.0, end_value = 240.0, easing = "inoutquad" },
+                    -- Whole-body sway toward the planted leg
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 2.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = 2.0, end_value = -2.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -2.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Bat sway during walk
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = 0.0, end_value = -10.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = -10.0, end_value = 0.0, easing = "inoutquad" },
+                    -- Head bob (secondary, smaller than the torso)
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+
+                    -- Head counter-tilt against the sway
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -1.5, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = -1.5, end_value = 1.5, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = 1.5, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Bat counter-swings and bobs along with the gait
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -6.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
                 }
             },
-            -- ATTACK
+            -- =========================================================
+            -- ATTACK - full baseball swing: coil (wind-up) -> drive
+            -- (strike) -> settle -> recover. The whole body leans via
+            -- "root"; the bat whips through ~215 degrees with overshoot.
+            -- =========================================================
             {
                 animation_id = "attack",
-                duration = 1.0,
+                duration = 0.9,
                 animation_keys = {
-                    -- Wind up (0.0 -> 0.3)
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -20.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -10.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -45.0, easing = "inoutquad" },
+                    -- Whole-body coil back, then lean into the strike (kept subtle
+                    -- so the torso doesn't slide off the planted legs)
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 6.0, end_value = -9.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -9.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Slash strike (0.3 -> 0.5)
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.3, duration = 0.15, start_value = -20.0, end_value = 60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -10.0, end_value = 15.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -45.0, end_value = 90.0, easing = "outquad" },
+                    -- Weight shifts back on the coil, drives forward on the hit
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -8.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.3, duration = 0.15, start_value = -8.0, end_value = 18.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.45, duration = 0.13, start_value = 18.0, end_value = 13.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.58, duration = 0.32, start_value = 13.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Recover/Return (0.55 -> 1.0)
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.55, duration = 0.45, start_value = 60.0, end_value = 0.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.55, duration = 0.45, start_value = 15.0, end_value = 0.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.55, duration = 0.45, start_value = 90.0, end_value = 0.0, easing = "inoutquad" },
+                    -- Crouch on the coil, rise through the swing
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.3, start_value = 70.0, end_value = 66.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.3, duration = 0.15, start_value = 66.0, end_value = 73.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.45, duration = 0.45, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
+
+                    -- Bat: cock over the shoulder, whip forward with overshoot, return
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 115.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 115.0, end_value = -100.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.45, duration = 0.13, start_value = -100.0, end_value = -78.0, easing = "outback" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.58, duration = 0.32, start_value = -78.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.3, start_value = 129.0, end_value = 150.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.3, duration = 0.15, start_value = 150.0, end_value = 120.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.45, duration = 0.45, start_value = 120.0, end_value = 129.0, easing = "inoutsine" },
+
+                    -- Head leads into the target, snaps with the strike
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 8.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 8.0, end_value = -10.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -10.0, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Legs brace and push off through the swing (small, so the back
+                    -- leg stays tucked behind the body)
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -4.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -4.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 4.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 4.0, end_value = -3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
                 }
             },
-            -- DAMAGE
+            -- =========================================================
+            -- DAMAGE - sharp hit reaction: instant recoil, then an
+            -- overshoot wobble back to rest. The whole body jolts via
+            -- "root"; the head snaps hardest.
+            -- =========================================================
             {
                 animation_id = "damage",
-                duration = 0.6,
+                duration = 0.55,
                 animation_keys = {
-                    -- Recoil impact (0.0 -> 0.12)
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -40.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -15.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -25.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = -12.0, end_value = 4.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Recover (0.12 -> 0.6)
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.12, duration = 0.48, start_value = -40.0, end_value = 0.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.12, duration = 0.48, start_value = -15.0, end_value = 0.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.12, duration = 0.48, start_value = -20.0, end_value = 0.0, easing = "inoutquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.12, duration = 0.48, start_value = -25.0, end_value = 0.0, easing = "inoutquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -32.0, end_value = 6.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.3, duration = 0.25, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
+
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.07, start_value = 70.0, end_value = 64.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.07, duration = 0.23, start_value = 64.0, end_value = 72.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.3, duration = 0.25, start_value = 72.0, end_value = 70.0, easing = "inoutsine" },
+
+                    -- Head snaps back hardest, then settles
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -22.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.07, duration = 0.23, start_value = -22.0, end_value = 6.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.3, duration = 0.25, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Bat jolts loosely with the hit
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -18.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.07, duration = 0.28, start_value = -18.0, end_value = 8.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.35, duration = 0.2, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Shadow squashes on impact
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 0.07, start_value = 1.0, end_value = 1.08, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.07, duration = 0.23, start_value = 1.08, end_value = 0.98, easing = "outcubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.3, duration = 0.25, start_value = 0.98, end_value = 1.0, easing = "inoutsine" },
                 }
             },
-            -- DEATH
+            -- =========================================================
+            -- DEATH - the whole rig topples as one piece by rotating
+            -- "root" about the feet, with a small ground bounce. The
+            -- shadow is counter-rotated so it stays flat on the floor,
+            -- then everything shrinks and fades out.
+            -- =========================================================
             {
                 animation_id = "death",
-                duration = 1.2,
+                duration = 1.4,
                 animation_keys = {
-                    -- Falling back (0.0 -> 0.5) (base y = 70.0)
-                    { key_type = "tween", node_id = "body", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -90.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.5, start_value = 70.0, end_value = -30.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -85.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -25.0, easing = "outquad" },
+                    -- Topple: tiny recoil, accelerating fall, bounce, settle
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = 8.0, end_value = -86.0, easing = "incubic" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = -86.0, end_value = -78.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = -78.0, end_value = -84.0, easing = "inoutsine" },
 
-                    -- Bat drops (base x = -15.0, y = 129.0)
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -110.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_x", start_time = 0.0, duration = 0.5, start_value = -15.0, end_value = -90.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.5, start_value = 129.0, end_value = 59.0, easing = "outquad" },
+                    -- Keep the shadow flat on the ground (cancels root rotation)
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -8.0, end_value = 86.0, easing = "incubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = 86.0, end_value = 78.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = 78.0, end_value = 84.0, easing = "inoutsine" },
 
-                    -- Legs kick up slightly
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 35.0, easing = "outquad" },
+                    -- Head lolls back as the body goes down
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -12.0, end_value = -30.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.62, duration = 0.18, start_value = -30.0, end_value = -20.0, easing = "outquad" },
+
+                    -- Bat flings out of the grip and drops
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -20.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.12, duration = 0.38, start_value = -20.0, end_value = -120.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.5, start_value = 129.0, end_value = 90.0, easing = "outquad" },
+
+                    -- Legs kick up from the fall
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 32.0, end_value = 24.0, easing = "outsine" },
                     { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 20.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 20.0, end_value = 14.0, easing = "outsine" },
 
-                    -- Fade out (0.5 -> 1.2)
-                    { key_type = "tween", node_id = "body#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
-                    { key_type = "tween", node_id = "head#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
-                    { key_type = "tween", node_id = "baseball_bat#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
-                    { key_type = "tween", node_id = "left_leg#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
-                    { key_type = "tween", node_id = "right_leg#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
-                    { key_type = "tween", node_id = "shadow#sprite", property_id = "color_a", start_time = 0.5, duration = 0.7, start_value = 1.0, end_value = 0.0, easing = "linear" },
+                    -- Shadow shrinks as the body lifts off the ground
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 0.62, start_value = 1.0, end_value = 0.6, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "scale_y", start_time = 0.0, duration = 0.62, start_value = 1.0, end_value = 0.6, easing = "inoutsine" },
+
+                    -- Fade everything out at the end
+                    { key_type = "tween", node_id = "body#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "head#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "baseball_bat#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "left_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "shadow#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                 }
             }
         },
@@ -150,7 +253,7 @@ return {
         nodes = {
             -- ROOT
             { node_id = "root", node_index = 1, node_type = "box", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 1, size_y = 1, visible = true, enabled = true },
-            
+
             -- SHADOW
             { node_id = "shadow", node_index = 2, node_type = "box", parent = "root", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 227, size_y = 52, visible = true, enabled = true },
             { node_id = "shadow#sprite", node_index = 3, node_type = "box", parent = "shadow", scale_x = 1, scale_y = 1, scale_z = 1, size_x = 227, size_y = 52, visible = true, enabled = true },
