@@ -1,6 +1,32 @@
 local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
 
+-- Rest pose values for the parts the walk moves, used to settle out of the walk
+local WALK_REST = {
+	{ "left_leg", "euler.z", 0 },
+	{ "right_leg", "euler.z", 0 },
+	{ "body", "position.y", 70 },
+	{ "head", "position.y", 240 },
+	{ "head", "euler.z", 0 },
+	{ "baseball_bat", "euler.z", 0 },
+	{ "baseball_bat", "position.y", 129 },
+}
+
+-- Quickly ease the walk pose back to rest, then start idle.
+-- Fast (0.15s) and smooth - avoids Panthera's instant reset snap.
+local function blend_walk_to_idle(anim, prefix, on_done)
+	panthera.stop(anim)
+	local blend = 0.15
+	for i = 1, #WALK_REST do
+		local r = WALK_REST[i]
+		go.animate("/" .. prefix .. "/" .. r[1], r[2], go.PLAYBACK_ONCE_FORWARD, r[3], go.EASING_OUTQUAD, blend)
+	end
+	timer.delay(blend, false, function()
+		panthera.play(anim, "default", { is_loop = true })
+		if on_done then on_done() end
+	end)
+end
+
 function init(self)
 	-- Use fixed fit projection to maintain aspect ratio on window resize
 	msg.post("@render:", "use_fixed_fit_projection")
@@ -29,12 +55,13 @@ function on_input(self, action_id, action)
 		self.is_animating = true
 
 		if self.battle_step == 1 then
-			-- STEP 1: Player walks forward to the enemy
-			print("Step 1: Player walks to Enemy")
-			panthera.play(self.player_anim, "walk", { is_loop = true })
-			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 480, go.EASING_LINEAR, 1.2, 0, function()
-				panthera.play(self.player_anim, "default", { is_loop = true })
-				self.is_animating = false
+			-- STEP 1: Player steps forward a little (stays opposite the enemy)
+			print("Step 1: Player steps toward Enemy")
+			panthera.play(self.player_anim, "walk", { is_loop = true, speed = 0.65 })
+			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 180, go.EASING_LINEAR, 0.8, 0, function()
+				blend_walk_to_idle(self.player_anim, "player", function()
+					self.is_animating = false
+				end)
 			end)
 
 		elseif self.battle_step == 2 then
@@ -52,11 +79,12 @@ function on_input(self, action_id, action)
 			end)
 
 		elseif self.battle_step == 3 then
-			-- STEP 3: Enemy walks closer and counter-attacks, Player gets damaged
+			-- STEP 3: Enemy steps toward the player (moves left) and counter-attacks
 			print("Step 3: Enemy approaches and counter-attacks")
-			panthera.play(self.enemy_anim, "walk", { is_loop = true })
-			go.animate("/enemy/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 560, go.EASING_LINEAR, 0.8, 0, function()
-				panthera.play(self.enemy_anim, "attack", { is_loop = false })
+			panthera.play(self.enemy_anim, "walk", { is_loop = true, speed = 0.65 })
+			go.animate("/enemy/root", "position.x", go.PLAYBACK_ONCE_FORWARD, -180, go.EASING_LINEAR, 0.8, 0, function()
+				-- is_skip_init blends out of the walk instead of snapping to rest
+				panthera.play(self.enemy_anim, "attack", { is_loop = false, is_skip_init = true })
 
 				-- Delay damage to sync with the bat strike (impact ~0.42)
 				timer.delay(0.42, false, function()
@@ -88,18 +116,19 @@ function on_input(self, action_id, action)
 			-- Face left so the walk-back isn't a moonwalk
 			-- (go.set_scale forbids negative components, so flip via scale.x)
 			go.set("/player/root", "scale.x", -1)
-			panthera.play(self.player_anim, "walk", { is_loop = true })
-			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 320, go.EASING_LINEAR, 1.2, 0, function()
+			panthera.play(self.player_anim, "walk", { is_loop = true, speed = 0.65 })
+			go.animate("/player/root", "position.x", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_LINEAR, 0.8, 0, function()
 				-- Face right again, ready for the next fight
 				go.set("/player/root", "scale.x", 1)
-				panthera.play(self.player_anim, "default", { is_loop = true })
 
-				-- Reset positions and revive Enemy
-				go.set_position(vmath.vector3(640, 280, 0), "/enemy/root")
+				-- Reset Enemy back to its starting spot and revive it
+				go.set_position(vmath.vector3(0, 0, 0), "/enemy/root")
 				panthera.play(self.enemy_anim, "default", { is_loop = true })
 
-				self.battle_step = 0
-				self.is_animating = false
+				blend_walk_to_idle(self.player_anim, "player", function()
+					self.battle_step = 0
+					self.is_animating = false
+				end)
 			end)
 		end
 	end

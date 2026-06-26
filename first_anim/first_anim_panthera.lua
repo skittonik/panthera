@@ -57,34 +57,30 @@ return {
                 animation_id = "walk",
                 duration = 0.8,
                 animation_keys = {
-                    -- Right leg stride (forward -> back -> forward)
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = 24.0, end_value = 0.0, easing = "insine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = -24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -24.0, end_value = 0.0, easing = "insine" },
+                    -- Right leg pendulum from the hip: forward -> back -> forward.
+                    -- The swing itself arcs the foot up off the ground at each
+                    -- extreme, so no extra vertical motion is needed.
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = 20.0, end_value = -20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -20.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Left leg stride (opposite phase)
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = -24.0, end_value = 0.0, easing = "insine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.2, start_value = 0.0, end_value = 24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = 24.0, end_value = 0.0, easing = "insine" },
+                    -- Left leg pendulum (opposite phase)
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = -20.0, end_value = 20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = 20.0, end_value = 0.0, easing = "inoutsine" },
 
-                    -- Torso bob: low at each footfall, high at each pass
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
+                    -- Torso bob: high as the body vaults over the straight leg
+                    -- (legs passing), low at the stride extreme (legs apart)
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
 
-                    -- Whole-body sway toward the planted leg
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 2.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = 2.0, end_value = -2.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -2.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Head bob (secondary, smaller than the torso)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+                    -- Head bob (secondary, follows the torso)
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 242.0, end_value = 238.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 238.0, end_value = 242.0, easing = "inoutsine" },
 
                     -- Head counter-tilt against the sway
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = -1.5, easing = "inoutsine" },
@@ -95,10 +91,10 @@ return {
                     { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 0.0, end_value = 6.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.2, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.6, duration = 0.2, start_value = -6.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
@@ -115,6 +111,11 @@ return {
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 6.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 6.0, end_value = -9.0, easing = "outquad" },
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -9.0, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Keep the shadow flat on the ground (cancels the root lean)
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -6.0, end_value = 9.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = 9.0, end_value = 0.0, easing = "inoutsine" },
 
                     -- Weight shifts back on the coil, drives forward on the hit
                     { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -8.0, easing = "inoutsine" },
@@ -163,6 +164,11 @@ return {
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -12.0, easing = "outquad" },
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = -12.0, end_value = 4.0, easing = "outcubic" },
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
+
+                    -- Keep the shadow flat on the ground (cancels the root jolt)
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = 12.0, end_value = -4.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
 
                     { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -32.0, easing = "outquad" },
                     { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -32.0, end_value = 6.0, easing = "outcubic" },
