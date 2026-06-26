@@ -184,10 +184,19 @@ return {
                 }
             },
             -- =========================================================
-            -- DEATH - the whole rig topples as one piece by rotating
-            -- "root" about the feet, with a small ground bounce. The
-            -- shadow is counter-rotated so it stays flat on the floor,
-            -- then everything shrinks and fades out.
+            -- DEATH - the whole rig topples as one piece by rotating "root"
+            -- about the feet (clockwise / negative = falls to the right).
+            -- Physics rationale:
+            --   root: recoil → accelerating fall → ground bounce → settle
+            --   shadow: counter-rotated (stays flat), shrinks on impact
+            --   head: lolls in the fall direction (gravity, negative local)
+            --   legs: POSITIVE local rotation = they kick UP against the fall
+            --         direction (inertia). Negative would fold them INTO the
+            --         floor, which is the old bug.
+            --   bat: brief grip → POSITIVE local swing (flies forward/up as
+            --        character falls right). At -85° root + +85° local the bat
+            --        ends up ~0° world = falls nearly vertically to the side.
+            --        Drops on position_y so it slides off the body as it falls.
             -- =========================================================
             {
                 animation_id = "death",
@@ -195,38 +204,39 @@ return {
                 animation_keys = {
                     -- Topple: tiny recoil, accelerating fall, bounce, settle
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = 8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = 8.0, end_value = -86.0, easing = "incubic" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = -86.0, end_value = -78.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = 8.0, end_value = -88.0, easing = "incubic" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = -88.0, end_value = -78.0, easing = "outquad" },
                     { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = -78.0, end_value = -84.0, easing = "inoutsine" },
 
                     -- Keep the shadow flat on the ground (cancels root rotation)
                     { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -8.0, end_value = 86.0, easing = "incubic" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = 86.0, end_value = 78.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -8.0, end_value = 88.0, easing = "incubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = 88.0, end_value = 78.0, easing = "outquad" },
                     { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = 78.0, end_value = 84.0, easing = "inoutsine" },
 
-                    -- Head lolls back as the body goes down
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -12.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -12.0, end_value = -30.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.62, duration = 0.18, start_value = -30.0, end_value = -20.0, easing = "outquad" },
+                    -- Head lolls in the fall direction (gravity drag, negative)
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -14.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.12, duration = 0.5, start_value = -14.0, end_value = -32.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.62, duration = 0.18, start_value = -32.0, end_value = -22.0, easing = "outquad" },
 
-                    -- Bat flings out of the grip and drops
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.12, duration = 0.38, start_value = -20.0, end_value = -120.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.5, start_value = 129.0, end_value = 90.0, easing = "outquad" },
+                    -- Bat: brief grip, then swings POSITIVELY (out/forward) as
+                    -- the character falls. +85° local + -84° root ≈ 0° world:
+                    -- bat ends nearly vertical, as if it slid off to the side.
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "rotation_z", start_time = 0.12, duration = 0.4, start_value = -12.0, end_value = 85.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "baseball_bat", property_id = "position_y", start_time = 0.0, duration = 0.52, start_value = 129.0, end_value = 75.0, easing = "outquad" },
 
-                    -- Legs kick up from the fall, swinging the SAME way as the
-                    -- topple (root falls clockwise, so the legs go negative too)
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -32.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -32.0, end_value = -24.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -20.0, end_value = -14.0, easing = "outsine" },
+                    -- Legs kick UP (positive local = against the fall direction = inertia)
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 28.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 28.0, end_value = 20.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = 20.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = 20.0, end_value = 14.0, easing = "outsine" },
 
-                    -- Shadow shrinks as the body lifts off the ground
+                    -- Shadow shrinks on impact
                     { key_type = "tween", node_id = "shadow", property_id = "scale_x", start_time = 0.0, duration = 0.62, start_value = 1.0, end_value = 0.6, easing = "inoutsine" },
                     { key_type = "tween", node_id = "shadow", property_id = "scale_y", start_time = 0.0, duration = 0.62, start_value = 1.0, end_value = 0.6, easing = "inoutsine" },
 
-                    -- Fade everything out at the end
+                    -- Fade everything out
                     { key_type = "tween", node_id = "body#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "head#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "baseball_bat#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
