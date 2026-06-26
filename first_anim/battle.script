@@ -65,7 +65,7 @@ function on_input(self, action_id, action)
 		elseif self.battle_step == 2 then
 			-- STEP 2: Player attacks, Enemy gets damaged
 			print("Step 2: Player attacks, Enemy takes damage")
-			panthera.play(self.player_anim, "attack", { is_loop = false })
+			panthera.play(self.player_anim, "attack_impact", { is_loop = false })
 
 			-- Delay damage animation to sync with the bat strike (impact ~0.42)
 			timer.delay(0.42, false, function()
@@ -81,7 +81,7 @@ function on_input(self, action_id, action)
 			panthera.play(self.enemy_anim, "walk", { is_loop = true, speed = 0.65 })
 			go.animate("/enemy/root", "position.x", go.PLAYBACK_ONCE_FORWARD, -180, go.EASING_LINEAR, 0.8, 0, function()
 				-- is_skip_init blends out of the walk instead of snapping to rest
-				panthera.play(self.enemy_anim, "attack", { is_loop = false, is_skip_init = true })
+				panthera.play(self.enemy_anim, "attack_impact", { is_loop = false, is_skip_init = true })
 
 				-- Delay damage to sync with the bat strike (impact ~0.42)
 				timer.delay(0.42, false, function()
@@ -95,7 +95,7 @@ function on_input(self, action_id, action)
 		elseif self.battle_step == 4 then
 			-- STEP 4: Player finishes the Enemy, Enemy dies
 			print("Step 4: Player slashes and Enemy dies")
-			panthera.play(self.player_anim, "attack", { is_loop = false })
+			panthera.play(self.player_anim, "attack_impact", { is_loop = false })
 
 			-- Delay death animation to sync with the bat strike (impact ~0.42)
 			timer.delay(0.42, false, function()

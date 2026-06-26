@@ -2,8 +2,7 @@ local M = {}
 
 local skins_data = nil
 
--- Load and decode the skins JSON configuration
-function M.load()
+local function load()
 	local json_str = sys.load_resource("/first_anim/skins.json")
 	if not json_str then
 		error("Failed to load /first_anim/skins.json. Ensure it is listed in game.project's custom_resources.")
@@ -11,54 +10,53 @@ function M.load()
 	skins_data = json.decode(json_str)
 end
 
--- Get a sorted list of attachment IDs available for a specific slot
+local function ensure_loaded()
+	if not skins_data then load() end
+end
+
+-- Sorted list of attachment IDs for a slot.
 function M.get_attachments_for_slot(slot_name)
-	if not skins_data then
-		M.load()
-	end
+	ensure_loaded()
 	local slot = skins_data.slots[slot_name]
-	if not slot then
-		return {}
-	end
-	
+	if not slot then return {} end
 	local list = {}
-	for attachment_id, _ in pairs(slot.attachments) do
+	for attachment_id in pairs(slot.attachments) do
 		table.insert(list, attachment_id)
 	end
-	table.sort(list) -- Ensure a consistent order for switching
+	table.sort(list)
 	return list
 end
 
--- Apply a single attachment to its slot on a given character prefix
-function M.apply_attachment(character_prefix, slot_name, attachment_id)
-	if not skins_data then
-		M.load()
-	end
+-- Returns the weapon "type" string for an attachment (e.g. "impact", "pistol").
+-- Returns nil for non-weapon attachments.
+function M.get_weapon_type(attachment_id)
+	ensure_loaded()
+	local slot = skins_data.slots["weapon"]
+	if not slot then return nil end
+	local att = slot.attachments[attachment_id]
+	return att and att.type or nil
+end
 
+-- Apply a single attachment to a character.
+function M.apply_attachment(character_prefix, slot_name, attachment_id)
+	ensure_loaded()
 	local slot = skins_data.slots[slot_name]
 	if not slot then
 		print("Warning: Slot not found: " .. tostring(slot_name))
 		return
 	end
-
 	local attachment = slot.attachments[attachment_id]
 	if not attachment then
 		print("Warning: Attachment not found: " .. tostring(attachment_id) .. " in slot " .. tostring(slot_name))
 		return
 	end
-
 	local sprite_url = msg.url(nil, "/" .. character_prefix .. "/" .. slot.node, slot.component)
-	
-	-- Play the sprite animation/flipbook
 	sprite.play_flipbook(sprite_url, attachment.animation)
 end
 
--- Apply all default attachments for all slots to a given character prefix
+-- Apply all default attachments to a character.
 function M.apply_defaults(character_prefix)
-	if not skins_data then
-		M.load()
-	end
-
+	ensure_loaded()
 	for slot_name, slot in pairs(skins_data.slots) do
 		if slot.default then
 			M.apply_attachment(character_prefix, slot_name, slot.default)

@@ -25,6 +25,23 @@
           "animation": "head_gasmask"
         }
       }
+    },
+    "weapon": {
+      "node": "weapon",
+      "component": "sprite",
+      "default": "impact_bat",
+      "attachments": {
+        "impact_bat":       { "animation": "impact_bat",       "type": "impact" },
+        "impact_tire_iron": { "animation": "impact_tire_iron",  "type": "impact" },
+        "stabbing_common":  { "animation": "stabbing_common",   "type": "stabbing" },
+        "stabbing_black":   { "animation": "stabbing_black",    "type": "stabbing" },
+        "pistol_deagle":    { "animation": "pistol_deagle",     "type": "pistol" },
+        "pistol_pm":        { "animation": "pistol_pm",         "type": "pistol" },
+        "rifle_ak":         { "animation": "rifle_ak",          "type": "rifle" },
+        "rifle_m4":         { "animation": "rifle_m4",          "type": "rifle" },
+        "shotgun_long":     { "animation": "shotgun_long",      "type": "shotgun" },
+        "shotgun_short":    { "animation": "shotgun_short",     "type": "shotgun" }
+      }
     }
   }
 }

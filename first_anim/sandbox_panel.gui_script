@@ -66,24 +66,29 @@ function init(self)
 	-- SKIN SYSTEM INITIALIZATION
 	self.slot_attachments = {
 		head = skins.get_attachments_for_slot("head"),
-		body = skins.get_attachments_for_slot("body")
+		body = skins.get_attachments_for_slot("body"),
+		weapon = skins.get_attachments_for_slot("weapon"),
 	}
 
 	self.slot_labels = {
 		head = gui.get_node("head_lbl"),
-		body = gui.get_node("body_lbl")
+		body = gui.get_node("body_lbl"),
+		weapon = gui.get_node("weapon_lbl"),
 	}
 
 	self.skin_buttons = {
-		head_left = { node = gui.get_node("head_left"), slot = "head", dir = -1 },
-		head_right = { node = gui.get_node("head_right"), slot = "head", dir = 1 },
-		body_left = { node = gui.get_node("body_left"), slot = "body", dir = -1 },
-		body_right = { node = gui.get_node("body_right"), slot = "body", dir = 1 },
+		head_left   = { node = gui.get_node("head_left"),   slot = "head",   dir = -1 },
+		head_right  = { node = gui.get_node("head_right"),  slot = "head",   dir = 1  },
+		body_left   = { node = gui.get_node("body_left"),   slot = "body",   dir = -1 },
+		body_right  = { node = gui.get_node("body_right"),  slot = "body",   dir = 1  },
+		weapon_left  = { node = gui.get_node("weapon_left"),  slot = "weapon", dir = -1 },
+		weapon_right = { node = gui.get_node("weapon_right"), slot = "weapon", dir = 1  },
 	}
 
 	self.current_indices = {
 		head = 1,
-		body = 1
+		body = 1,
+		weapon = 1,
 	}
 
 	-- Find index of defaults
@@ -93,10 +98,14 @@ function init(self)
 	for i, attachment_id in ipairs(self.slot_attachments.body) do
 		if attachment_id == "body_default" then self.current_indices.body = i end
 	end
+	for i, attachment_id in ipairs(self.slot_attachments.weapon) do
+		if attachment_id == "impact_bat" then self.current_indices.weapon = i end
+	end
 
 	-- Update labels with active values
-	gui.set_text(self.slot_labels.head, "HEAD: " .. self.slot_attachments.head[self.current_indices.head])
-	gui.set_text(self.slot_labels.body, "BODY: " .. self.slot_attachments.body[self.current_indices.body])
+	gui.set_text(self.slot_labels.head,   "HEAD: "   .. self.slot_attachments.head[self.current_indices.head])
+	gui.set_text(self.slot_labels.body,   "BODY: "   .. self.slot_attachments.body[self.current_indices.body])
+	gui.set_text(self.slot_labels.weapon, "WEAPON: " .. self.slot_attachments.weapon[self.current_indices.weapon])
 end
 
 function on_input(self, action_id, action)

@@ -290,56 +290,6 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 55.0
-  }
-  scale {
-    x: 0.48
-    y: 0.48
-  }
-  size {
-    x: 420.0
-    y: 40.0
-  }
-  color {
-    x: 0.7
-    y: 0.7
-    z: 0.7
-  }
-  type: TYPE_TEXT
-  text: "* ATTACK: ONLY FROM IDLE"
-  font: "troika"
-  id: "lbl_info_attack"
-  inherit_alpha: true
-  shadow_alpha: 0.0
-}
-nodes {
-  position {
-    x: 1680.0
-    y: 15.0
-  }
-  scale {
-    x: 0.48
-    y: 0.48
-  }
-  size {
-    x: 420.0
-    y: 40.0
-  }
-  color {
-    x: 0.7
-    y: 0.7
-    z: 0.7
-  }
-  type: TYPE_TEXT
-  text: "* DAMAGE: DETACHED OVERLAY"
-  font: "troika"
-  id: "lbl_info_damage"
-  inherit_alpha: true
-  shadow_alpha: 0.0
-}
-nodes {
-  position {
-    x: 1680.0
     y: 310.0
   }
   scale {
@@ -587,6 +537,120 @@ nodes {
   text: ">"
   font: "troika"
   id: "body_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 30.0
+  }
+  size {
+    x: 380.0
+    y: 60.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "weapon_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 30.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 260.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "WEAPON: impact_bat"
+  font: "troika"
+  id: "weapon_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 30.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "weapon_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 30.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "weapon_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 30.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "weapon_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 30.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "weapon_right_lbl"
   inherit_alpha: true
   shadow_alpha: 0.0
 }

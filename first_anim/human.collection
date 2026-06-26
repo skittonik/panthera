@@ -40,8 +40,8 @@ instances {
   }
 }
 instances {
-  id: "baseball_bat"
-  prototype: "/first_anim/baseball_bat.go"
+  id: "weapon"
+  prototype: "/first_anim/weapon.go"
   position {
     x: -15.0
     y: 129.0
@@ -57,7 +57,7 @@ embedded_instances {
 }
 embedded_instances {
   id: "hit"
-  children: "baseball_bat"
+  children: "weapon"
   children: "body"
   children: "head_pivot"
   children: "left_leg"

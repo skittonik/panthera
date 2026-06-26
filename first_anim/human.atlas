@@ -15,9 +15,6 @@ images {
   pivot_y: 0.45
 }
 images {
-  image: "/first_anim/assets/baseball_bat.png"
-}
-images {
   image: "/first_anim/assets/left_leg.png"
 }
 images {

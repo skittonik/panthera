@@ -21,6 +21,7 @@ function init(self)
 	self.base_anim = "default"
 	self.base_loop = true
 	self.is_playing_action = false
+	self.weapon_type = "impact"
 
 	panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
 end
@@ -28,6 +29,10 @@ end
 function on_message(self, message_id, message)
 	if message_id == hash("apply_skin_attachment") then
 		skins.apply_attachment("human", message.slot, message.attachment_id)
+		if message.slot == "weapon" then
+			local wtype = skins.get_weapon_type(message.attachment_id)
+			if wtype then self.weapon_type = wtype end
+		end
 		return
 	end
 
@@ -49,7 +54,7 @@ function on_message(self, message_id, message)
 			return
 		end
 		self.is_playing_action = true
-		panthera.play(self.anim, "attack", {
+		panthera.play(self.anim, "attack_" .. self.weapon_type, {
 			is_loop = false,
 			callback = function()
 				-- Hold is_playing_action=true through the crossfade window

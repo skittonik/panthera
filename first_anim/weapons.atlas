@@ -1,0 +1,31 @@
+images {
+  image: "/first_anim/assets/impact_bat.png"
+}
+images {
+  image: "/first_anim/assets/impact_tire_iron.png"
+}
+images {
+  image: "/first_anim/assets/stabbing_common.png"
+}
+images {
+  image: "/first_anim/assets/stabbing_black.png"
+}
+images {
+  image: "/first_anim/assets/pistol_deagle.png"
+}
+images {
+  image: "/first_anim/assets/pistol_pm.png"
+}
+images {
+  image: "/first_anim/assets/rifle_ak.png"
+}
+images {
+  image: "/first_anim/assets/rifle_m4.png"
+}
+images {
+  image: "/first_anim/assets/shotgun_long.png"
+}
+images {
+  image: "/first_anim/assets/shotgun_short.png"
+}
+extrude_borders: 2
