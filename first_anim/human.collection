@@ -45,8 +45,8 @@ instances {
   children: "hand_left"
   children: "hand_right"
   position {
-    x: -15.0
-    y: 129.0
+    x: -50.0
+    y: 174.0
     z: 0.02
   }
 }
