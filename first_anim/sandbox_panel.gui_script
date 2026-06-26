@@ -1,0 +1,44 @@
+local CONTROLLER = "/controller#sandbox"
+
+local function play(anim, loop)
+	msg.post(CONTROLLER, "play_anim", { anim = anim, loop = loop })
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	self.loop = false
+	self.buttons = {
+		{ node = gui.get_node("btn_default"), anim = "default" },
+		{ node = gui.get_node("btn_walk"),   anim = "walk" },
+		{ node = gui.get_node("btn_attack"), anim = "attack" },
+		{ node = gui.get_node("btn_damage"), anim = "damage" },
+		{ node = gui.get_node("btn_death"),  anim = "death" },
+	}
+	self.chk_box = gui.get_node("chk_box")
+	self.chk_mark = gui.get_node("chk_mark")
+	gui.set_enabled(self.chk_mark, self.loop)
+end
+
+function on_input(self, action_id, action)
+	if action_id ~= hash("touch") or not action.pressed then
+		return
+	end
+
+	for i = 1, #self.buttons do
+		local button = self.buttons[i]
+		if gui.pick_node(button.node, action.x, action.y) then
+			-- Quick press flash: dim, then fade back
+			gui.animate(button.node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
+				gui.animate(button.node, "color.w", 1.0, gui.EASING_OUTQUAD, 0.15)
+			end)
+			play(button.anim, self.loop)
+			return
+		end
+	end
+
+	if gui.pick_node(self.chk_box, action.x, action.y) then
+		self.loop = not self.loop
+		gui.set_enabled(self.chk_mark, self.loop)
+	end
+end

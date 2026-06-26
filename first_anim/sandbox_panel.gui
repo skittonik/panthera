@@ -1,0 +1,297 @@
+script: "/first_anim/sandbox_panel.gui_script"
+fonts {
+  name: "troika"
+  font: "/example/assets/troika.font"
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 540.0
+  }
+  size {
+    x: 460.0
+    y: 1010.0
+  }
+  color {
+    x: 0.13
+    y: 0.14
+    z: 0.17
+  }
+  type: TYPE_BOX
+  id: "panel_bg"
+  inherit_alpha: true
+  alpha: 0.96
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 1000.0
+  }
+  scale {
+    x: 0.9
+    y: 0.9
+  }
+  size {
+    x: 420.0
+    y: 60.0
+  }
+  color {
+    x: 0.85
+    y: 0.9
+  }
+  type: TYPE_TEXT
+  text: "ANIMATIONS"
+  font: "troika"
+  id: "title"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 860.0
+  }
+  size {
+    x: 380.0
+    y: 96.0
+  }
+  color {
+    x: 0.22
+    y: 0.45
+    z: 0.85
+  }
+  type: TYPE_BOX
+  id: "btn_default"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 740.0
+  }
+  size {
+    x: 380.0
+    y: 96.0
+  }
+  color {
+    x: 0.22
+    y: 0.45
+    z: 0.85
+  }
+  type: TYPE_BOX
+  id: "btn_walk"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 620.0
+  }
+  size {
+    x: 380.0
+    y: 96.0
+  }
+  color {
+    x: 0.85
+    y: 0.55
+    z: 0.2
+  }
+  type: TYPE_BOX
+  id: "btn_attack"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 500.0
+  }
+  size {
+    x: 380.0
+    y: 96.0
+  }
+  color {
+    x: 0.8
+    y: 0.3
+    z: 0.3
+  }
+  type: TYPE_BOX
+  id: "btn_damage"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 380.0
+  }
+  size {
+    x: 380.0
+    y: 96.0
+  }
+  color {
+    x: 0.45
+    y: 0.2
+    z: 0.55
+  }
+  type: TYPE_BOX
+  id: "btn_death"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 860.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "IDLE"
+  font: "troika"
+  id: "lbl_default"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 740.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "WALK"
+  font: "troika"
+  id: "lbl_walk"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 620.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "ATTACK"
+  font: "troika"
+  id: "lbl_attack"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 500.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "DAMAGE"
+  font: "troika"
+  id: "lbl_damage"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 380.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "DEATH"
+  font: "troika"
+  id: "lbl_death"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1525.0
+    y: 250.0
+  }
+  size {
+    x: 56.0
+    y: 56.0
+  }
+  color {
+    x: 0.22
+    y: 0.24
+    z: 0.28
+  }
+  type: TYPE_BOX
+  id: "chk_box"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1525.0
+    y: 250.0
+  }
+  size {
+    x: 32.0
+    y: 32.0
+  }
+  color {
+    x: 0.35
+    y: 0.82
+    z: 0.45
+  }
+  type: TYPE_BOX
+  id: "chk_mark"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1660.0
+    y: 250.0
+  }
+  scale {
+    x: 0.8
+    y: 0.8
+  }
+  size {
+    x: 240.0
+    y: 60.0
+  }
+  type: TYPE_TEXT
+  text: "LOOP"
+  font: "troika"
+  id: "chk_label"
+  pivot: PIVOT_W
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

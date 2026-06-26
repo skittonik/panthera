@@ -1,0 +1,25 @@
+local panthera = require("panthera.panthera")
+local animation = require("first_anim.first_anim_panthera")
+
+-- One-shot clips: never loop, no matter what the Loop toggle says.
+-- They are authored to look good when replayed rapidly.
+local NO_LOOP = {
+	attack = true,
+	damage = true,
+}
+
+function init(self)
+	-- Keep aspect ratio on window resize
+	msg.post("@render:", "use_fixed_fit_projection")
+
+	-- Drive the "human" collection instance with Panthera
+	self.anim = panthera.create_go(animation, "human")
+	panthera.play(self.anim, "default", { is_loop = true })
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("play_anim") then
+		local loop = message.loop and not NO_LOOP[message.anim]
+		panthera.play(self.anim, message.anim, { is_loop = loop })
+	end
+end
