@@ -377,6 +377,18 @@ end
 function M.play_detached(animation_state, animation_id, options)
 	options = options or EMPTY_OPTIONS
 
+	-- If the same animation is already playing as a detached child, stop it first
+	-- to prevent tween conflicts and freezing when the older one finishes.
+	if animation_state.childs then
+		for i = #animation_state.childs, 1, -1 do
+			local child = animation_state.childs[i]
+			if child.animation_id == animation_id then
+				M.stop(child)
+				panthera_internal.remove_child_animation(animation_state, child)
+			end
+		end
+	end
+
 	local child_state = M.clone_state(animation_state)
 	if not child_state then
 		return
