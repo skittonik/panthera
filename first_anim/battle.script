@@ -2,6 +2,9 @@ local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
 
 function init(self)
+	-- Use fixed fit projection to maintain aspect ratio on window resize
+	msg.post("@render:", "use_fixed_fit_projection")
+
 	-- Create independent animation states for player and enemy
 	self.player_anim = panthera.create_go(animation, "player")
 	self.enemy_anim = panthera.create_go(animation, "enemy")

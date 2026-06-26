@@ -6,8 +6,9 @@ render = /example/default.renderc
 shared_state = 1
 
 [display]
-width = 960
-height = 640
+width = 1920
+height = 1080
+high_dpi = 1
 
 [android]
 input_method = HiddenInputField
@@ -38,4 +39,10 @@ show_fullscreen_button = 0
 show_made_with_defold = 0
 show_console_banner = 0
 scale_mode = stretch
+
+[render]
+clear_color_red = 0.85098
+clear_color_green = 0.85098
+clear_color_blue = 0.85098
+clear_color_alpha = 1.0
 

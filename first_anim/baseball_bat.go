@@ -1,7 +1,7 @@
 embedded_components {
   id: "sprite"
   type: "sprite"
-  data: "default_animation: \"melee_weapon\"\n"
+  data: "default_animation: \"baseball_bat\"\n"
   "material: \"/panthera/materials/sprite.material\"\n"
   "textures {\n"
   "  sampler: \"texture_sampler\"\n"
@@ -9,8 +9,8 @@ embedded_components {
   "}\n"
   ""
   position {
-    x: 0.0
-    y: 109.0
+    x: 117.5
+    y: 149.0
     z: 0.0
   }
 }

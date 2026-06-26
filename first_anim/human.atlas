@@ -5,6 +5,15 @@ images {
   image: "/first_anim/assets/head.png"
 }
 images {
-  image: "/first_anim/assets/melee_weapon.png"
+  image: "/first_anim/assets/baseball_bat.png"
+}
+images {
+  image: "/first_anim/assets/left_leg.png"
+}
+images {
+  image: "/first_anim/assets/right_leg.png"
+}
+images {
+  image: "/first_anim/assets/shadow.png"
 }
 extrude_borders: 2
