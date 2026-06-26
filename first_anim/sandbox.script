@@ -34,17 +34,21 @@ function on_message(self, message_id, message)
 		end
 
 		-- "attack" is a ONE-SHOT ACTION: it interrupts the base animation,
-		-- but automatically returns to the base state (walk or default) when finished.
+		-- but it is only allowed to start from the IDLE ("default") state.
 		if message.anim == "attack" then
-			self.is_playing_action = true
-			panthera.play(self.anim, "attack", {
-				is_loop = false,
-				callback = function()
-					self.is_playing_action = false
-					-- Return to whatever base state was chosen
-					panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
-				end
-			})
+			if self.base_anim == "default" then
+				self.is_playing_action = true
+				panthera.play(self.anim, "attack", {
+					is_loop = false,
+					callback = function()
+						self.is_playing_action = false
+						-- Return to the base state (which will be "default")
+						panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
+					end
+				})
+			else
+				print("Attack is ignored because the character is not in IDLE state.")
+			end
 			return
 		end
 

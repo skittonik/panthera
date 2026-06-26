@@ -25,7 +25,7 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 1000.0
+    y: 990.0
   }
   scale {
     x: 0.9
@@ -38,6 +38,7 @@ nodes {
   color {
     x: 0.85
     y: 0.9
+    z: 1.0
   }
   type: TYPE_TEXT
   text: "ANIMATIONS"
@@ -49,11 +50,36 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 860.0
+    y: 920.0
+  }
+  scale {
+    x: 0.6
+    y: 0.6
   }
   size {
     x: 380.0
-    y: 96.0
+    y: 40.0
+  }
+  color {
+    x: 0.5
+    y: 0.6
+    z: 0.7
+  }
+  type: TYPE_TEXT
+  text: "BASE STATES"
+  font: "troika"
+  id: "sub_states"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 840.0
+  }
+  size {
+    x: 380.0
+    y: 84.0
   }
   color {
     x: 0.22
@@ -71,7 +97,7 @@ nodes {
   }
   size {
     x: 380.0
-    y: 96.0
+    y: 84.0
   }
   color {
     x: 0.22
@@ -85,47 +111,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 620.0
+    y: 640.0
   }
   size {
     x: 380.0
-    y: 96.0
-  }
-  color {
-    x: 0.85
-    y: 0.55
-    z: 0.2
-  }
-  type: TYPE_BOX
-  id: "btn_attack"
-  inherit_alpha: true
-}
-nodes {
-  position {
-    x: 1680.0
-    y: 500.0
-  }
-  size {
-    x: 380.0
-    y: 96.0
-  }
-  color {
-    x: 0.8
-    y: 0.3
-    z: 0.3
-  }
-  type: TYPE_BOX
-  id: "btn_damage"
-  inherit_alpha: true
-}
-nodes {
-  position {
-    x: 1680.0
-    y: 380.0
-  }
-  size {
-    x: 380.0
-    y: 96.0
+    y: 84.0
   }
   color {
     x: 0.45
@@ -139,11 +129,72 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 860.0
+    y: 550.0
   }
   scale {
+    x: 0.6
+    y: 0.6
+  }
+  size {
+    x: 380.0
+    y: 40.0
+  }
+  color {
+    x: 0.7
+    y: 0.55
+    z: 0.4
+  }
+  type: TYPE_TEXT
+  text: "OVERLAY ACTIONS"
+  font: "troika"
+  id: "sub_actions"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 470.0
+  }
+  size {
+    x: 380.0
+    y: 84.0
+  }
+  color {
     x: 0.85
-    y: 0.85
+    y: 0.55
+    z: 0.2
+  }
+  type: TYPE_BOX
+  id: "btn_attack"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 370.0
+  }
+  size {
+    x: 380.0
+    y: 84.0
+  }
+  color {
+    x: 0.8
+    y: 0.3
+    z: 0.3
+  }
+  type: TYPE_BOX
+  id: "btn_damage"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 840.0
+  }
+  scale {
+    x: 0.8
+    y: 0.8
   }
   size {
     x: 360.0
@@ -162,8 +213,8 @@ nodes {
     y: 740.0
   }
   scale {
-    x: 0.85
-    y: 0.85
+    x: 0.8
+    y: 0.8
   }
   size {
     x: 360.0
@@ -179,11 +230,31 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 620.0
+    y: 640.0
   }
   scale {
-    x: 0.85
-    y: 0.85
+    x: 0.8
+    y: 0.8
+  }
+  size {
+    x: 360.0
+    y: 70.0
+  }
+  type: TYPE_TEXT
+  text: "DEATH"
+  font: "troika"
+  id: "lbl_death"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 470.0
+  }
+  scale {
+    x: 0.8
+    y: 0.8
   }
   size {
     x: 360.0
@@ -199,11 +270,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 500.0
+    y: 370.0
   }
   scale {
-    x: 0.85
-    y: 0.85
+    x: 0.8
+    y: 0.8
   }
   size {
     x: 360.0
@@ -218,28 +289,8 @@ nodes {
 }
 nodes {
   position {
-    x: 1680.0
-    y: 380.0
-  }
-  scale {
-    x: 0.85
-    y: 0.85
-  }
-  size {
-    x: 360.0
-    y: 70.0
-  }
-  type: TYPE_TEXT
-  text: "DEATH"
-  font: "troika"
-  id: "lbl_death"
-  inherit_alpha: true
-  shadow_alpha: 0.0
-}
-nodes {
-  position {
     x: 1525.0
-    y: 250.0
+    y: 270.0
   }
   size {
     x: 56.0
@@ -257,7 +308,7 @@ nodes {
 nodes {
   position {
     x: 1525.0
-    y: 250.0
+    y: 270.0
   }
   size {
     x: 32.0
@@ -274,22 +325,72 @@ nodes {
 }
 nodes {
   position {
-    x: 1660.0
-    y: 250.0
+    x: 1600.0
+    y: 270.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
     x: 240.0
     y: 60.0
   }
   type: TYPE_TEXT
-  text: "LOOP"
+  text: "LOOP STATES"
   font: "troika"
   id: "chk_label"
   pivot: PIVOT_W
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 170.0
+  }
+  scale {
+    x: 0.48
+    y: 0.48
+  }
+  size {
+    x: 420.0
+    y: 40.0
+  }
+  color {
+    x: 0.7
+    y: 0.7
+    z: 0.7
+  }
+  type: TYPE_TEXT
+  text: "* ATTACK: ONLY FROM IDLE"
+  font: "troika"
+  id: "lbl_info_attack"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 120.0
+  }
+  scale {
+    x: 0.48
+    y: 0.48
+  }
+  size {
+    x: 420.0
+    y: 40.0
+  }
+  color {
+    x: 0.7
+    y: 0.7
+    z: 0.7
+  }
+  type: TYPE_TEXT
+  text: "* DAMAGE: DETACHED OVERLAY"
+  font: "troika"
+  id: "lbl_info_damage"
   inherit_alpha: true
   shadow_alpha: 0.0
 }
