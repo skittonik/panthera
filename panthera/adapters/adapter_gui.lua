@@ -377,10 +377,41 @@ local function tween_animation_key(node, property_id, easing, duration, end_valu
 end
 
 
+---@param node node
+---@param property_id string
+---@return any
+local function get_node_property(node, property_id)
+	local trigger_info = TRIGGER_DEFOLD_SET_GET[property_id]
+	if trigger_info then
+		return nil
+	end
+
+	-- Handle Tween properties
+	if IS_DEFOLD_180 then
+		local defold_number_property_id = PROPERTY_TO_DEFOLD_TWEEN_PROPERTY[property_id]
+		return gui_get(node, defold_number_property_id)
+	else
+		local tween_info = TWEEN_DEFOLD_SET_GET[property_id]
+		if not tween_info then
+			return nil
+		end
+
+		local field, getter = tween_info[2], tween_info[3]
+		if field then
+			local vector_value = getter(node)
+			return vector_value[field]
+		else
+			return getter(node)
+		end
+	end
+end
+
+
 local M = {
 	get_easing = get_easing,
 	stop_tween = stop_tween,
 	set_node_property = set_node_property,
+	get_node_property = get_node_property,
 	tween_animation_key = tween_animation_key,
 	trigger_animation_key = trigger_animation_key,
 	create_get_node_function = create_get_node_function,

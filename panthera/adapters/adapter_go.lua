@@ -218,9 +218,28 @@ local function tween_animation_key(node, property_id, easing, duration, end_valu
 end
 
 
+---@param node node
+---@param property_id string
+---@return any
+local function get_node_property(node, property_id)
+	local trigger_info = PROPERTY_TO_TRIGGER_PROPERTY[property_id]
+	if trigger_info then
+		return nil
+	end
+
+	local defold_property_id = PROPERTY_TO_TWEEN_PROPERTY[property_id]
+	if not defold_property_id then
+		return nil
+	end
+
+	return go.get(node, defold_property_id)
+end
+
+
 local M = {
 	get_easing = get_easing,
 	set_node_property = set_node_property,
+	get_node_property = get_node_property,
 	tween_animation_key = tween_animation_key,
 	stop_tween = stop_tween,
 	trigger_animation_key = trigger_animation_key,

@@ -1,0 +1,30 @@
+{
+  "slots": {
+    "body": {
+      "node": "body",
+      "component": "sprite",
+      "default": "body_default",
+      "attachments": {
+        "body_default": {
+          "animation": "body"
+        },
+        "body_armor": {
+          "animation": "body_armor"
+        }
+      }
+    },
+    "head": {
+      "node": "head",
+      "component": "sprite",
+      "default": "head_default",
+      "attachments": {
+        "head_default": {
+          "animation": "head"
+        },
+        "head_gasmask": {
+          "animation": "head_gasmask"
+        }
+      }
+    }
+  }
+}

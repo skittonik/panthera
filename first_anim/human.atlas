@@ -5,6 +5,12 @@ images {
   image: "/first_anim/assets/head.png"
 }
 images {
+  image: "/first_anim/assets/body_armor.png"
+}
+images {
+  image: "/first_anim/assets/head_gasmask.png"
+}
+images {
   image: "/first_anim/assets/baseball_bat.png"
 }
 images {

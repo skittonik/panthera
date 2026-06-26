@@ -1,5 +1,6 @@
 local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
+local skins = require("first_anim.skins")
 
 -- Rest pose values for the parts the walk moves, used to settle out of the walk
 local WALK_REST = {
@@ -34,6 +35,10 @@ function init(self)
 	-- Create independent animation states for player and enemy
 	self.player_anim = panthera.create_go(animation, "player")
 	self.enemy_anim = panthera.create_go(animation, "enemy")
+
+	-- Apply default skin attachments
+	skins.apply_defaults("player")
+	skins.apply_defaults("enemy")
 
 	-- Initial states: both idle
 	panthera.play(self.player_anim, "default", { is_loop = true })

@@ -1,5 +1,6 @@
 local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
+local skins = require("first_anim.skins")
 
 -- One-shot clips: never loop, no matter what the Loop toggle says.
 -- They are authored to look good when replayed rapidly.
@@ -13,6 +14,9 @@ function init(self)
 
 	-- Drive the "human" collection instance with Panthera
 	self.anim = panthera.create_go(animation, "human")
+
+	-- Apply default skin attachments
+	skins.apply_defaults("human")
 	
 	-- State machine tracking
 	self.base_anim = "default"
@@ -23,6 +27,11 @@ function init(self)
 end
 
 function on_message(self, message_id, message)
+	if message_id == hash("apply_skin_attachment") then
+		skins.apply_attachment("human", message.slot, message.attachment_id)
+		return
+	end
+
 	if message_id == hash("play_anim") then
 		-- "damage" is an OVERLAY: it only drives the "hit" / "head_pivot" layer
 		-- nodes, which no base clip touches, so we play it detached on top of

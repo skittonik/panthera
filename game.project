@@ -18,6 +18,7 @@ title = Panthera Runtime
 version = 5.0
 publisher = Insality
 developer = Maksim Tuprikov
+custom_resources = /first_anim/skins.json
 dependencies#0 = https://github.com/Insality/defold-log/archive/refs/heads/develop.zip
 dependencies#1 = https://github.com/Insality/defold-tweener/archive/refs/tags/5.zip
 dependencies#2 = https://github.com/Insality/druid/archive/refs/heads/develop.zip

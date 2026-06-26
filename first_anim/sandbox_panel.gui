@@ -10,7 +10,7 @@ nodes {
   }
   size {
     x: 460.0
-    y: 1010.0
+    y: 1060.0
   }
   color {
     x: 0.13
@@ -290,7 +290,7 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 240.0
+    y: 55.0
   }
   scale {
     x: 0.48
@@ -315,7 +315,7 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 190.0
+    y: 15.0
   }
   scale {
     x: 0.48
@@ -334,6 +334,259 @@ nodes {
   text: "* DAMAGE: DETACHED OVERLAY"
   font: "troika"
   id: "lbl_info_damage"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 310.0
+  }
+  scale {
+    x: 0.6
+    y: 0.6
+  }
+  size {
+    x: 380.0
+    y: 40.0
+  }
+  color {
+    x: 0.5
+    y: 0.7
+    z: 0.6
+  }
+  type: TYPE_TEXT
+  text: "SKINS"
+  font: "troika"
+  id: "sub_skins"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 230.0
+  }
+  size {
+    x: 380.0
+    y: 60.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "head_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 230.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 260.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "HEAD: default_head"
+  font: "troika"
+  id: "head_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 230.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "head_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 230.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "head_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 230.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "head_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 230.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "head_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 130.0
+  }
+  size {
+    x: 380.0
+    y: 60.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "body_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1680.0
+    y: 130.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 260.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "BODY: default_body"
+  font: "troika"
+  id: "body_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 130.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "body_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1520.0
+    y: 130.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "body_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 130.0
+  }
+  size {
+    x: 50.0
+    y: 60.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "body_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1840.0
+    y: 130.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 50.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "body_right_lbl"
   inherit_alpha: true
   shadow_alpha: 0.0
 }

@@ -133,6 +133,7 @@ function M.play(animation_state, animation_id, options)
 	end
 
 	animation_state.animation_id = animation.animation_id
+	animation_state.target_animation_id = nil
 	animation_state.animation_keys_index = 1
 	animation_state.events = nil
 
@@ -208,6 +209,7 @@ function M.play_tweener(animation_state, animation_id, options)
 
 	local easing = options.easing or tweener.linear
 	animation_state.events = nil
+	animation_state.target_animation_id = nil
 
 	local total_duration = animation.duration / (options.speed or 1)
 	local from = options.from or 0
@@ -235,6 +237,7 @@ function M.play_tweener(animation_state, animation_id, options)
 
 			animation_state.current_time = time
 			animation_state.animation_id = animation.animation_id
+			animation_state.target_animation_id = nil
 			animation_state.animation_keys_index = 1
 
 			panthera_internal.set_animation_state_at_time(animation_state, animation.animation_id, time, options.callback_event)
@@ -352,6 +355,7 @@ function M.update_animation(animation, animation_state, options)
 	-- If current time >= animation duration - stop animation
 	if animation_state.current_time >= animation.duration then
 		local time_overflow = animation_state.current_time - animation.duration
+		panthera_internal.set_animation_state_at_time(animation_state, animation.animation_id, animation.duration)
 		M.stop(animation_state)
 
 		if options.callback then
@@ -377,16 +381,32 @@ end
 function M.play_detached(animation_state, animation_id, options)
 	options = options or EMPTY_OPTIONS
 
-	-- If the same animation is already playing as a detached child, stop it first
-	-- to prevent tween conflicts and freezing when the older one finishes.
+	local existing_child = nil
 	if animation_state.childs then
 		for i = #animation_state.childs, 1, -1 do
 			local child = animation_state.childs[i]
-			if child.animation_id == animation_id then
-				M.stop(child)
-				panthera_internal.remove_child_animation(animation_state, child)
+			if child.animation_id == animation_id or child.target_animation_id == animation_id then
+				existing_child = child
+				break
 			end
 		end
+	end
+
+	if existing_child then
+		local crossfade_duration = options.crossfade_duration or 0.1
+		M.crossfade(existing_child, animation_id, crossfade_duration, {
+			is_skip_init = options.is_skip_init,
+			speed = options.speed,
+			is_loop = options.is_loop,
+			callback = function(...)
+				if options.callback then
+					options.callback(...)
+				end
+				panthera_internal.reset_animation_state(existing_child, animation_id)
+				panthera_internal.remove_child_animation(animation_state, existing_child)
+			end
+		})
+		return
 	end
 
 	local child_state = M.clone_state(animation_state)
@@ -405,6 +425,7 @@ function M.play_detached(animation_state, animation_id, options)
 			if options.callback then
 				options.callback(...)
 			end
+			panthera_internal.reset_animation_state(child_state, animation_id)
 			panthera_internal.remove_child_animation(animation_state, child_state)
 		end
 	})
@@ -472,7 +493,7 @@ end
 ---Stop a currently playing animation. The animation will be stopped at current time.
 ---@param animation_state panthera.animation The animation state object to stop
 ---@return boolean is_stopped True if animation was stopped, false if animation is not playing
-function M.stop(animation_state)
+function M.stop(animation_state, is_skip_reset)
 	if not animation_state then
 		panthera_internal.logger:warn("Can't stop animation, animation_state is nil")
 		return false
@@ -483,7 +504,7 @@ function M.stop(animation_state)
 		animation_state.timer_id = nil
 	end
 
-	local previous_animation_id = animation_state.animation_id
+	local previous_animation_id = animation_state.animation_id or animation_state.target_animation_id
 	animation_state.previous_animation_id = previous_animation_id
 
 	-- Stop all tweens started by animation
@@ -492,12 +513,20 @@ function M.stop(animation_state)
 	end
 
 	animation_state.animation_id = nil
+	animation_state.target_animation_id = nil
 	animation_state.current_time = 0
 	animation_state.animation_keys_index = 1
 
 	if animation_state.childs then
 		for index = 1, #animation_state.childs do
-			M.stop(animation_state.childs[index])
+			local child = animation_state.childs[index]
+			M.stop(child, is_skip_reset)
+			if not is_skip_reset and child.previous_animation_id then
+				panthera_internal.reset_animation_state(child, child.previous_animation_id)
+			end
+		end
+		if not is_skip_reset then
+			animation_state.childs = nil
 		end
 	end
 
@@ -579,6 +608,7 @@ end
 ---@return boolean result True if the crossfade was successfully initiated, false otherwise
 function M.crossfade(animation_state, target_anim_id, duration, play_options)
 	assert(animation_state, "Can't crossfade animation, animation_state is nil")
+	local adapter = animation_state.adapter
 	play_options = play_options or EMPTY_OPTIONS
 	duration = duration or 0.15
 
@@ -620,11 +650,90 @@ function M.crossfade(animation_state, target_anim_id, duration, play_options)
 		end
 	end
 
-	-- 2. Stop the currently running animation (leaves nodes in their current poses)
-	M.stop(animation_state)
+	animation_state.target_animation_id = target_anim_id
 
-	-- 3. Transition nodes to the start frame of the target animation using Defold's native easing
-	local adapter = animation_state.adapter
+	-- 2. Gather active properties from current animation and child animations.
+	-- If they are not in the target animation, we blend them to their resting values.
+	local active_properties = {}
+	local current_anim_id = animation_state.animation_id or animation_state.target_animation_id
+	if current_anim_id then
+		local current_group_keys = animation_data.group_animation_keys[current_anim_id]
+		if current_group_keys then
+			for node_id, node_keys in pairs(current_group_keys) do
+				for property_id, property_keys in pairs(node_keys) do
+					if #property_keys > 0 and property_keys[1].key_type == panthera_internal.KEY_TYPE.TWEEN then
+						local id = node_id .. "/" .. property_id
+						local start_val = nil
+						if adapter.get_node_property then
+							local node = panthera_internal.get_node(animation_state, node_id)
+							if node then
+								start_val = adapter.get_node_property(node, property_id)
+							end
+						end
+						if not start_val then
+							start_val = panthera_internal.get_node_value_at_time(animation_state, current_anim_id, node_id, property_id, -1)
+						end
+						active_properties[id] = {
+							node_id = node_id,
+							property_id = property_id,
+							resting_value = start_val
+						}
+					end
+				end
+			end
+		end
+	end
+
+	if animation_state.childs then
+		for c = 1, #animation_state.childs do
+			local child = animation_state.childs[c]
+			local child_anim_id = child.animation_id or child.target_animation_id
+			if child_anim_id then
+				local child_group_keys = animation_data.group_animation_keys[child_anim_id]
+				if child_group_keys then
+					for node_id, node_keys in pairs(child_group_keys) do
+						for property_id, property_keys in pairs(node_keys) do
+							if #property_keys > 0 and property_keys[1].key_type == panthera_internal.KEY_TYPE.TWEEN then
+								local id = node_id .. "/" .. property_id
+								local start_val = nil
+								if child.adapter and child.adapter.get_node_property then
+									local node = panthera_internal.get_node(child, node_id)
+									if node then
+										start_val = child.adapter.get_node_property(node, property_id)
+									end
+								end
+								if not start_val then
+									start_val = panthera_internal.get_node_value_at_time(child, child_anim_id, node_id, property_id, -1)
+								end
+								active_properties[id] = {
+									node_id = node_id,
+									property_id = property_id,
+									resting_value = start_val
+								}
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	for id, active in pairs(active_properties) do
+		if not targets[id] then
+			targets[id] = {
+				node_id = active.node_id,
+				property_id = active.property_id,
+				start_value = active.resting_value,
+				start_time = 0
+			}
+		end
+	end
+
+	-- 3. Stop the currently running animation (leaves nodes in their current poses, skip reset to prevent snaps)
+	M.stop(animation_state, true)
+
+	-- 4. Transition nodes to the start frame of the target animation using Defold's native easing
+	adapter = animation_state.adapter
 	local easing = adapter.get_easing("outquad") -- smooth transition easing
 	for _, target in pairs(targets) do
 		local node = panthera_internal.get_node(animation_state, target.node_id)
@@ -633,10 +742,15 @@ function M.crossfade(animation_state, target_anim_id, duration, play_options)
 		end
 	end
 
-	-- 4. Set the timer to start the actual animation once the crossfade finishes.
+	-- 5. Set the timer to start the actual animation once the crossfade finishes.
 	-- We use `is_skip_init = true` to prevent resetting properties back to default
 	-- which would cause snapping (we want to seamlessly play from the blended state).
-	local timer_id = timer.delay(duration, false, function()
+	animation_state.timer_id = timer.delay(duration, false, function()
+		animation_state.timer_id = nil
+		animation_state.target_animation_id = nil
+		-- Now that crossfade is done, we can safely clear the children
+		animation_state.childs = nil
+
 		local opts = {
 			is_loop = play_options.is_loop,
 			speed = play_options.speed,
