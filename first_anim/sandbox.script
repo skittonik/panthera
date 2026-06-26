@@ -13,7 +13,13 @@ function init(self)
 
 	-- Drive the "human" collection instance with Panthera
 	self.anim = panthera.create_go(animation, "human")
-	panthera.play(self.anim, "default", { is_loop = true })
+	
+	-- State machine tracking
+	self.base_anim = "default"
+	self.base_loop = true
+	self.is_playing_action = false
+
+	panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
 end
 
 function on_message(self, message_id, message)
@@ -27,7 +33,38 @@ function on_message(self, message_id, message)
 			return
 		end
 
+		-- "attack" is a ONE-SHOT ACTION: it interrupts the base animation,
+		-- but automatically returns to the base state (walk or default) when finished.
+		if message.anim == "attack" then
+			self.is_playing_action = true
+			panthera.play(self.anim, "attack", {
+				is_loop = false,
+				callback = function()
+					self.is_playing_action = false
+					-- Return to whatever base state was chosen
+					panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
+				end
+			})
+			return
+		end
+
+		-- "death" is a TERMINAL STATE: it permanently overrides action state
+		if message.anim == "death" then
+			self.base_anim = "death"
+			self.base_loop = message.loop
+			self.is_playing_action = false
+			panthera.play(self.anim, "death", { is_loop = message.loop })
+			return
+		end
+
+		-- Otherwise, we are changing the base state (default/walk)
 		local loop = message.loop and not NO_LOOP[message.anim]
-		panthera.play(self.anim, message.anim, { is_loop = loop })
+		self.base_anim = message.anim
+		self.base_loop = loop
+
+		-- Only update the current active animation if we aren't mid-attack
+		if not self.is_playing_action then
+			panthera.play(self.anim, message.anim, { is_loop = loop })
+		end
 	end
 end
