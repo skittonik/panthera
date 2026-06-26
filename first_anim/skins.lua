@@ -55,7 +55,8 @@ function M.apply_attachment(character_prefix, slot_name, attachment_id)
 	if slot.typed_nodes then
 		local active_node = attachment.node
 		for _, node_id in ipairs(slot.typed_nodes) do
-			go.set_enabled("/" .. character_prefix .. "/" .. node_id, node_id == active_node)
+			local url = "/" .. character_prefix .. "/" .. node_id
+			msg.post(url, node_id == active_node and "enable" or "disable")
 		end
 	end
 
