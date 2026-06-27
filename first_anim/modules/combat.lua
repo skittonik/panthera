@@ -151,11 +151,17 @@ end
 
 -- Combat --------------------------------------------------------------------
 
-local function get_next_alive_enemy(world)
+local function get_closest_enemy(world, from_pos)
+	local best, best_sq = nil, math.huge
 	for _, e in ipairs(world.enemies) do
-		if e:is_alive() then return e end
+		if e:is_alive() then
+			local ep = e:get_position()
+			local dx, dy = ep.x - from_pos.x, ep.y - from_pos.y
+			local sq = dx * dx + dy * dy
+			if sq < best_sq then best, best_sq = e, sq end
+		end
 	end
-	return nil
+	return best
 end
 
 local function perform_attack(world, attacker, defender)
@@ -326,7 +332,7 @@ function M.update(world, dt)
 		return
 	end
 
-	local target = get_next_alive_enemy(world)
+	local target = get_closest_enemy(world, player:get_position())
 	if not target then
 		world.phase = "finished"
 		player:ensure_anim("idle", true)

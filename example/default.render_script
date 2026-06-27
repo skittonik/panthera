@@ -191,6 +191,7 @@ function update(self)
     --
     render.enable_state(render.STATE_BLEND)
     render.set_depth_mask(true)
+    render.set_depth_func(render.COMPARE_FUNC_LEQUAL)
     render.draw(predicates.tile, camera_world.frustum)
     render.set_depth_mask(false)
     render.draw(predicates.particle, camera_world.frustum)
