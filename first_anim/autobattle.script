@@ -123,7 +123,7 @@ local function apply_damage(self, attacker_id, defender_id, amount)
 		local smudge_id = factory.create("/factories#smudge_factory", pos)
 		table.insert(self.spawned_paths, smudge_id)
 
-		go.set_scale(vmath.vector3(0, 0, 1.0), smudge_id)
+		go.set_scale(vmath.vector3(0.0001, 0.0001, 1.0), smudge_id)
 		go.animate(smudge_id, "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(0.55, 0.55, 1.0), go.EASING_OUTQUAD, 0.45)
 	else
 		panthera.play(defender.overlay, "damage", { is_loop = false })
@@ -247,7 +247,7 @@ local function spawn_enemies(self)
 			max_hp = e_cfg.hp,
 			move_speed = e_cfg.move_speed,
 			attack_cooldown = e_cfg.attack_cooldown,
-			attack_timer = 0,
+			attack_timer = e_cfg.attack_cooldown,
 			damage = e_cfg.damage,
 			attack_range = skins.get_attack_range(e_cfg.weapon_skin),
 			weapon_skin = e_cfg.weapon_skin,
