@@ -71,7 +71,7 @@ end
 
 function R:set_weapon(weapon_id)
 	self.weapon_def = weapons.get_weapon_def(weapon_id)
-	weapons.equip(self.resolve, weapon_id, self.anim, self.overlay, self.anim_objects)
+	weapons.equip(self.resolve, weapon_id)
 end
 
 function R:set_equipment(weapon_id, body_id, head_id)

@@ -40,7 +40,7 @@ function init(self)
 
 	skins.apply_defaults(resolve)
 	self.weapon_attachment = weapons.default_weapon()
-	weapons.equip(resolve, self.weapon_attachment, self.anim, self.overlay, self.anim_objects)
+	weapons.equip(resolve, self.weapon_attachment)
 
 	self.base_anim = "default"
 	self.base_loop = true
@@ -53,7 +53,7 @@ function on_message(self, message_id, message)
 	if message_id == hash("apply_skin_attachment") then
 		if message.slot == "weapon" then
 			self.weapon_attachment = message.attachment_id
-			weapons.equip(resolve, message.attachment_id, self.anim, self.overlay, self.anim_objects)
+			weapons.equip(resolve, message.attachment_id)
 		else
 			skins.apply_attachment(resolve, message.slot, message.attachment_id)
 		end
