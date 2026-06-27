@@ -1,0 +1,43 @@
+{
+  "player": {
+    "name": "Survivor",
+    "hp": 220,
+    "move_speed": 130,
+    "attack_cooldown": 1.2,
+    "damage": 30,
+    "attack_range": 75,
+    "weapon_skin": "impact_bat"
+  },
+  "enemies": [
+    {
+      "name": "Zombie Melee",
+      "hp": 75,
+      "move_speed": 90,
+      "attack_cooldown": 1.6,
+      "damage": 12,
+      "attack_range": 70,
+      "weapon_skin": "stabbing_common",
+      "spawn_x": 1300
+    },
+    {
+      "name": "Bandit Ranged",
+      "hp": 65,
+      "move_speed": 100,
+      "attack_cooldown": 2.2,
+      "damage": 18,
+      "attack_range": 350,
+      "weapon_skin": "rifle_ak",
+      "spawn_x": 1550
+    },
+    {
+      "name": "Zombie Boss",
+      "hp": 250,
+      "move_speed": 60,
+      "attack_cooldown": 2.4,
+      "damage": 35,
+      "attack_range": 75,
+      "weapon_skin": "impact_tire_iron",
+      "spawn_x": 1800
+    }
+  ]
+}

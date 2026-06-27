@@ -1,0 +1,437 @@
+local panthera = require("panthera.panthera")
+local animation = require("first_anim.first_anim_panthera")
+local skins = require("first_anim.skins")
+
+local FLASH_NODES = {
+	"body", "head", "hand_right", "hand_left", "left_leg", "right_leg",
+	"weapon_impact", "weapon_pistol", "weapon_rifle", "weapon_shotgun", "weapon_stabbing"
+}
+
+local WEAPON_HIT_DELAYS = {
+	impact = 0.42,
+	stabbing = 0.3,
+	pistol = 0.12,
+	rifle = 0.12,
+	shotgun = 0.12
+}
+
+local function play_flash(prefix)
+	for _, id in ipairs(FLASH_NODES) do
+		local url = msg.url(nil, "/" .. prefix .. "/human/" .. id, "sprite")
+		pcall(function()
+			go.set(url, "flash", vmath.vector4(1, 0, 0, 0))
+			go.animate(url, "flash", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0, 0, 0, 0), go.EASING_LINEAR, 0.3, 0)
+		end)
+	end
+end
+
+local function play_muzzle(prefix, wtype, attachment)
+	if wtype ~= "pistol" and wtype ~= "rifle" and wtype ~= "shotgun" then return end
+	local muzzle_go = "/" .. prefix .. "/human/muzzle"
+	local offset = skins.get_muzzle_offset(attachment)
+	if offset then
+		pcall(function()
+			go.set_position(offset, muzzle_go)
+			local rot = (prefix ~= "player") and vmath.quat_rotation_z(math.pi) or vmath.quat()
+			go.set_rotation(rot, muzzle_go)
+		end)
+	end
+
+	local url_flash = msg.url(nil, hash(muzzle_go), hash("muzzle_flash"))
+	local url_smoke = msg.url(nil, hash(muzzle_go), hash("smoke_puff"))
+	local function fire()
+		pcall(function()
+			particlefx.stop(url_flash)
+			particlefx.stop(url_smoke)
+			particlefx.play(url_flash)
+			particlefx.play(url_smoke)
+		end)
+	end
+	if wtype == "pistol" then
+		timer.delay(0.1, false, function() fire() end)
+	elseif wtype == "shotgun" then
+		fire()
+	elseif wtype == "rifle" then
+		fire()
+		timer.delay(0.13, false, function() fire() end)
+		timer.delay(0.26, false, function() fire() end)
+	end
+end
+
+local function add_log(self, text)
+	table.insert(self.battle_log, text)
+	if #self.battle_log > 5 then
+		table.remove(self.battle_log, 1)
+	end
+	msg.post("/ui#panel", "update_logs", { logs = self.battle_log })
+end
+
+local function apply_damage(self, attacker_id, defender_id, amount)
+	local defender = self.characters[defender_id]
+	local attacker = self.characters[attacker_id]
+	if not defender or defender.hp <= 0 then return end
+
+	local new_hp = math.max(0, defender.hp - amount)
+	defender.hp = new_hp
+
+	-- Update GO-based health bar (scale X scaled to 0.5 * ratio since units are scaled to 0.5)
+	local ratio = new_hp / defender.max_hp
+	local scale_x = math.max(0.0001, 0.5 * ratio)
+	go.set_scale(vmath.vector3(scale_x, 0.5, 1), "/" .. defender_id .. "/hp_fill")
+	label.set_text("/" .. defender_id .. "/hp_bg#label", string.format("%s: %d / %d", defender.name, new_hp, defender.max_hp))
+
+	if new_hp <= 0 then
+		defender.state = "dead"
+		add_log(self, string.format("%s defeated %s!", attacker.name, defender.name))
+		panthera.play(defender.anim, "death", { is_loop = false })
+		msg.post("/" .. defender_id .. "/hp_bg", "disable")
+		msg.post("/" .. defender_id .. "/hp_fill", "disable")
+	else
+		panthera.play(defender.overlay, "damage", { is_loop = false })
+		play_flash(defender_id)
+		add_log(self, string.format("%s hit %s for %d DMG!", attacker.name, defender.name, amount))
+	end
+end
+
+local function load_config()
+	local json_str = sys.load_resource("/first_anim/autobattle_config.json")
+	if not json_str then
+		print("Warning: Failed to load /first_anim/autobattle_config.json. Using fallback config.")
+		return nil
+	end
+	local ok, data = pcall(json.decode, json_str)
+	if not ok then
+		print("Warning: Failed to decode autobattle config JSON. Using fallback config.")
+		return nil
+	end
+	return data
+end
+
+local function start_simulation(self)
+	-- Reload config if possible
+	local config = load_config()
+	if not config then
+		config = {
+			player = {
+				name = "Survivor", hp = 220, move_speed = 130, attack_cooldown = 1.2, damage = 30, attack_range = 75, weapon_skin = "impact_bat"
+			},
+			enemies = {
+				{ name = "Zombie Melee", hp = 75, move_speed = 90, attack_cooldown = 1.6, damage = 12, attack_range = 70, weapon_skin = "stabbing_common", spawn_x = 1300 },
+				{ name = "Bandit Ranged", hp = 65, move_speed = 100, attack_cooldown = 2.2, damage = 18, attack_range = 350, weapon_skin = "rifle_ak", spawn_x = 1550 },
+				{ name = "Zombie Boss", hp = 250, move_speed = 60, attack_cooldown = 2.4, damage = 35, attack_range = 75, weapon_skin = "impact_tire_iron", spawn_x = 1800 }
+			}
+		}
+	end
+
+	self.battle_log = {}
+	self.battle_state = "fighting"
+
+	-- Build player (spawn Y is fixed to center 350)
+	local p_cfg = config.player
+	local p_spawn_y = 350
+	self.characters.player = {
+		id = "player",
+		go_prefix = "player/human",
+		is_enemy = false,
+		name = p_cfg.name or "Survivor",
+		hp = p_cfg.hp or 220,
+		max_hp = p_cfg.hp or 220,
+		move_speed = p_cfg.move_speed or 130,
+		attack_cooldown = p_cfg.attack_cooldown or 1.2,
+		attack_timer = 0,
+		damage = p_cfg.damage or 30,
+		attack_range = p_cfg.attack_range or 75,
+		weapon_skin = p_cfg.weapon_skin or "impact_bat",
+		state = "walk",
+		spawn_x = p_cfg.spawn_x or 200,
+		spawn_y = p_spawn_y,
+		anim = self.player_anim,
+		overlay = self.player_overlay
+	}
+
+	-- Position & scale player GO
+	go.set_position(vmath.vector3(self.characters.player.spawn_x, p_spawn_y, 0.5 - (p_spawn_y / 10000)), "/player/human/root")
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/human/hit")
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/human/shadow")
+	go.set_rotation(vmath.quat(), "/player/human/root")
+	skins.apply_defaults("player/human")
+	skins.apply_attachment("player/human", "weapon", self.characters.player.weapon_skin)
+	self.characters.player.weapon_type = skins.get_weapon_type(self.characters.player.weapon_skin) or "impact"
+	panthera.play(self.characters.player.anim, "walk", { is_loop = true })
+
+	-- Enable player HP bar, scale to 0.5, reset state
+	msg.post("/player/hp_bg", "enable")
+	msg.post("/player/hp_fill", "enable")
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/hp_bg")
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/hp_fill")
+	label.set_text("/player/hp_bg#label", string.format("%s: %d / %d", self.characters.player.name, self.characters.player.hp, self.characters.player.max_hp))
+	go.set("/player/hp_fill#sprite", "tint", vmath.vector4(0.15, 0.75, 0.15, 1.0))
+	go.set("/player/hp_bg#sprite", "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+
+	-- Build enemies (randomize Y spawn position inside vertical lane [280, 420])
+	self.enemy_ids = {}
+	for i = 1, 3 do
+		local id = "enemy" .. i
+		local e_cfg = config.enemies[i]
+		if e_cfg then
+			local spawn_y = 280 + math.random() * 140
+			self.characters[id] = {
+				id = id,
+				go_prefix = id .. "/human",
+				is_enemy = true,
+				name = e_cfg.name or ("Zombie " .. i),
+				hp = e_cfg.hp or 80,
+				max_hp = e_cfg.hp or 80,
+				move_speed = e_cfg.move_speed or 100,
+				attack_cooldown = e_cfg.attack_cooldown or 1.5,
+				attack_timer = 0,
+				damage = e_cfg.damage or 15,
+				attack_range = e_cfg.attack_range or 70,
+				weapon_skin = e_cfg.weapon_skin or "stabbing_common",
+				state = "walk",
+				spawn_x = e_cfg.spawn_x or (1000 + i * 250),
+				spawn_y = spawn_y,
+				anim = self.enemy_anims[id],
+				overlay = self.enemy_overlays[id]
+			}
+			table.insert(self.enemy_ids, id)
+
+			-- Position, scale and show enemy
+			msg.post("/" .. id .. "/human/root", "enable")
+			go.set_position(vmath.vector3(self.characters[id].spawn_x, spawn_y, 0.5 - (spawn_y / 10000)), "/" .. id .. "/human/root")
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/human/hit")
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/human/shadow")
+			go.set_rotation(vmath.quat(), "/" .. id .. "/human/root")
+			skins.apply_defaults(id .. "/human")
+			skins.apply_attachment(id .. "/human", "weapon", self.characters[id].weapon_skin)
+			self.characters[id].weapon_type = skins.get_weapon_type(self.characters[id].weapon_skin) or "impact"
+			panthera.play(self.characters[id].anim, "walk", { is_loop = true })
+
+			-- Enable enemy HP bar, scale to 0.5, reset state
+			msg.post("/" .. id .. "/hp_bg", "enable")
+			msg.post("/" .. id .. "/hp_fill", "enable")
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/hp_bg")
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/hp_fill")
+			label.set_text("/" .. id .. "/hp_bg#label", string.format("%s: %d / %d", self.characters[id].name, self.characters[id].hp, self.characters[id].max_hp))
+			go.set("/" .. id .. "/hp_fill#sprite", "tint", vmath.vector4(0.85, 0.15, 0.15, 1.0))
+			go.set("/" .. id .. "/hp_bg#sprite", "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+		else
+			-- Disable unused enemy slot
+			self.characters[id] = nil
+			msg.post("/" .. id .. "/human/root", "disable")
+			msg.post("/" .. id .. "/hp_bg", "disable")
+			msg.post("/" .. id .. "/hp_fill", "disable")
+		end
+	end
+
+	-- Sync GUI speed highlight
+	msg.post("/ui#panel", "speed_changed", { speed = self.simulation_speed })
+
+	add_log(self, "Simulation started!")
+	msg.post("/ui#panel", "set_status", { text = "BATTLE IN PROGRESS", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+end
+
+function init(self)
+	msg.post("@render:", "use_fixed_fit_projection")
+	math.randomseed(os.time())
+
+	-- Create Panthera states
+	self.player_anim = panthera.create_go(animation, "player/human")
+	self.player_overlay = panthera.create_go(animation, "player/human")
+
+	self.enemy_anims = {}
+	self.enemy_overlays = {}
+	for i = 1, 3 do
+		local id = "enemy" .. i
+		self.enemy_anims[id] = panthera.create_go(animation, id .. "/human")
+		self.enemy_overlays[id] = panthera.create_go(animation, id .. "/human")
+	end
+
+	self.characters = {}
+	self.simulation_speed = 1
+	panthera.SPEED = self.simulation_speed
+
+	start_simulation(self)
+end
+
+local function get_next_alive_enemy(self)
+	for _, id in ipairs(self.enemy_ids) do
+		local enemy = self.characters[id]
+		if enemy and enemy.hp > 0 then
+			return enemy
+		end
+	end
+	return nil
+end
+
+local function perform_attack(self, attacker, defender)
+	attacker.state = "attack"
+	attacker.attack_timer = 0
+	local wtype = attacker.weapon_type
+	play_muzzle(attacker.id, wtype, attacker.weapon_skin)
+
+	panthera.play(attacker.anim, "attack_" .. wtype, {
+		is_loop = false,
+		callback = function()
+			if attacker.state == "attack" then
+				attacker.state = "attack_cooldown"
+			end
+		end
+	})
+
+	if wtype == "rifle" then
+		-- Automatic weapon: burst fire 3 ticks of damage
+		local t1 = math.floor(attacker.damage / 3)
+		local t2 = math.floor(attacker.damage / 3)
+		local t3 = attacker.damage - t1 - t2
+
+		timer.delay(0.12 / self.simulation_speed, false, function()
+			if self.battle_state == "fighting" and attacker.hp > 0 and defender.hp > 0 then
+				apply_damage(self, attacker.id, defender.id, t1)
+			end
+		end)
+		timer.delay(0.25 / self.simulation_speed, false, function()
+			if self.battle_state == "fighting" and attacker.hp > 0 and defender.hp > 0 then
+				apply_damage(self, attacker.id, defender.id, t2)
+			end
+		end)
+		timer.delay(0.38 / self.simulation_speed, false, function()
+			if self.battle_state == "fighting" and attacker.hp > 0 and defender.hp > 0 then
+				apply_damage(self, attacker.id, defender.id, t3)
+			end
+		end)
+	else
+		-- Single shot/slash/blunt damage tick
+		local hit_delay = WEAPON_HIT_DELAYS[wtype] or 0.12
+		timer.delay(hit_delay / self.simulation_speed, false, function()
+			if self.battle_state == "fighting" and attacker.hp > 0 and defender.hp > 0 then
+				apply_damage(self, attacker.id, defender.id, attacker.damage)
+			end
+		end)
+	end
+end
+
+function update(self, dt)
+	if self.battle_state ~= "fighting" then return end
+
+	local sim_dt = dt * self.simulation_speed
+
+	-- 1. Update Player
+	local player = self.characters.player
+	if player.hp > 0 then
+		local target = get_next_alive_enemy(self)
+		if not target then
+			-- Victory!
+			self.battle_state = "victory"
+			panthera.play(player.anim, "default", { is_loop = true })
+			add_log(self, "Victory! All enemies defeated!")
+			msg.post("/ui#panel", "set_status", { text = "VICTORY!", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+		else
+			-- Fight/Walk towards target in 2D space
+			local p_pos = go.get_position("/player/human/root")
+			local t_pos = go.get_position("/" .. target.id .. "/human/root")
+			local dx = t_pos.x - p_pos.x
+			local dy = t_pos.y - p_pos.y
+			local dist = math.sqrt(dx*dx + dy*dy)
+
+			if dist <= player.attack_range then
+				if player.state == "walk" then
+					player.state = "attack_cooldown"
+					panthera.play(player.anim, "default", { is_loop = true })
+				end
+
+				if player.state == "attack_cooldown" then
+					player.attack_timer = player.attack_timer + sim_dt
+					if player.attack_timer >= player.attack_cooldown then
+						perform_attack(self, player, target)
+					end
+				end
+			else
+				-- Walk diagonally towards target
+				if player.state ~= "walk" and player.state ~= "attack" then
+					player.state = "walk"
+					panthera.play(player.anim, "walk", { is_loop = true })
+				end
+
+				if player.state == "walk" then
+					p_pos.x = p_pos.x + (dx / dist) * player.move_speed * sim_dt
+					p_pos.y = p_pos.y + (dy / dist) * player.move_speed * sim_dt
+				end
+			end
+
+			-- Apply Y-sorting Z depth: 0.5 - Y / 10000
+			p_pos.z = 0.5 - (p_pos.y / 10000)
+			go.set_position(p_pos, "/player/human/root")
+		end
+
+		-- Position Player HP bar at Y + 210, X - 40 (since scale is 0.5, half size is 40)
+		local p_pos = go.get_position("/player/human/root")
+		go.set_position(vmath.vector3(p_pos.x, p_pos.y + 210, 0.9), "/player/hp_bg")
+		go.set_position(vmath.vector3(p_pos.x - 40, p_pos.y + 210, 0.91), "/player/hp_fill")
+	end
+
+	-- 2. Update Enemies
+	for _, id in ipairs(self.enemy_ids) do
+		local enemy = self.characters[id]
+		if enemy and enemy.hp > 0 then
+			if player.hp <= 0 then
+				-- Defeat!
+				self.battle_state = "defeat"
+				panthera.play(enemy.anim, "default", { is_loop = true })
+				add_log(self, "Defeat! Survivor perished.")
+				msg.post("/ui#panel", "set_status", { text = "DEFEAT!", color = vmath.vector4(0.85, 0.15, 0.15, 1.0) })
+			else
+				local e_pos = go.get_position("/" .. id .. "/human/root")
+				local p_pos = go.get_position("/player/human/root")
+				local dx = p_pos.x - e_pos.x
+				local dy = p_pos.y - e_pos.y
+				local dist = math.sqrt(dx*dx + dy*dy)
+
+				if dist <= enemy.attack_range then
+					if enemy.state == "walk" then
+						enemy.state = "attack_cooldown"
+						panthera.play(enemy.anim, "default", { is_loop = true })
+					end
+
+					if enemy.state == "attack_cooldown" then
+						enemy.attack_timer = enemy.attack_timer + sim_dt
+						if enemy.attack_timer >= enemy.attack_cooldown then
+							perform_attack(self, enemy, player)
+						end
+					end
+				else
+					-- Walk diagonally towards player
+					if enemy.state ~= "walk" and enemy.state ~= "attack" then
+						enemy.state = "walk"
+						panthera.play(enemy.anim, "walk", { is_loop = true })
+					end
+
+					if enemy.state == "walk" then
+						e_pos.x = e_pos.x + (dx / dist) * enemy.move_speed * sim_dt
+						e_pos.y = e_pos.y + (dy / dist) * enemy.move_speed * sim_dt
+					end
+				end
+
+				-- Apply Y-sorting Z depth
+				e_pos.z = 0.5 - (e_pos.y / 10000)
+				go.set_position(e_pos, "/" .. id .. "/human/root")
+			end
+
+			-- Position Enemy HP bar
+			local e_pos = go.get_position("/" .. id .. "/human/root")
+			go.set_position(vmath.vector3(e_pos.x, e_pos.y + 210, 0.9), "/" .. id .. "/hp_bg")
+			go.set_position(vmath.vector3(e_pos.x - 40, e_pos.y + 210, 0.91), "/" .. id .. "/hp_fill")
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("restart") then
+		start_simulation(self)
+	elseif message_id == hash("set_speed") then
+		self.simulation_speed = message.speed
+		panthera.SPEED = message.speed
+		msg.post("/ui#panel", "speed_changed", { speed = message.speed })
+		add_log(self, string.format("Speed changed to %dx", message.speed))
+	end
+end

@@ -1,0 +1,69 @@
+name: "autobattle"
+collection_instances {
+  id: "player"
+  collection: "/first_anim/unit.collection"
+  position {
+    x: 200.0
+    y: 350.0
+    z: 0.0
+  }
+}
+collection_instances {
+  id: "enemy1"
+  collection: "/first_anim/unit.collection"
+  position {
+    x: 1300.0
+    y: 350.0
+    z: -0.1
+  }
+  scale3 {
+    x: -1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+collection_instances {
+  id: "enemy2"
+  collection: "/first_anim/unit.collection"
+  position {
+    x: 1600.0
+    y: 350.0
+    z: -0.2
+  }
+  scale3 {
+    x: -1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+collection_instances {
+  id: "enemy3"
+  collection: "/first_anim/unit.collection"
+  position {
+    x: 1900.0
+    y: 350.0
+    z: -0.3
+  }
+  scale3 {
+    x: -1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "system"
+  data: "components {\n"
+  "  id: \"autobattle\"\n"
+  "  component: \"/first_anim/autobattle.script\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "ui"
+  data: "components {\n"
+  "  id: \"panel\"\n"
+  "  component: \"/first_anim/autobattle_panel.gui\"\n"
+  "}\n"
+  ""
+}

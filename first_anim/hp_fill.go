@@ -1,0 +1,19 @@
+embedded_components {
+  id: "sprite"
+  type: "sprite"
+  data: "default_animation: \"pixel\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "size {\n"
+  "  x: 160.0\n"
+  "  y: 16.0\n"
+  "}\n"
+  "size_mode: SIZE_MODE_MANUAL\n"
+  "textures {\n"
+  "  sampler: \"texture_sampler\"\n"
+  "  texture: \"/example/assets/example.atlas\"\n"
+  "}\n"
+  ""
+  position {
+    x: 80.0
+  }
+}
