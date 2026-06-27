@@ -1,56 +1,49 @@
 name: "autobattle"
-collection_instances {
-  id: "player"
-  collection: "/first_anim/unit.collection"
+scale_along_z: 0
+instances {
+  id: "spawn_player"
+  prototype: "/first_anim/spawn_placeholder.go"
   position {
     x: 200.0
     y: 350.0
-    z: 0.0
+    z: -0.9
   }
 }
-collection_instances {
-  id: "enemy1"
-  collection: "/first_anim/unit.collection"
+instances {
+  id: "spawn_melee"
+  prototype: "/first_anim/spawn_placeholder.go"
   position {
     x: 1300.0
     y: 350.0
-    z: -0.1
-  }
-  scale3 {
-    x: -1.0
-    y: 1.0
-    z: 1.0
+    z: -0.9
   }
 }
-collection_instances {
-  id: "enemy2"
-  collection: "/first_anim/unit.collection"
+instances {
+  id: "spawn_ranged"
+  prototype: "/first_anim/spawn_placeholder.go"
   position {
-    x: 1600.0
+    x: 1550.0
     y: 350.0
-    z: -0.2
-  }
-  scale3 {
-    x: -1.0
-    y: 1.0
-    z: 1.0
+    z: -0.9
   }
 }
-collection_instances {
-  id: "enemy3"
-  collection: "/first_anim/unit.collection"
+instances {
+  id: "spawn_boss"
+  prototype: "/first_anim/spawn_placeholder.go"
   position {
-    x: 1900.0
+    x: 1800.0
     y: 350.0
-    z: -0.3
-  }
-  scale3 {
-    x: -1.0
-    y: 1.0
-    z: 1.0
+    z: -0.9
   }
 }
-scale_along_z: 0
+embedded_instances {
+  id: "factories"
+  data: "components {\n"
+  "  id: \"unit_factory\"\n"
+  "  component: \"/first_anim/unit_factory.collectionfactory\"\n"
+  "}\n"
+  ""
+}
 embedded_instances {
   id: "system"
   data: "components {\n"

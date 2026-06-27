@@ -38,7 +38,7 @@ end
 
 -- Apply a single attachment to a character.
 -- For slots with typed_nodes (weapon): enables the active typed GO, disables the rest.
-function M.apply_attachment(character_prefix, slot_name, attachment_id)
+function M.apply_attachment(p_ids, slot_name, attachment_id)
 	ensure_loaded()
 	local slot = skins_data.slots[slot_name]
 	if not slot then
@@ -55,22 +55,33 @@ function M.apply_attachment(character_prefix, slot_name, attachment_id)
 	if slot.typed_nodes then
 		local active_node = attachment.node
 		for _, node_id in ipairs(slot.typed_nodes) do
-			local url = "/" .. character_prefix .. "/" .. node_id
-			msg.post(url, node_id == active_node and "enable" or "disable")
+			local relative_path = hash("/human/" .. node_id)
+			local abs_path = p_ids[relative_path]
+			if abs_path then
+				msg.post(abs_path, node_id == active_node and "enable" or "disable")
+			end
 		end
 	end
 
+	if attachment.node == "none" then
+		return
+	end
+
 	local node = attachment.node or slot.node
-	local sprite_url = msg.url(nil, "/" .. character_prefix .. "/" .. node, slot.component)
-	sprite.play_flipbook(sprite_url, attachment.animation)
+	local relative_path = hash("/human/" .. node)
+	local abs_path = p_ids[relative_path]
+	if abs_path then
+		local sprite_url = msg.url(nil, abs_path, slot.component)
+		sprite.play_flipbook(sprite_url, attachment.animation)
+	end
 end
 
 -- Apply all default attachments to a character.
-function M.apply_defaults(character_prefix)
+function M.apply_defaults(p_ids)
 	ensure_loaded()
 	for slot_name, slot in pairs(skins_data.slots) do
 		if slot.default then
-			M.apply_attachment(character_prefix, slot_name, slot.default)
+			M.apply_attachment(p_ids, slot_name, slot.default)
 		end
 	end
 end
@@ -85,6 +96,15 @@ function M.get_muzzle_offset(attachment_id)
 		return vmath.vector3(att.muzzle_offset.x, att.muzzle_offset.y, 0)
 	end
 	return nil
+end
+
+-- Returns the attack range for a weapon skin, if defined.
+function M.get_attack_range(attachment_id)
+	ensure_loaded()
+	local slot = skins_data.slots["weapon"]
+	if not slot then return 70 end
+	local att = slot.attachments[attachment_id]
+	return att and att.attack_range or 70
 end
 
 return M

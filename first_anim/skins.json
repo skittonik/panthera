@@ -23,16 +23,17 @@
       "default": "impact_bat",
       "typed_nodes": ["weapon_impact", "weapon_stabbing", "weapon_pistol", "weapon_rifle", "weapon_shotgun"],
       "attachments": {
-        "impact_bat":       { "node": "weapon_impact",   "animation": "impact_bat",       "type": "impact"   },
-        "impact_tire_iron": { "node": "weapon_impact",   "animation": "impact_tire_iron",  "type": "impact"   },
-        "stabbing_common":  { "node": "weapon_stabbing", "animation": "stabbing_common",   "type": "stabbing" },
-        "stabbing_black":   { "node": "weapon_stabbing", "animation": "stabbing_black",    "type": "stabbing" },
-        "pistol_deagle":    { "node": "weapon_pistol",   "animation": "pistol_deagle",     "type": "pistol",   "muzzle_offset": { "x": 194.0, "y": 112.0 } },
-        "pistol_pm":        { "node": "weapon_pistol",   "animation": "pistol_pm",         "type": "pistol",   "muzzle_offset": { "x": 129.0, "y": 160.0 } },
-        "rifle_ak":         { "node": "weapon_rifle",    "animation": "rifle_ak",          "type": "rifle",    "muzzle_offset": { "x": 316.0, "y": 89.0  } },
-        "rifle_m4":         { "node": "weapon_rifle",    "animation": "rifle_m4",          "type": "rifle",    "muzzle_offset": { "x": 332.0, "y": 151.0 } },
-        "shotgun_long":     { "node": "weapon_shotgun",  "animation": "shotgun_long",      "type": "shotgun",  "muzzle_offset": { "x": 353.0, "y": 120.0 } },
-        "shotgun_short":    { "node": "weapon_shotgun",  "animation": "shotgun_short",     "type": "shotgun",  "muzzle_offset": { "x": 344.0, "y": 126.0 } }
+        "impact_bat":       { "node": "weapon_impact",   "animation": "impact_bat",       "type": "impact",   "attack_range": 75 },
+        "impact_tire_iron": { "node": "weapon_impact",   "animation": "impact_tire_iron",  "type": "impact",   "attack_range": 75 },
+        "stabbing_common":  { "node": "weapon_stabbing", "animation": "stabbing_common",   "type": "stabbing", "attack_range": 70 },
+        "stabbing_black":   { "node": "weapon_stabbing", "animation": "stabbing_black",    "type": "stabbing", "attack_range": 70 },
+        "pistol_deagle":    { "node": "weapon_pistol",   "animation": "pistol_deagle",     "type": "pistol",   "attack_range": 450, "muzzle_offset": { "x": 194.0, "y": 112.0 } },
+        "pistol_pm":        { "node": "weapon_pistol",   "animation": "pistol_pm",         "type": "pistol",   "attack_range": 450, "muzzle_offset": { "x": 129.0, "y": 160.0 } },
+        "rifle_ak":         { "node": "weapon_rifle",    "animation": "rifle_ak",          "type": "rifle",    "attack_range": 600, "muzzle_offset": { "x": 316.0, "y": 89.0  } },
+        "rifle_m4":         { "node": "weapon_rifle",    "animation": "rifle_m4",          "type": "rifle",    "attack_range": 600, "muzzle_offset": { "x": 332.0, "y": 151.0 } },
+        "shotgun_long":     { "node": "weapon_shotgun",  "animation": "shotgun_long",      "type": "shotgun",  "attack_range": 350, "muzzle_offset": { "x": 353.0, "y": 120.0 } },
+        "shotgun_short":    { "node": "weapon_shotgun",  "animation": "shotgun_short",     "type": "shotgun",  "attack_range": 350, "muzzle_offset": { "x": 344.0, "y": 126.0 } },
+        "fists_default":    { "node": "none",            "animation": "",                  "type": "fists",    "attack_range": 65 }
       }
     }
   }

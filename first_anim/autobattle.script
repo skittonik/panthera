@@ -2,43 +2,69 @@ local panthera = require("panthera.panthera")
 local animation = require("first_anim.first_anim_panthera")
 local skins = require("first_anim.skins")
 
+local function build_anim_objects(p_ids)
+	return {
+		[hash("/root")] = p_ids[hash("/human/root")],
+		[hash("/hit")] = p_ids[hash("/human/hit")],
+		[hash("/shadow")] = p_ids[hash("/human/shadow")],
+		[hash("/body")] = p_ids[hash("/human/body")],
+		[hash("/head")] = p_ids[hash("/human/head")],
+		[hash("/left_leg")] = p_ids[hash("/human/left_leg")],
+		[hash("/right_leg")] = p_ids[hash("/human/right_leg")],
+		[hash("/hand_right")] = p_ids[hash("/human/hand_right")],
+		[hash("/hand_left")] = p_ids[hash("/human/hand_left")],
+		[hash("/weapon")] = p_ids[hash("/human/weapon")],
+		[hash("/muzzle")] = p_ids[hash("/human/muzzle")],
+		[hash("/weapon_impact")] = p_ids[hash("/human/weapon_impact")],
+		[hash("/weapon_stabbing")] = p_ids[hash("/human/weapon_stabbing")],
+		[hash("/weapon_pistol")] = p_ids[hash("/human/weapon_pistol")],
+		[hash("/weapon_rifle")] = p_ids[hash("/human/weapon_rifle")],
+		[hash("/weapon_shotgun")] = p_ids[hash("/human/weapon_shotgun")]
+	}
+end
+
 local FLASH_NODES = {
 	"body", "head", "hand_right", "hand_left", "left_leg", "right_leg",
-	"weapon_impact", "weapon_pistol", "weapon_rifle", "weapon_shotgun", "weapon_stabbing"
+	"weapon_impact", "weapon_stabbing", "weapon_pistol", "weapon_rifle", "weapon_shotgun"
 }
 
 local WEAPON_HIT_DELAYS = {
 	impact = 0.42,
 	stabbing = 0.3,
+	fists = 0.3,
 	pistol = 0.12,
 	rifle = 0.12,
 	shotgun = 0.12
 }
 
-local function play_flash(prefix)
+local function play_flash(p_ids)
 	for _, id in ipairs(FLASH_NODES) do
-		local url = msg.url(nil, "/" .. prefix .. "/human/" .. id, "sprite")
-		pcall(function()
-			go.set(url, "flash", vmath.vector4(1, 0, 0, 0))
-			go.animate(url, "flash", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0, 0, 0, 0), go.EASING_LINEAR, 0.3, 0)
-		end)
+		local path = p_ids[hash("/human/" .. id)]
+		if path then
+			local url = msg.url(nil, path, "sprite")
+			pcall(function()
+				go.set(url, "flash", vmath.vector4(1, 0, 0, 0))
+				go.animate(url, "flash", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0, 0, 0, 0), go.EASING_LINEAR, 0.3, 0)
+			end)
+		end
 	end
 end
 
-local function play_muzzle(prefix, wtype, attachment)
+local function play_muzzle(p_ids, is_enemy, wtype, attachment)
 	if wtype ~= "pistol" and wtype ~= "rifle" and wtype ~= "shotgun" then return end
-	local muzzle_go = "/" .. prefix .. "/human/muzzle"
+	local muzzle_go = p_ids[hash("/human/muzzle")]
+	if not muzzle_go then return end
 	local offset = skins.get_muzzle_offset(attachment)
 	if offset then
 		pcall(function()
 			go.set_position(offset, muzzle_go)
-			local rot = (prefix ~= "player") and vmath.quat_rotation_z(math.pi) or vmath.quat()
+			local rot = is_enemy and vmath.quat_rotation_z(math.pi) or vmath.quat()
 			go.set_rotation(rot, muzzle_go)
 		end)
 	end
 
-	local url_flash = msg.url(nil, hash(muzzle_go), hash("muzzle_flash"))
-	local url_smoke = msg.url(nil, hash(muzzle_go), hash("smoke_puff"))
+	local url_flash = msg.url(nil, muzzle_go, "muzzle_flash")
+	local url_smoke = msg.url(nil, muzzle_go, "smoke_puff")
 	local function fire()
 		pcall(function()
 			particlefx.stop(url_flash)
@@ -77,18 +103,20 @@ local function apply_damage(self, attacker_id, defender_id, amount)
 	-- Update GO-based health bar (scale X scaled to 0.5 * ratio since units are scaled to 0.5)
 	local ratio = new_hp / defender.max_hp
 	local scale_x = math.max(0.0001, 0.5 * ratio)
-	go.set_scale(vmath.vector3(scale_x, 0.5, 1), "/" .. defender_id .. "/hp_fill")
-	label.set_text("/" .. defender_id .. "/hp_bg#label", string.format("%s: %d / %d", defender.name, new_hp, defender.max_hp))
+	go.set_scale(vmath.vector3(scale_x, 0.5, 1), defender.hp_fill_path)
+	
+	local label_url = msg.url(nil, defender.hp_bg_path, "label")
+	label.set_text(label_url, string.format("%s: %d / %d", defender.name, new_hp, defender.max_hp))
 
 	if new_hp <= 0 then
 		defender.state = "dead"
 		add_log(self, string.format("%s defeated %s!", attacker.name, defender.name))
 		panthera.play(defender.anim, "death", { is_loop = false })
-		msg.post("/" .. defender_id .. "/hp_bg", "disable")
-		msg.post("/" .. defender_id .. "/hp_fill", "disable")
+		msg.post(defender.hp_bg_path, "disable")
+		msg.post(defender.hp_fill_path, "disable")
 	else
 		panthera.play(defender.overlay, "damage", { is_loop = false })
-		play_flash(defender_id)
+		play_flash(defender.p_ids)
 		add_log(self, string.format("%s hit %s for %d DMG!", attacker.name, defender.name, amount))
 	end
 end
@@ -107,31 +135,123 @@ local function load_config()
 	return data
 end
 
+local function load_enemies_config()
+	local json_str = sys.load_resource("/first_anim/enemies_config.json")
+	if not json_str then
+		print("Warning: Failed to load /first_anim/enemies_config.json.")
+		return {}
+	end
+	local ok, data = pcall(json.decode, json_str)
+	if not ok then
+		print("Warning: Failed to decode enemies config JSON.")
+		return {}
+	end
+	return data
+end
+
+
+
 local function start_simulation(self)
 	-- Reload config if possible
 	local config = load_config()
 	if not config then
+		-- Incase config load fails, use fallback mock
 		config = {
 			player = {
-				name = "Survivor", hp = 220, move_speed = 130, attack_cooldown = 1.2, damage = 30, attack_range = 75, weapon_skin = "impact_bat"
+				name = "Survivor", hp = 220, move_speed = 130, attack_cooldown = 1.2, damage = 30, weapon_skin = "rifle_ak", body_skin = "body_armor", head_skin = "head_gasmask"
 			},
-			enemies = {
-				{ name = "Zombie Melee", hp = 75, move_speed = 90, attack_cooldown = 1.6, damage = 12, attack_range = 70, weapon_skin = "stabbing_common", spawn_x = 1300 },
-				{ name = "Bandit Ranged", hp = 65, move_speed = 100, attack_cooldown = 2.2, damage = 18, attack_range = 350, weapon_skin = "rifle_ak", spawn_x = 1550 },
-				{ name = "Zombie Boss", hp = 250, move_speed = 60, attack_cooldown = 2.4, damage = 35, attack_range = 75, weapon_skin = "impact_tire_iron", spawn_x = 1800 }
+			groups = {
+				{ id = 1, name = "Group 1: 2 Melee (Bats)", enemies = { "zombie_bat", "zombie_bat" } },
+				{ id = 2, name = "Group 2: 2 Ranged (Pistol/AK)", enemies = { "zombie_pistol", "bandit_ak" } },
+				{ id = 3, name = "Group 3: 2 Irons, 2 AKs (75hp)", enemies = { "zombie_iron", "zombie_iron", { key = "bandit_ak", hp = 75 }, { key = "bandit_ak", hp = 75 } } }
 			}
+		}
+	end
+
+	local enemy_templates = load_enemies_config()
+	if not enemy_templates or not next(enemy_templates) then
+		-- Mock templates incase loading fails
+		enemy_templates = {
+			zombie_bat = { name = "Zombie Bat", hp = 100, move_speed = 90, attack_cooldown = 1.6, damage = 12, weapon_skin = "impact_bat" },
+			zombie_pistol = { name = "Zombie Pistol", hp = 80, move_speed = 100, attack_cooldown = 2.0, damage = 15, weapon_skin = "pistol_pm" },
+			bandit_ak = { name = "Bandit AK", hp = 90, move_speed = 100, attack_cooldown = 2.2, damage = 18, weapon_skin = "rifle_ak" },
+			zombie_fists = { name = "Zombie Fists", hp = 100, move_speed = 95, attack_cooldown = 1.4, damage = 10, weapon_skin = "fists_default" },
+			zombie_iron = { name = "Zombie Iron", hp = 100, move_speed = 90, attack_cooldown = 1.7, damage = 15, weapon_skin = "impact_tire_iron" }
 		}
 	end
 
 	self.battle_log = {}
 	self.battle_state = "fighting"
 
-	-- Build player (spawn Y is fixed to center 350)
+	-- Clean up previous game objects and stop their active animations
+	for _, char in pairs(self.characters) do
+		if char.anim then pcall(panthera.stop, char.anim) end
+		if char.overlay then pcall(panthera.stop, char.overlay) end
+	end
+	if self.spawned_paths then
+		for _, path in ipairs(self.spawned_paths) do
+			-- CRITICAL: recursive deletion is set to true to ensure all child parts disappear!
+			pcall(go.delete, path, true)
+		end
+	end
+	self.spawned_paths = {}
+	self.characters = {}
+
+	-- 1. Read, scale & tint spawner placeholders to visually display the spawn zone bounds
+	local pos_player = go.get_position("/spawn_player")
+	local pos_melee = go.get_position("/spawn_melee")
+	local pos_ranged = go.get_position("/spawn_ranged")
+	local pos_boss = go.get_position("/spawn_boss")
+
+	-- Scale enemy spawners to represent spawn zones (width 100, height 240)
+	-- base size of sprite is 64x64, so scale is X = 1.5625, Y = 3.75
+	go.set_scale(vmath.vector3(1.5625, 3.75, 1.0), "/spawn_melee")
+	go.set_scale(vmath.vector3(1.5625, 3.75, 1.0), "/spawn_ranged")
+	go.set_scale(vmath.vector3(1.5625, 3.75, 1.0), "/spawn_boss")
+
+	-- Scale player spawner to represent player spawn zone (width 40, height 60)
+	-- scale is X = 0.625, Y = 0.9375
+	go.set_scale(vmath.vector3(0.625, 0.9375, 1.0), "/spawn_player")
+
+	pcall(go.set, "/spawn_player#sprite", "tint", vmath.vector4(0.15, 0.75, 0.55, 0.35))
+	pcall(go.set, "/spawn_melee#sprite", "tint", vmath.vector4(0.85, 0.15, 0.15, 0.35))
+	pcall(go.set, "/spawn_ranged#sprite", "tint", vmath.vector4(0.9, 0.5, 0.1, 0.35))
+	pcall(go.set, "/spawn_boss#sprite", "tint", vmath.vector4(0.7, 0.1, 0.8, 0.35))
+
+	-- 2. Spawn Player (within random X/Y offset zone)
 	local p_cfg = config.player
-	local p_spawn_y = 350
+	if not self.player_weapon then
+		self.player_weapon = p_cfg.weapon_skin or "rifle_ak"
+		self.player_body = p_cfg.body_skin or "body_armor"
+		self.player_head = p_cfg.head_skin or "head_gasmask"
+	end
+
+	local p_spawn_y = pos_player.y
+	local p_spawn_x = pos_player.x
+	if self.simulation_speed > 0 then
+		p_spawn_y = pos_player.y - 30 + math.random() * 60
+		p_spawn_x = pos_player.x - 20 + math.random() * 40
+	end
+	local p_pos = vmath.vector3(p_spawn_x, p_spawn_y, 0.5 - (p_spawn_y / 10000))
+	local p_ids = collectionfactory.create("/factories#unit_factory", p_pos, vmath.quat(), {}, vmath.vector3(1.0, 1.0, 1.0))
+	
+	for _, path in pairs(p_ids) do
+		table.insert(self.spawned_paths, path)
+	end
+
+	local p_root = p_ids[hash("/human/root")]
+	local p_hit = p_ids[hash("/human/hit")]
+	local p_shadow = p_ids[hash("/human/shadow")]
+	local p_hp_bg = p_ids[hash("/hp_bg")]
+	local p_hp_fill = p_ids[hash("/hp_fill")]
+	-- Scale child templates to 0.5
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), p_hit)
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), p_shadow)
+
+	-- Build player character info
 	self.characters.player = {
 		id = "player",
-		go_prefix = "player/human",
+		p_ids = p_ids,
 		is_enemy = false,
 		name = p_cfg.name or "Survivor",
 		hp = p_cfg.hp or 220,
@@ -140,115 +260,169 @@ local function start_simulation(self)
 		attack_cooldown = p_cfg.attack_cooldown or 1.2,
 		attack_timer = 0,
 		damage = p_cfg.damage or 30,
-		attack_range = p_cfg.attack_range or 75,
-		weapon_skin = p_cfg.weapon_skin or "impact_bat",
-		state = "walk",
-		spawn_x = p_cfg.spawn_x or 200,
+		weapon_skin = self.player_weapon,
+		body_skin = self.player_body,
+		head_skin = self.player_head,
+		state = (self.simulation_speed == 0) and "idle" or "walk",
+		spawn_x = p_spawn_x,
 		spawn_y = p_spawn_y,
-		anim = self.player_anim,
-		overlay = self.player_overlay
+		root_path = p_root,
+		hit_path = p_hit,
+		shadow_path = p_shadow,
+		hp_bg_path = p_hp_bg,
+		hp_fill_path = p_hp_fill,
+		anim = panthera.create_go(animation, nil, build_anim_objects(p_ids)),
+		overlay = panthera.create_go(animation, nil, build_anim_objects(p_ids))
 	}
 
-	-- Position & scale player GO
-	go.set_position(vmath.vector3(self.characters.player.spawn_x, p_spawn_y, 0.5 - (p_spawn_y / 10000)), "/player/human/root")
-	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/human/hit")
-	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/human/shadow")
-	go.set_rotation(vmath.quat(), "/player/human/root")
-	skins.apply_defaults("player/human")
-	skins.apply_attachment("player/human", "weapon", self.characters.player.weapon_skin)
+	-- Query attack range from weapon configuration
+	self.characters.player.attack_range = skins.get_attack_range(self.characters.player.weapon_skin)
+
+	-- Apply skin parts (weapon, armor, helmet) and play walk/idle
+	skins.apply_defaults(p_ids)
+	skins.apply_attachment(p_ids, "body", self.characters.player.body_skin)
+	skins.apply_attachment(p_ids, "head", self.characters.player.head_skin)
+	skins.apply_attachment(p_ids, "weapon", self.characters.player.weapon_skin)
 	self.characters.player.weapon_type = skins.get_weapon_type(self.characters.player.weapon_skin) or "impact"
-	panthera.play(self.characters.player.anim, "walk", { is_loop = true })
+	
+	if self.simulation_speed == 0 then
+		panthera.play(self.characters.player.anim, "default", { is_loop = true })
+	else
+		panthera.play(self.characters.player.anim, "walk", { is_loop = true })
+	end
 
-	-- Enable player HP bar, scale to 0.5, reset state
-	msg.post("/player/hp_bg", "enable")
-	msg.post("/player/hp_fill", "enable")
-	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/hp_bg")
-	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/player/hp_fill")
-	label.set_text("/player/hp_bg#label", string.format("%s: %d / %d", self.characters.player.name, self.characters.player.hp, self.characters.player.max_hp))
-	go.set("/player/hp_fill#sprite", "tint", vmath.vector4(0.15, 0.75, 0.15, 1.0))
-	go.set("/player/hp_bg#sprite", "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+	-- Scale & configure player HP bar
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), p_hp_bg)
+	go.set_scale(vmath.vector3(0.5, 0.5, 1.0), p_hp_fill)
+	go.set(msg.url(nil, p_hp_fill, "sprite"), "tint", vmath.vector4(0.15, 0.75, 0.15, 1.0))
+	go.set(msg.url(nil, p_hp_bg, "sprite"), "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+	label.set_text(msg.url(nil, p_hp_bg, "label"), string.format("%s: %d / %d", self.characters.player.name, self.characters.player.hp, self.characters.player.max_hp))
 
-	-- Build enemies (randomize Y spawn position inside vertical lane [280, 420])
+	-- 3. Spawn Enemies from the Selected Group
 	self.enemy_ids = {}
-	for i = 1, 3 do
-		local id = "enemy" .. i
-		local e_cfg = config.enemies[i]
-		if e_cfg then
-			local spawn_y = 280 + math.random() * 140
+	local group_cfg = config.groups[self.active_group] or config.groups[1]
+	
+	if self.simulation_speed > 0 then
+		for i, e_entry in ipairs(group_cfg.enemies) do
+			local id = "enemy" .. i
+			
+			-- Resolve enemy configuration from reference key or override object
+			local e_cfg = {}
+			if type(e_entry) == "string" then
+				local template = enemy_templates[e_entry]
+				if template then
+					for k, v in pairs(template) do e_cfg[k] = v end
+				end
+			elseif type(e_entry) == "table" then
+				local template = enemy_templates[e_entry.key]
+				if template then
+					for k, v in pairs(template) do e_cfg[k] = v end
+				end
+				for k, v in pairs(e_entry) do
+					if k ~= "key" then e_cfg[k] = v end
+				end
+			end
+
+			-- Standard defaults in case configuration is incomplete
+			e_cfg.name = e_cfg.name or ("Zombie " .. i)
+			e_cfg.hp = e_cfg.hp or 80
+			e_cfg.move_speed = e_cfg.move_speed or 100
+			e_cfg.attack_cooldown = e_cfg.attack_cooldown or 1.5
+			e_cfg.damage = e_cfg.damage or 15
+			e_cfg.weapon_skin = e_cfg.weapon_skin or "stabbing_common"
+			
+			-- Determine weapon type and role to choose correct spawner
+			local e_wtype = skins.get_weapon_type(e_cfg.weapon_skin) or "impact"
+			local spawn_pos = pos_melee
+			if e_cfg.name:find("Boss") then
+				spawn_pos = pos_boss
+			elseif e_wtype == "pistol" or e_wtype == "rifle" or e_wtype == "shotgun" then
+				spawn_pos = pos_ranged
+			end
+
+			-- Add increased X and Y spawn offsets
+			local spawn_y = spawn_pos.y - 120 + math.random() * 240
+			local spawn_x = spawn_pos.x - 50 + math.random() * 100
+			local e_pos = vmath.vector3(spawn_x, spawn_y, 0.5 - (spawn_y / 10000))
+			
+			local e_ids = collectionfactory.create("/factories#unit_factory", e_pos, vmath.quat(), {}, vmath.vector3(-1.0, 1.0, 1.0))
+			for _, path in pairs(e_ids) do
+				table.insert(self.spawned_paths, path)
+			end
+
+			local e_root = e_ids[hash("/human/root")]
+			local e_hit = e_ids[hash("/human/hit")]
+			local e_shadow = e_ids[hash("/human/shadow")]
+			local e_hp_bg = e_ids[hash("/hp_bg")]
+			local e_hp_fill = e_ids[hash("/hp_fill")]
+			-- Scale child templates
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hit)
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_shadow)
+
+			-- Build enemy info
 			self.characters[id] = {
 				id = id,
-				go_prefix = id .. "/human",
+				p_ids = e_ids,
 				is_enemy = true,
-				name = e_cfg.name or ("Zombie " .. i),
-				hp = e_cfg.hp or 80,
-				max_hp = e_cfg.hp or 80,
-				move_speed = e_cfg.move_speed or 100,
-				attack_cooldown = e_cfg.attack_cooldown or 1.5,
+				name = e_cfg.name,
+				hp = e_cfg.hp,
+				max_hp = e_cfg.hp,
+				move_speed = e_cfg.move_speed,
+				attack_cooldown = e_cfg.attack_cooldown,
 				attack_timer = 0,
-				damage = e_cfg.damage or 15,
-				attack_range = e_cfg.attack_range or 70,
-				weapon_skin = e_cfg.weapon_skin or "stabbing_common",
+				damage = e_cfg.damage,
+				attack_range = skins.get_attack_range(e_cfg.weapon_skin),
+				weapon_skin = e_cfg.weapon_skin,
 				state = "walk",
-				spawn_x = e_cfg.spawn_x or (1000 + i * 250),
+				spawn_x = spawn_x,
 				spawn_y = spawn_y,
-				anim = self.enemy_anims[id],
-				overlay = self.enemy_overlays[id]
+				root_path = e_root,
+				hit_path = e_hit,
+				shadow_path = e_shadow,
+				hp_bg_path = e_hp_bg,
+				hp_fill_path = e_hp_fill,
+				anim = panthera.create_go(animation, nil, build_anim_objects(e_ids)),
+				overlay = panthera.create_go(animation, nil, build_anim_objects(e_ids))
 			}
 			table.insert(self.enemy_ids, id)
 
-			-- Position, scale and show enemy
-			msg.post("/" .. id .. "/human/root", "enable")
-			go.set_position(vmath.vector3(self.characters[id].spawn_x, spawn_y, 0.5 - (spawn_y / 10000)), "/" .. id .. "/human/root")
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/human/hit")
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/human/shadow")
-			go.set_rotation(vmath.quat(), "/" .. id .. "/human/root")
-			skins.apply_defaults(id .. "/human")
-			skins.apply_attachment(id .. "/human", "weapon", self.characters[id].weapon_skin)
-			self.characters[id].weapon_type = skins.get_weapon_type(self.characters[id].weapon_skin) or "impact"
+			-- Apply skin and play walk
+			skins.apply_defaults(e_ids)
+			skins.apply_attachment(e_ids, "weapon", self.characters[id].weapon_skin)
+			self.characters[id].weapon_type = e_wtype
 			panthera.play(self.characters[id].anim, "walk", { is_loop = true })
 
-			-- Enable enemy HP bar, scale to 0.5, reset state
-			msg.post("/" .. id .. "/hp_bg", "enable")
-			msg.post("/" .. id .. "/hp_fill", "enable")
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/hp_bg")
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), "/" .. id .. "/hp_fill")
-			label.set_text("/" .. id .. "/hp_bg#label", string.format("%s: %d / %d", self.characters[id].name, self.characters[id].hp, self.characters[id].max_hp))
-			go.set("/" .. id .. "/hp_fill#sprite", "tint", vmath.vector4(0.85, 0.15, 0.15, 1.0))
-			go.set("/" .. id .. "/hp_bg#sprite", "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
-		else
-			-- Disable unused enemy slot
-			self.characters[id] = nil
-			msg.post("/" .. id .. "/human/root", "disable")
-			msg.post("/" .. id .. "/hp_bg", "disable")
-			msg.post("/" .. id .. "/hp_fill", "disable")
+			-- Scale & configure enemy HP bar
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_bg)
+			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_fill)
+			go.set(msg.url(nil, e_hp_fill, "sprite"), "tint", vmath.vector4(0.85, 0.15, 0.15, 1.0))
+			go.set(msg.url(nil, e_hp_bg, "sprite"), "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+			label.set_text(msg.url(nil, e_hp_bg, "label"), string.format("%s: %d / %d", self.characters[id].name, self.characters[id].hp, self.characters[id].max_hp))
 		end
 	end
 
-	-- Sync GUI speed highlight
+	-- Sync GUI speed, active group, and player equipment highlights
 	msg.post("/ui#panel", "speed_changed", { speed = self.simulation_speed })
+	msg.post("/ui#panel", "group_changed", { group_id = self.active_group })
+	msg.post("/ui#panel", "init_equipment", { weapon = self.player_weapon, body = self.player_body, head = self.player_head })
 
-	add_log(self, "Simulation started!")
-	msg.post("/ui#panel", "set_status", { text = "BATTLE IN PROGRESS", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+	if self.simulation_speed == 0 then
+		msg.post("/ui#panel", "set_status", { text = "PAUSED - EDIT LOADOUT", color = vmath.vector4(0.9, 0.6, 0.1, 1.0) })
+	else
+		add_log(self, string.format("Simulating %s", group_cfg.name or "Wave"))
+		msg.post("/ui#panel", "set_status", { text = "BATTLE IN PROGRESS", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+	end
 end
 
 function init(self)
 	msg.post("@render:", "use_fixed_fit_projection")
 	math.randomseed(os.time())
 
-	-- Create Panthera states
-	self.player_anim = panthera.create_go(animation, "player/human")
-	self.player_overlay = panthera.create_go(animation, "player/human")
-
-	self.enemy_anims = {}
-	self.enemy_overlays = {}
-	for i = 1, 3 do
-		local id = "enemy" .. i
-		self.enemy_anims[id] = panthera.create_go(animation, id .. "/human")
-		self.enemy_overlays[id] = panthera.create_go(animation, id .. "/human")
-	end
-
 	self.characters = {}
-	self.simulation_speed = 1
+	self.spawned_paths = {}
+	self.enemy_ids = {}
+	self.active_group = 1
+	self.simulation_speed = 0
 	panthera.SPEED = self.simulation_speed
 
 	start_simulation(self)
@@ -268,9 +442,15 @@ local function perform_attack(self, attacker, defender)
 	attacker.state = "attack"
 	attacker.attack_timer = 0
 	local wtype = attacker.weapon_type
-	play_muzzle(attacker.id, wtype, attacker.weapon_skin)
+	play_muzzle(attacker.p_ids, attacker.is_enemy, wtype, attacker.weapon_skin)
 
-	panthera.play(attacker.anim, "attack_" .. wtype, {
+	-- Map fists weapon type to play the stabbing punching animation
+	local anim_type = wtype
+	if wtype == "fists" then
+		anim_type = "stabbing"
+	end
+
+	panthera.play(attacker.anim, "attack_" .. anim_type, {
 		is_loop = false,
 		callback = function()
 			if attacker.state == "attack" then
@@ -318,7 +498,7 @@ function update(self, dt)
 
 	-- 1. Update Player
 	local player = self.characters.player
-	if player.hp > 0 then
+	if player and player.hp > 0 then
 		local target = get_next_alive_enemy(self)
 		if not target then
 			-- Victory!
@@ -328,8 +508,8 @@ function update(self, dt)
 			msg.post("/ui#panel", "set_status", { text = "VICTORY!", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
 		else
 			-- Fight/Walk towards target in 2D space
-			local p_pos = go.get_position("/player/human/root")
-			local t_pos = go.get_position("/" .. target.id .. "/human/root")
+			local p_pos = go.get_position(player.root_path)
+			local t_pos = go.get_position(target.root_path)
 			local dx = t_pos.x - p_pos.x
 			local dy = t_pos.y - p_pos.y
 			local dist = math.sqrt(dx*dx + dy*dy)
@@ -358,16 +538,13 @@ function update(self, dt)
 					p_pos.y = p_pos.y + (dy / dist) * player.move_speed * sim_dt
 				end
 			end
-
-			-- Apply Y-sorting Z depth: 0.5 - Y / 10000
-			p_pos.z = 0.5 - (p_pos.y / 10000)
-			go.set_position(p_pos, "/player/human/root")
+			go.set_position(p_pos, player.root_path)
 		end
 
-		-- Position Player HP bar at Y + 210, X - 40 (since scale is 0.5, half size is 40)
-		local p_pos = go.get_position("/player/human/root")
-		go.set_position(vmath.vector3(p_pos.x, p_pos.y + 210, 0.9), "/player/hp_bg")
-		go.set_position(vmath.vector3(p_pos.x - 40, p_pos.y + 210, 0.91), "/player/hp_fill")
+		-- Position Player HP bar at Y + 210, X - 40
+		local p_pos = go.get_position(player.root_path)
+		go.set_position(vmath.vector3(p_pos.x, p_pos.y + 210, 0.9), player.hp_bg_path)
+		go.set_position(vmath.vector3(p_pos.x - 40, p_pos.y + 210, 0.91), player.hp_fill_path)
 	end
 
 	-- 2. Update Enemies
@@ -381,8 +558,8 @@ function update(self, dt)
 				add_log(self, "Defeat! Survivor perished.")
 				msg.post("/ui#panel", "set_status", { text = "DEFEAT!", color = vmath.vector4(0.85, 0.15, 0.15, 1.0) })
 			else
-				local e_pos = go.get_position("/" .. id .. "/human/root")
-				local p_pos = go.get_position("/player/human/root")
+				local e_pos = go.get_position(enemy.root_path)
+				local p_pos = go.get_position(player.root_path)
 				local dx = p_pos.x - e_pos.x
 				local dy = p_pos.y - e_pos.y
 				local dist = math.sqrt(dx*dx + dy*dy)
@@ -411,27 +588,119 @@ function update(self, dt)
 						e_pos.y = e_pos.y + (dy / dist) * enemy.move_speed * sim_dt
 					end
 				end
-
-				-- Apply Y-sorting Z depth
-				e_pos.z = 0.5 - (e_pos.y / 10000)
-				go.set_position(e_pos, "/" .. id .. "/human/root")
+				go.set_position(e_pos, enemy.root_path)
 			end
 
 			-- Position Enemy HP bar
-			local e_pos = go.get_position("/" .. id .. "/human/root")
-			go.set_position(vmath.vector3(e_pos.x, e_pos.y + 210, 0.9), "/" .. id .. "/hp_bg")
-			go.set_position(vmath.vector3(e_pos.x - 40, e_pos.y + 210, 0.91), "/" .. id .. "/hp_fill")
+			local e_pos = go.get_position(enemy.root_path)
+			go.set_position(vmath.vector3(e_pos.x, e_pos.y + 210, 0.9), enemy.hp_bg_path)
+			go.set_position(vmath.vector3(e_pos.x - 40, e_pos.y + 210, 0.91), enemy.hp_fill_path)
 		end
 	end
+
+	-- 3. Dynamic Z-sorting of all units as independent planes (preventing interleaved bones)
+	local alive_units = {}
+	if player and player.hp > 0 then
+		table.insert(alive_units, player)
+	end
+	for _, id in ipairs(self.enemy_ids) do
+		local enemy = self.characters[id]
+		if enemy and enemy.hp > 0 then
+			table.insert(alive_units, enemy)
+		end
+	end
+	table.sort(alive_units, function(a, b)
+		local pos_a = go.get_position(a.root_path)
+		local pos_b = go.get_position(b.root_path)
+		return pos_a.y > pos_b.y
+	end)
+	for index, unit in ipairs(alive_units) do
+		local pos = go.get_position(unit.root_path)
+		pos.z = 0.1 + index * 0.05
+		go.set_position(pos, unit.root_path)
+	end
+end
+
+local function pause_simulation(self)
+	self.battle_state = "paused"
+
+	-- Delete all enemies from the characters table and scene
+	for _, id in ipairs(self.enemy_ids) do
+		local enemy = self.characters[id]
+		if enemy then
+			if enemy.anim then pcall(panthera.stop, enemy.anim) end
+			if enemy.overlay then pcall(panthera.stop, enemy.overlay) end
+			for _, path in pairs(enemy.p_ids) do
+				pcall(go.delete, path, true)
+			end
+			self.characters[id] = nil
+		end
+	end
+	self.enemy_ids = {}
+
+	-- Place the player on their starting point and set to idle
+	local player = self.characters.player
+	if player then
+		local pos_player = go.get_position("/spawn_player")
+		go.set_position(pos_player, player.root_path)
+
+		-- Revive player if they were dead, reset HP to max
+		player.hp = player.max_hp
+		msg.post(player.hp_bg_path, "enable")
+		msg.post(player.hp_fill_path, "enable")
+		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), player.hp_fill_path)
+		label.set_text(msg.url(nil, player.hp_bg_path, "label"), string.format("%s: %d / %d", player.name, player.hp, player.max_hp))
+
+		player.state = "idle"
+		panthera.play(player.anim, "default", { is_loop = true })
+
+		-- Position HP bar above player
+		go.set_position(vmath.vector3(pos_player.x, pos_player.y + 210, 0.9), player.hp_bg_path)
+		go.set_position(vmath.vector3(pos_player.x - 40, pos_player.y + 210, 0.91), player.hp_fill_path)
+	end
+
+	msg.post("/ui#panel", "set_status", { text = "PAUSED - EDIT LOADOUT", color = vmath.vector4(0.9, 0.6, 0.1, 1.0) })
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("restart") then
 		start_simulation(self)
 	elseif message_id == hash("set_speed") then
+		local prev_speed = self.simulation_speed
 		self.simulation_speed = message.speed
 		panthera.SPEED = message.speed
 		msg.post("/ui#panel", "speed_changed", { speed = message.speed })
-		add_log(self, string.format("Speed changed to %dx", message.speed))
+
+		if message.speed == 0 then
+			add_log(self, "Simulation PAUSED")
+			pause_simulation(self)
+		else
+			add_log(self, string.format("Speed changed to %dx", message.speed))
+			if prev_speed == 0 then
+				start_simulation(self)
+			end
+		end
+	elseif message_id == hash("select_group") then
+		self.active_group = message.group_id
+		start_simulation(self)
+	elseif message_id == hash("equip_player") then
+		self.player_weapon = message.weapon
+		self.player_body = message.body
+		self.player_head = message.head
+		if self.simulation_speed == 0 then
+			local player = self.characters.player
+			if player then
+				player.weapon_skin = self.player_weapon
+				player.body_skin = self.player_body
+				player.head_skin = self.player_head
+				skins.apply_attachment(player.p_ids, "body", player.body_skin)
+				skins.apply_attachment(player.p_ids, "head", player.head_skin)
+				skins.apply_attachment(player.p_ids, "weapon", player.weapon_skin)
+				player.weapon_type = skins.get_weapon_type(player.weapon_skin) or "impact"
+				player.attack_range = skins.get_attack_range(player.weapon_skin)
+			end
+		else
+			start_simulation(self)
+		end
 	end
 end

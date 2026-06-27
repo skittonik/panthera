@@ -5,39 +5,36 @@
     "move_speed": 130,
     "attack_cooldown": 1.2,
     "damage": 30,
-    "attack_range": 75,
-    "weapon_skin": "impact_bat"
+    "weapon_skin": "rifle_ak",
+    "body_skin": "body_armor",
+    "head_skin": "head_gasmask"
   },
-  "enemies": [
+  "groups": [
     {
-      "name": "Zombie Melee",
-      "hp": 75,
-      "move_speed": 90,
-      "attack_cooldown": 1.6,
-      "damage": 12,
-      "attack_range": 70,
-      "weapon_skin": "stabbing_common",
-      "spawn_x": 1300
+      "id": 1,
+      "name": "Group 1: 2 Melee (Bats)",
+      "enemies": [
+        "zombie_bat",
+        "zombie_bat"
+      ]
     },
     {
-      "name": "Bandit Ranged",
-      "hp": 65,
-      "move_speed": 100,
-      "attack_cooldown": 2.2,
-      "damage": 18,
-      "attack_range": 350,
-      "weapon_skin": "rifle_ak",
-      "spawn_x": 1550
+      "id": 2,
+      "name": "Group 2: 2 Ranged (Pistol/AK)",
+      "enemies": [
+        "zombie_pistol",
+        "bandit_ak"
+      ]
     },
     {
-      "name": "Zombie Boss",
-      "hp": 250,
-      "move_speed": 60,
-      "attack_cooldown": 2.4,
-      "damage": 35,
-      "attack_range": 75,
-      "weapon_skin": "impact_tire_iron",
-      "spawn_x": 1800
+      "id": 3,
+      "name": "Group 3: 2 Irons, 2 AKs (75hp)",
+      "enemies": [
+        "zombie_iron",
+        "zombie_iron",
+        { "key": "bandit_ak", "hp": 75 },
+        { "key": "bandit_ak", "hp": 75 }
+      ]
     }
   ]
 }

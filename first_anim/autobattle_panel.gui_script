@@ -1,9 +1,47 @@
 local CONTROLLER = "/system#autobattle"
 
+local WEAPONS = { "rifle_ak", "impact_bat", "fists_default", "pistol_pm", "shotgun_short" }
+local WEAPON_LABELS = {
+	rifle_ak = "WEAPON: AK-47",
+	impact_bat = "WEAPON: BAT",
+	fists_default = "WEAPON: FISTS",
+	pistol_pm = "WEAPON: PISTOL",
+	shotgun_short = "WEAPON: SHOTGUN"
+}
+
+local BODIES = { "body_default", "body_armor" }
+local BODY_LABELS = {
+	body_default = "ARMOR: NONE",
+	body_armor = "ARMOR: KEVLAR"
+}
+
+local HEADS = { "head_default", "head_gasmask" }
+local HEAD_LABELS = {
+	head_default = "HELMET: NONE",
+	head_gasmask = "HELMET: GASMASK"
+}
+
 local function flash_node(node)
 	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
 		gui.animate(node, "color.w", 1.0, gui.EASING_OUTQUAD, 0.15)
 	end)
+end
+
+local function get_index(tbl, val)
+	for i, v in ipairs(tbl) do
+		if v == val then return i end
+	end
+	return 1
+end
+
+local function update_equip_ui(self)
+	local w_id = WEAPONS[self.weapon_idx]
+	local b_id = BODIES[self.body_idx]
+	local h_id = HEADS[self.head_idx]
+
+	gui.set_text(self.lbl_equip_weapon, WEAPON_LABELS[w_id] or "WEAPON")
+	gui.set_text(self.lbl_equip_body, BODY_LABELS[b_id] or "ARMOR")
+	gui.set_text(self.lbl_equip_head, HEAD_LABELS[h_id] or "HELMET")
 end
 
 function init(self)
@@ -15,6 +53,7 @@ function init(self)
 
 	-- Speed control panel & buttons
 	self.speed_buttons = {
+		[0] = gui.get_node("speed_0x"),
 		[1] = gui.get_node("speed_1x"),
 		[2] = gui.get_node("speed_2x"),
 		[4] = gui.get_node("speed_4x")
@@ -23,6 +62,27 @@ function init(self)
 
 	-- Restart button
 	self.btn_restart = gui.get_node("btn_restart")
+
+	-- Group selection buttons
+	self.group_buttons = {
+		[1] = gui.get_node("btn_group1"),
+		[2] = gui.get_node("btn_group2"),
+		[3] = gui.get_node("btn_group3")
+	}
+	self.active_group = 1
+
+	-- Equipment buttons
+	self.btn_equip_weapon = gui.get_node("btn_equip_weapon")
+	self.btn_equip_body = gui.get_node("btn_equip_body")
+	self.btn_equip_head = gui.get_node("btn_equip_head")
+
+	self.lbl_equip_weapon = gui.get_node("lbl_equip_weapon")
+	self.lbl_equip_body = gui.get_node("lbl_equip_body")
+	self.lbl_equip_head = gui.get_node("lbl_equip_head")
+
+	self.weapon_idx = 1
+	self.body_idx = 1
+	self.head_idx = 1
 
 	-- Color tokens
 	self.color_active = vmath.vector4(0.15, 0.75, 0.55, 1.0)
@@ -45,6 +105,18 @@ function on_message(self, message_id, message, sender)
 		for speed_val, node in pairs(self.speed_buttons) do
 			gui.set_color(node, speed_val == self.active_speed and self.color_active or self.color_inactive)
 		end
+
+	elseif message_id == hash("group_changed") then
+		self.active_group = message.group_id
+		for group_val, node in pairs(self.group_buttons) do
+			gui.set_color(node, group_val == self.active_group and self.color_active or self.color_inactive)
+		end
+
+	elseif message_id == hash("init_equipment") then
+		self.weapon_idx = get_index(WEAPONS, message.weapon)
+		self.body_idx = get_index(BODIES, message.body)
+		self.head_idx = get_index(HEADS, message.head)
+		update_equip_ui(self)
 	end
 end
 
@@ -65,5 +137,50 @@ function on_input(self, action_id, action)
 			msg.post(CONTROLLER, "set_speed", { speed = speed_val })
 			return
 		end
+	end
+
+	for group_val, btn in pairs(self.group_buttons) do
+		if gui.pick_node(btn, action.x, action.y) then
+			flash_node(btn)
+			msg.post(CONTROLLER, "select_group", { group_id = group_val })
+			return
+		end
+	end
+
+	-- Equipment selections
+	if gui.pick_node(self.btn_equip_weapon, action.x, action.y) then
+		flash_node(self.btn_equip_weapon)
+		self.weapon_idx = (self.weapon_idx % #WEAPONS) + 1
+		update_equip_ui(self)
+		msg.post(CONTROLLER, "equip_player", {
+			weapon = WEAPONS[self.weapon_idx],
+			body = BODIES[self.body_idx],
+			head = HEADS[self.head_idx]
+		})
+		return
+	end
+
+	if gui.pick_node(self.btn_equip_body, action.x, action.y) then
+		flash_node(self.btn_equip_body)
+		self.body_idx = (self.body_idx % #BODIES) + 1
+		update_equip_ui(self)
+		msg.post(CONTROLLER, "equip_player", {
+			weapon = WEAPONS[self.weapon_idx],
+			body = BODIES[self.body_idx],
+			head = HEADS[self.head_idx]
+		})
+		return
+	end
+
+	if gui.pick_node(self.btn_equip_head, action.x, action.y) then
+		flash_node(self.btn_equip_head)
+		self.head_idx = (self.head_idx % #HEADS) + 1
+		update_equip_ui(self)
+		msg.post(CONTROLLER, "equip_player", {
+			weapon = WEAPONS[self.weapon_idx],
+			body = BODIES[self.body_idx],
+			head = HEADS[self.head_idx]
+		})
+		return
 	end
 end
