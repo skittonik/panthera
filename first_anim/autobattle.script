@@ -423,7 +423,7 @@ function init(self)
 	self.enemy_ids = {}
 	self.active_group = 1
 	self.simulation_speed = 0
-	panthera.SPEED = self.simulation_speed
+	panthera.SPEED = 1
 
 	start_simulation(self)
 end
@@ -668,13 +668,14 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("set_speed") then
 		local prev_speed = self.simulation_speed
 		self.simulation_speed = message.speed
-		panthera.SPEED = message.speed
-		msg.post("/ui#panel", "speed_changed", { speed = message.speed })
-
 		if message.speed == 0 then
+			panthera.SPEED = 1
+			msg.post("/ui#panel", "speed_changed", { speed = 0 })
 			add_log(self, "Simulation PAUSED")
 			pause_simulation(self)
 		else
+			panthera.SPEED = message.speed
+			msg.post("/ui#panel", "speed_changed", { speed = message.speed })
 			add_log(self, string.format("Speed changed to %dx", message.speed))
 			if prev_speed == 0 then
 				start_simulation(self)
