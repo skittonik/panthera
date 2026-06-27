@@ -199,8 +199,9 @@ local function advance(world, unit, target, sim_dt)
 	local dx, dy = tpos.x - upos.x, tpos.y - upos.y
 	local dist = math.sqrt(dx * dx + dy * dy)
 
+	unit.attack_timer = math.min(unit.attack_timer + sim_dt, unit.attack_cooldown)
+
 	if dist <= unit.attack_range then
-		unit.attack_timer = unit.attack_timer + sim_dt
 		if unit.attack_timer >= unit.attack_cooldown then
 			perform_attack(world, unit, target)
 		else

@@ -17,12 +17,12 @@ local MIN_FILL = 0.0001
 function Unit:resolve_combat(weapon_skin)
 	if self.uses_weapons then
 		local w = weapons.get_weapon_def(weapon_skin)
-		self.attack_range = w and w.attack_range or 70
+		self.attack_range = w and w.attack_range or 110
 		self.hit_delay = w and w.hit_delay or 0.12
 		self.burst = w and w.burst or nil
 	else
 		local m = units.get(self.unit_type).melee or {}
-		self.attack_range = m.attack_range or 70
+		self.attack_range = m.attack_range or 110
 		self.hit_delay = m.hit_delay or 0.3
 		self.burst = nil
 	end
@@ -40,6 +40,7 @@ function Unit.spawn(opts)
 	local self = setmetatable({}, Unit)
 	self.unit_type = opts.unit_type
 	self.uses_weapons = udef.uses_weapons
+	self.hp_bar_offset_y = udef.hp_bar_offset_y or theme.hp_bar.offset_y
 	self.rig = rig
 	self.is_enemy = opts.is_enemy
 	self.p_ids = rig.p_ids
@@ -53,7 +54,7 @@ function Unit.spawn(opts)
 	self.max_hp = cfg.hp
 	self.move_speed = cfg.move_speed
 	self.attack_cooldown = cfg.attack_cooldown
-	self.attack_timer = opts.is_enemy and cfg.attack_cooldown or 0
+	self.attack_timer = cfg.attack_cooldown
 	self.damage = cfg.damage
 	self.attacking = false
 	self.current_anim = nil
@@ -131,8 +132,9 @@ end
 
 function Unit:position_hp_bar()
 	local pos = self:get_position()
-	go.set_position(vmath.vector3(pos.x, pos.y + theme.hp_bar.offset_y, theme.hp_bar.z_bg), self.hp_bg_path)
-	go.set_position(vmath.vector3(pos.x + theme.hp_bar.fill_dx, pos.y + theme.hp_bar.offset_y, theme.hp_bar.z_fill), self.hp_fill_path)
+	local offset_y = self.hp_bar_offset_y
+	go.set_position(vmath.vector3(pos.x, pos.y + offset_y, theme.hp_bar.z_bg), self.hp_bg_path)
+	go.set_position(vmath.vector3(pos.x + theme.hp_bar.fill_dx, pos.y + offset_y, theme.hp_bar.z_fill), self.hp_fill_path)
 end
 
 local function set_fill(self)
