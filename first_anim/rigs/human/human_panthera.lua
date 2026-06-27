@@ -348,11 +348,16 @@ return {
                     { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.0, duration = 0.12, start_value = -15.0, end_value = -15.0, easing = "linear" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.52, start_value = 129.0, end_value = 75.0, easing = "outquad" },
 
-                    -- Legs kick in fall direction
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -28.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -28.0, end_value = -20.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.5, start_value = 0.0, end_value = -20.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.5, duration = 0.2, start_value = -20.0, end_value = -14.0, easing = "outsine" },
+                    -- Left leg: inertia counter-kick, then swept in fall direction, bounce, settle
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0,  duration = 0.12, start_value = 0.0,  end_value = 5.0,  easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.12, duration = 0.5,  start_value = 5.0,  end_value = -32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = -32.0, end_value = -25.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = -25.0, end_value = -29.0, easing = "inoutsine" },
+                    -- Right leg: slight delay, less extreme, same phases
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0,  duration = 0.15, start_value = 0.0,  end_value = 3.0,  easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.47, start_value = 3.0,  end_value = -22.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.62, duration = 0.16, start_value = -22.0, end_value = -17.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.78, duration = 0.17, start_value = -17.0, end_value = -20.0, easing = "inoutsine" },
 
                     -- hand_right falls with weapon (gripped through death)
                     { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -12.0, easing = "outquad" },
