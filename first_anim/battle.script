@@ -17,16 +17,10 @@ local function play_flash(prefix)
 	end
 end
 
-local MUZZLE_OFFSETS = {
-	pistol = vmath.vector3(194.0, 112.0, 0),
-	rifle = vmath.vector3(316.0, 89.0, 0),
-	shotgun = vmath.vector3(363.0, 77.0, 0)
-}
-
-local function play_muzzle(prefix, wtype)
+local function play_muzzle(prefix, wtype, attachment)
 	if wtype ~= "pistol" and wtype ~= "rifle" and wtype ~= "shotgun" then return end
 	local muzzle_go = "/" .. prefix .. "/muzzle"
-	local offset = MUZZLE_OFFSETS[wtype]
+	local offset = skins.get_muzzle_offset(attachment)
 	if offset then
 		pcall(function()
 			go.set_position(offset, muzzle_go)
@@ -118,6 +112,8 @@ function init(self)
 	self.enemy_hp = 100
 	self.player_weapon_type = "impact"
 	self.enemy_weapon_type = "impact"
+	self.player_weapon_attachment = "impact_bat"
+	self.enemy_weapon_attachment = "impact_bat"
 	self.player_is_acting = false
 	self.enemy_is_acting = false
 
@@ -128,6 +124,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("apply_skin_attachment") then
 		skins.apply_attachment(message.character, message.slot, message.attachment_id)
 		if message.slot == "weapon" then
+			self[message.character .. "_weapon_attachment"] = message.attachment_id
 			local wtype = skins.get_weapon_type(message.attachment_id)
 			if wtype then
 				self[message.character .. "_weapon_type"] = wtype
@@ -191,7 +188,7 @@ function on_message(self, message_id, message, sender)
 			end)
 		else
 			-- Shoot in place
-			play_muzzle(char, wtype)
+			play_muzzle(char, wtype, self[char .. "_weapon_attachment"])
 			panthera.play(anim_state, "attack_" .. wtype, {
 				is_loop = false,
 				callback = function()

@@ -75,4 +75,16 @@ function M.apply_defaults(character_prefix)
 	end
 end
 
+-- Returns the muzzle_offset vector for a weapon skin attachment, if defined.
+function M.get_muzzle_offset(attachment_id)
+	ensure_loaded()
+	local slot = skins_data.slots["weapon"]
+	if not slot then return nil end
+	local att = slot.attachments[attachment_id]
+	if att and att.muzzle_offset then
+		return vmath.vector3(att.muzzle_offset.x, att.muzzle_offset.y, 0)
+	end
+	return nil
+end
+
 return M
