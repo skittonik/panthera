@@ -59,7 +59,8 @@ function M.get_ui_list()
 end
 
 -- Equip a weapon: enable its typed node, disable the others, play its flipbook.
-function M.equip(resolve, weapon_id)
+-- Optionally takes animation states and mapping table to handle two-handed hand_right parenting dynamically.
+function M.equip(resolve, weapon_id, anim_state_base, anim_state_overlay, anim_objects)
 	ensure_loaded()
 	local slot = data.slot
 	local w = data.weapons[weapon_id]
@@ -76,11 +77,53 @@ function M.equip(resolve, weapon_id)
 	end
 
 	if w.node == "none" then
-		return
+		-- Fists or no weapon
+	else
+		local path = resolve(w.node)
+		if path then
+			sprite.play_flipbook(msg.url(nil, path, slot.component), w.animation)
+		end
 	end
-	local path = resolve(w.node)
-	if path then
-		sprite.play_flipbook(msg.url(nil, path, slot.component), w.animation)
+
+	-- Dynamic parenting for hand_right
+	local function to_hash(val)
+		if type(val) == "string" then
+			return hash(val)
+		end
+		return val
+	end
+
+	local hand_right = to_hash(resolve("hand_right"))
+	local weapon = to_hash(resolve("weapon"))
+	local hit = to_hash(resolve("hit"))
+	local dummy = to_hash(resolve("weapon_pistol")) -- Use disabled pistol GO as dummy when two-handed
+
+	local key1 = hash("/hand_right")
+	local key2 = hash("/human/hand_right")
+
+	if w.type == "rifle" or w.type == "shotgun" then
+		go.set_parent(hand_right, weapon, false)
+		go.set_position(vmath.vector3(140, 52, -0.025), hand_right)
+		go.set_rotation(vmath.quat(), hand_right)
+		if anim_objects then
+			if anim_objects[key1] then anim_objects[key1] = dummy end
+			if anim_objects[key2] then anim_objects[key2] = dummy end
+		end
+	else
+		go.set_parent(hand_right, hit, false)
+		go.set_position(vmath.vector3(125, 181, -0.005), hand_right)
+		go.set_rotation(vmath.quat(), hand_right)
+		if anim_objects then
+			if anim_objects[key1] then anim_objects[key1] = hand_right end
+			if anim_objects[key2] then anim_objects[key2] = hand_right end
+		end
+	end
+
+	if anim_state_base then
+		anim_state_base.nodes["hand_right"] = nil
+	end
+	if anim_state_overlay then
+		anim_state_overlay.nodes["hand_right"] = nil
 	end
 end
 

@@ -55,8 +55,9 @@ function R.new(opts)
 	go.set_scale(s, self.shadow_path)
 
 	-- Independent base + overlay (hit reaction) animation states.
-	self.anim = panthera.create_go(animation, nil, build_anim_objects(p_ids))
-	self.overlay = panthera.create_go(animation, nil, build_anim_objects(p_ids))
+	self.anim_objects = build_anim_objects(p_ids)
+	self.anim = panthera.create_go(animation, nil, self.anim_objects)
+	self.overlay = panthera.create_go(animation, nil, self.anim_objects)
 
 	return self
 end
@@ -70,7 +71,7 @@ end
 
 function R:set_weapon(weapon_id)
 	self.weapon_def = weapons.get_weapon_def(weapon_id)
-	weapons.equip(self.resolve, weapon_id)
+	weapons.equip(self.resolve, weapon_id, self.anim, self.overlay, self.anim_objects)
 end
 
 function R:set_equipment(weapon_id, body_id, head_id)

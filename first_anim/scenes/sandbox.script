@@ -6,24 +6,41 @@ local fx = require("first_anim.modules.fx")
 
 local CROSSFADE = 0.15
 
+local ANIM_NODES = {
+	"root", "hit", "shadow", "body", "head", "head_pivot",
+	"left_leg", "right_leg", "hand_right", "hand_left", "weapon", "muzzle",
+	"weapon_impact", "weapon_stabbing", "weapon_pistol", "weapon_rifle", "weapon_shotgun",
+}
+
+local function build_anim_objects(resolve)
+	local map = {}
+	for _, id in ipairs(ANIM_NODES) do
+		local path = resolve(id)
+		map[hash("/human/" .. id)] = go.get_id(path)
+	end
+	return map
+end
+
 -- The sandbox rig is placed statically at /human, so address it by prefix.
 local resolve = skins.resolver_from_prefix("/human")
 
 function init(self)
 	msg.post("@render:", "use_fixed_fit_projection")
 
+	self.anim_objects = build_anim_objects(resolve)
+
 	-- Base state: drives the body (idle / walk / attack / death).
-	self.anim = panthera.create_go(animation, "human")
+	self.anim = panthera.create_go(animation, "human", self.anim_objects)
 
 	-- Overlay state: an INDEPENDENT Panthera state on the same rig.
 	-- "damage" only animates the dedicated "hit" / "head_pivot" nodes,
 	-- which no base clip touches, so the overlay runs fully decoupled
 	-- from the base - never clobbered by attack/crossfade.
-	self.overlay = panthera.create_go(animation, "human")
+	self.overlay = panthera.create_go(animation, "human", self.anim_objects)
 
 	skins.apply_defaults(resolve)
 	self.weapon_attachment = weapons.default_weapon()
-	weapons.equip(resolve, self.weapon_attachment)
+	weapons.equip(resolve, self.weapon_attachment, self.anim, self.overlay, self.anim_objects)
 
 	self.base_anim = "default"
 	self.base_loop = true
@@ -36,7 +53,7 @@ function on_message(self, message_id, message)
 	if message_id == hash("apply_skin_attachment") then
 		if message.slot == "weapon" then
 			self.weapon_attachment = message.attachment_id
-			weapons.equip(resolve, message.attachment_id)
+			weapons.equip(resolve, message.attachment_id, self.anim, self.overlay, self.anim_objects)
 		else
 			skins.apply_attachment(resolve, message.slot, message.attachment_id)
 		end
