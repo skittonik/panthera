@@ -1,3 +1,19 @@
+components {
+  id: "muzzle_flash"
+  component: "/first_anim/muzzle_flash.particlefx"
+  position {
+    x: 205.0
+    y: 65.0
+  }
+}
+components {
+  id: "smoke_puff"
+  component: "/first_anim/smoke_puff.particlefx"
+  position {
+    x: 205.0
+    y: 65.0
+  }
+}
 embedded_components {
   id: "sprite"
   type: "sprite"

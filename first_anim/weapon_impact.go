@@ -8,4 +8,12 @@ embedded_components {
   "  texture: \"/first_anim/weapons.atlas\"\n"
   "}\n"
   ""
+  position {
+    x: 22.0
+    y: -4.0
+  }
+  rotation {
+    z: 0.8224751
+    w: 0.56880116
+  }
 }

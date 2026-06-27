@@ -1,0 +1,16 @@
+images {
+  image: "/first_anim/assets/effects/muzzle_star.png"
+}
+images {
+  image: "/first_anim/assets/effects/shockwave_ring.png"
+}
+images {
+  image: "/first_anim/assets/effects/smoke_puff_1.png"
+}
+images {
+  image: "/first_anim/assets/effects/smoke_puff_2.png"
+}
+images {
+  image: "/first_anim/assets/effects/smoke_puff_3.png"
+}
+extrude_borders: 2

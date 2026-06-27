@@ -42,13 +42,12 @@ instances {
 instances {
   id: "weapon"
   prototype: "/first_anim/weapon.go"
-  children: "hand_right"
+  children: "hand_left"
   children: "weapon_impact"
-  children: "weapon_stabbing"
   children: "weapon_pistol"
   children: "weapon_rifle"
   children: "weapon_shotgun"
-  children: "hand_left"
+  children: "weapon_stabbing"
   position {
     x: -15.0
     y: 129.0
@@ -59,33 +58,57 @@ instances {
   id: "hand_right"
   prototype: "/first_anim/hand_right.go"
   position {
-    z: -0.025
+    x: 85.0
+    y: 181.0
+    z: -0.005
   }
 }
 instances {
   id: "weapon_impact"
   prototype: "/first_anim/weapon_impact.go"
+  position {
+    x: -35.0
+    y: 33.0
+  }
 }
 instances {
   id: "weapon_stabbing"
   prototype: "/first_anim/weapon_stabbing.go"
+  position {
+    x: -18.0
+    y: 39.0
+  }
 }
 instances {
   id: "weapon_pistol"
   prototype: "/first_anim/weapon_pistol.go"
+  position {
+    x: -11.0
+    y: 47.0
+  }
 }
 instances {
   id: "weapon_rifle"
   prototype: "/first_anim/weapon_rifle.go"
+  position {
+    x: -15.0
+    y: 41.0
+  }
 }
 instances {
   id: "weapon_shotgun"
   prototype: "/first_anim/weapon_shotgun.go"
+  position {
+    x: -4.0
+    y: 43.0
+  }
 }
 instances {
   id: "hand_left"
   prototype: "/first_anim/hand_left.go"
   position {
+    x: -14.0
+    y: 36.0
     z: 0.01
   }
 }
@@ -99,6 +122,7 @@ embedded_instances {
 embedded_instances {
   id: "hit"
   children: "body"
+  children: "hand_right"
   children: "head_pivot"
   children: "left_leg"
   children: "right_leg"

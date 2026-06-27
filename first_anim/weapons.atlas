@@ -1,31 +1,49 @@
 images {
-  image: "/first_anim/assets/impact_bat.png"
+  image: "/first_anim/assets/weapons/impact_bat.png"
+  pivot_x: 0.177386
 }
 images {
-  image: "/first_anim/assets/impact_tire_iron.png"
+  image: "/first_anim/assets/weapons/impact_tire_iron.png"
+  pivot_x: 0.204053
+  pivot_y: 0.31046
 }
 images {
-  image: "/first_anim/assets/stabbing_common.png"
+  image: "/first_anim/assets/weapons/stabbing_common.png"
+  pivot_x: 0.216505
+  pivot_y: 0.477442
 }
 images {
-  image: "/first_anim/assets/stabbing_black.png"
+  image: "/first_anim/assets/weapons/stabbing_black.png"
+  pivot_x: 0.257633
 }
 images {
-  image: "/first_anim/assets/pistol_deagle.png"
+  image: "/first_anim/assets/weapons/pistol_deagle.png"
+  pivot_x: 0.230054
+  pivot_y: 0.605907
 }
 images {
-  image: "/first_anim/assets/pistol_pm.png"
+  image: "/first_anim/assets/weapons/pistol_pm.png"
+  pivot_x: 0.223761
+  pivot_y: 0.631612
 }
 images {
-  image: "/first_anim/assets/rifle_ak.png"
+  image: "/first_anim/assets/weapons/rifle_ak.png"
+  pivot_x: 0.364607
+  pivot_y: 0.53217
 }
 images {
-  image: "/first_anim/assets/rifle_m4.png"
+  image: "/first_anim/assets/weapons/rifle_m4.png"
+  pivot_x: 0.311547
+  pivot_y: 0.631235
 }
 images {
-  image: "/first_anim/assets/shotgun_long.png"
+  image: "/first_anim/assets/weapons/shotgun_long.png"
+  pivot_x: 0.310113
+  pivot_y: 0.469053
 }
 images {
-  image: "/first_anim/assets/shotgun_short.png"
+  image: "/first_anim/assets/weapons/shotgun_short.png"
+  pivot_x: 0.187979
+  pivot_y: 0.530516
 }
 extrude_borders: 2

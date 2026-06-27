@@ -4,6 +4,40 @@ local skins = require("first_anim.skins")
 
 local CROSSFADE = 0.15
 
+local FLASH_NODES = {
+	"body", "head", "hand_right", "hand_left", "left_leg", "right_leg",
+	"weapon_impact", "weapon_pistol", "weapon_rifle", "weapon_shotgun", "weapon_stabbing"
+}
+
+local function play_flash(prefix)
+	for _, id in ipairs(FLASH_NODES) do
+		local url = msg.url(nil, "/" .. prefix .. "/" .. id, "sprite")
+		go.set(url, "flash", vmath.vector4(1, 0, 0, 0))
+		go.animate(url, "flash", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0, 0, 0, 0), go.EASING_LINEAR, 0.3, 0)
+	end
+end
+
+local function play_muzzle(wtype)
+	if wtype ~= "pistol" and wtype ~= "rifle" and wtype ~= "shotgun" then return end
+	local url_flash = msg.url(nil, hash("/human/weapon_" .. wtype), hash("muzzle_flash"))
+	local url_smoke = msg.url(nil, hash("/human/weapon_" .. wtype), hash("smoke_puff"))
+	local function fire()
+		particlefx.stop(url_flash)
+		particlefx.stop(url_smoke)
+		particlefx.play(url_flash)
+		particlefx.play(url_smoke)
+	end
+	if wtype == "pistol" then
+		timer.delay(0.1, false, function() fire() end)
+	elseif wtype == "shotgun" then
+		fire()
+	elseif wtype == "rifle" then
+		fire()
+		timer.delay(0.13, false, function() fire() end)
+		timer.delay(0.26, false, function() fire() end)
+	end
+end
+
 function init(self)
 	msg.post("@render:", "use_fixed_fit_projection")
 
@@ -45,6 +79,7 @@ function on_message(self, message_id, message)
 	-- OVERLAY: damage layers on top of whatever the base is doing.
 	if anim == "damage" then
 		panthera.play(self.overlay, "damage", { is_loop = false })
+		play_flash("human")
 		return
 	end
 
@@ -54,6 +89,7 @@ function on_message(self, message_id, message)
 			return
 		end
 		self.is_playing_action = true
+		play_muzzle(self.weapon_type)
 		panthera.play(self.anim, "attack_" .. self.weapon_type, {
 			is_loop = false,
 			callback = function()
