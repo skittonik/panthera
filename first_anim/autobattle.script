@@ -115,6 +115,13 @@ local function apply_damage(self, attacker_id, defender_id, amount)
 		panthera.play(defender.anim, "death", { is_loop = false })
 		msg.post(defender.hp_bg_path, "disable")
 		msg.post(defender.hp_fill_path, "disable")
+
+		-- Swap shadow to smudge.png from effects atlas, and animate it spreading out
+		local shadow_sprite_url = msg.url(nil, defender.shadow_path, "sprite")
+		sprite.set_texture(shadow_sprite_url, "/first_anim/effects.atlas")
+		sprite.play_flipbook(shadow_sprite_url, "smudge")
+		go.set_scale(vmath.vector3(0, 0, 1.0), defender.shadow_path)
+		go.animate(defender.shadow_path, "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(0.6, 0.6, 1.0), go.EASING_OUTQUAD, 0.45)
 	else
 		panthera.play(defender.overlay, "damage", { is_loop = false })
 		play_flash(defender.p_ids)

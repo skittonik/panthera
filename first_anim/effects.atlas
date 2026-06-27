@@ -13,4 +13,7 @@ images {
 images {
   image: "/first_anim/assets/effects/smoke_puff_3.png"
 }
+images {
+  image: "/first_anim/assets/effects/smudge.png"
+}
 extrude_borders: 2

@@ -356,7 +356,7 @@ return {
                     { key_type = "tween", node_id = "head#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "left_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "right_leg#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "shadow#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "shadow#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 1.0, easing = "outsine" },
                     { key_type = "tween", node_id = "hand_right#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "hand_left#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
                     { key_type = "tween", node_id = "weapon_pistol#sprite", property_id = "color_a", start_time = 0.85, duration = 0.55, start_value = 1.0, end_value = 0.0, easing = "outsine" },
