@@ -280,6 +280,8 @@ local function spawn_enemies(self)
 	if player then
 		player.state = "walk"
 		panthera.play(player.anim, "walk", { is_loop = true })
+		msg.post(player.hp_bg_path, "enable")
+		msg.post(player.hp_fill_path, "enable")
 	end
 
 	self.battle_state = "fighting"
@@ -432,6 +434,8 @@ local function start_simulation(self)
 		spawn_enemies(self)
 	else
 		self.battle_state = "paused"
+		msg.post(p_hp_bg, "disable")
+		msg.post(p_hp_fill, "disable")
 		msg.post("/ui#panel", "speed_changed", { speed = self.simulation_speed })
 		msg.post("/ui#panel", "group_changed", { group_id = self.active_group })
 		msg.post("/ui#panel", "init_equipment", { weapon = self.player_weapon, body = self.player_body, head = self.player_head })
@@ -669,10 +673,10 @@ local function pause_simulation(self)
 		local pos_player = go.get_position("/spawn_player")
 		go.set_position(pos_player, player.root_path)
 
-		-- Revive player if they were dead, reset HP to max
+		-- Revive player if they were dead, reset HP to max, and disable HP bar
 		player.hp = player.max_hp
-		msg.post(player.hp_bg_path, "enable")
-		msg.post(player.hp_fill_path, "enable")
+		msg.post(player.hp_bg_path, "disable")
+		msg.post(player.hp_fill_path, "disable")
 		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), player.hp_fill_path)
 		label.set_text(msg.url(nil, player.hp_bg_path, "label"), string.format("%s: %d / %d", player.name, player.hp, player.max_hp))
 
