@@ -54,7 +54,8 @@ function Unit.spawn(opts)
 	self.attack_cooldown = cfg.attack_cooldown
 	self.attack_timer = opts.is_enemy and cfg.attack_cooldown or 0
 	self.damage = cfg.damage
-	self.state = "walk"
+	self.attacking = false   -- true only while a one-shot attack clip is playing
+	self.current_anim = nil  -- last base clip, for ensure_anim de-duplication
 
 	-- Scale child templates down to unit size.
 	local s = vmath.vector3(theme.unit_scale, theme.unit_scale, 1.0)
@@ -117,8 +118,18 @@ function Unit:set_equipment(weapon_skin, body_skin, head_skin)
 	self:set_weapon(weapon_skin)
 end
 
+-- Play a base clip (always restarts it, even if it's the current one).
 function Unit:play(anim_id, opts)
+	self.current_anim = anim_id
 	panthera.play(self.anim, anim_id, opts)
+end
+
+-- Play a looping base clip only if it isn't already the active one. Keeps the
+-- per-frame FSM from restarting walk/idle every tick.
+function Unit:ensure_anim(anim_id, loop)
+	if self.current_anim ~= anim_id then
+		self:play(anim_id, { is_loop = loop })
+	end
 end
 
 function Unit:refresh_hp_label()
@@ -156,7 +167,7 @@ end
 -- (Death disables the shadow and plays a terminal clip, so revive undoes both.)
 function Unit:revive()
 	self:reset_hp()
-	self.state = "idle"
+	self.attacking = false
 	msg.post(self.shadow_path, "enable")
 	self:play("default", { is_loop = true })
 end
@@ -177,7 +188,7 @@ function Unit:apply_damage(amount, ctx)
 	end
 
 	-- Death: terminal animation, hide bars, swap shadow for a ground smudge.
-	self.state = "dead"
+	self.attacking = false
 	self:play("death", { is_loop = false })
 	self:set_hp_bar_visible(false)
 	msg.post(self.shadow_path, "disable")

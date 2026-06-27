@@ -182,7 +182,7 @@ nodes {
     z: 0.4
   }
   type: TYPE_BOX
-  id: "btn_restart"
+  id: "btn_play"
   inherit_alpha: true
 }
 nodes {
@@ -199,10 +199,10 @@ nodes {
     y: 60.0
   }
   type: TYPE_TEXT
-  text: "RESTART"
+  text: "PLAY"
   font: "troika"
-  id: "lbl_restart"
-  parent: "btn_restart"
+  id: "lbl_play"
+  parent: "btn_play"
   inherit_alpha: true
   shadow_alpha: 0.0
 }

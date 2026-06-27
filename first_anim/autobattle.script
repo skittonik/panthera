@@ -18,6 +18,8 @@ local function make_emit(self)
 				table.remove(buf, 1)
 			end
 			msg.post(UI, "update_logs", { logs = buf })
+		elseif ev.type == "phase" then
+			msg.post(UI, "phase_changed", { phase = ev.phase })
 		elseif ev.type == "status" then
 			msg.post(UI, "set_status", { text = ev.text, color = ev.color })
 		elseif ev.type == "speed" then
@@ -63,12 +65,14 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message)
-	if message_id == hash("restart") then
-		combat.start(self.world)
+	if message_id == hash("play") then
+		combat.play(self.world)
+	elseif message_id == hash("pause") then
+		combat.pause(self.world)
 	elseif message_id == hash("set_speed") then
 		combat.set_speed(self.world, message.speed)
 	elseif message_id == hash("select_group") then
-		combat.select_group(self.world, message.group_id)
+		combat.set_group(self.world, message.group_id)
 	elseif message_id == hash("equip_player") then
 		combat.set_loadout(self.world, message.weapon, message.body, message.head)
 	end
