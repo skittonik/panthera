@@ -17,10 +17,26 @@ local function play_flash(prefix)
 	end
 end
 
+local MUZZLE_OFFSETS = {
+	pistol = vmath.vector3(194.0, 112.0, 0),
+	rifle = vmath.vector3(316.0, 89.0, 0),
+	shotgun = vmath.vector3(363.0, 77.0, 0)
+}
+
 local function play_muzzle(prefix, wtype)
 	if wtype ~= "pistol" and wtype ~= "rifle" and wtype ~= "shotgun" then return end
-	local url_flash = msg.url(nil, hash("/" .. prefix .. "/weapon_" .. wtype), hash("muzzle_flash"))
-	local url_smoke = msg.url(nil, hash("/" .. prefix .. "/weapon_" .. wtype), hash("smoke_puff"))
+	local muzzle_go = "/" .. prefix .. "/muzzle"
+	local offset = MUZZLE_OFFSETS[wtype]
+	if offset then
+		pcall(function()
+			go.set_position(offset, muzzle_go)
+			local rot = (prefix == "enemy") and vmath.quat_rotation_z(math.pi) or vmath.quat()
+			go.set_rotation(rot, muzzle_go)
+		end)
+	end
+
+	local url_flash = msg.url(nil, hash(muzzle_go), hash("muzzle_flash"))
+	local url_smoke = msg.url(nil, hash(muzzle_go), hash("smoke_puff"))
 	local function fire()
 		pcall(function()
 			particlefx.stop(url_flash)

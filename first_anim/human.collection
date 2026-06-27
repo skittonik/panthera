@@ -43,6 +43,7 @@ instances {
   id: "weapon"
   prototype: "/first_anim/weapon.go"
   children: "hand_left"
+  children: "muzzle"
   children: "weapon_impact"
   children: "weapon_pistol"
   children: "weapon_rifle"
@@ -110,6 +111,15 @@ instances {
     x: -14.0
     y: 36.0
     z: 0.01
+  }
+}
+instances {
+  id: "muzzle"
+  prototype: "/first_anim/muzzle.go"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
   }
 }
 scale_along_z: 0
