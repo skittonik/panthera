@@ -42,6 +42,10 @@ embedded_instances {
   "  id: \"unit_factory\"\n"
   "  component: \"/first_anim/unit_factory.collectionfactory\"\n"
   "}\n"
+  "components {\n"
+  "  id: \"smudge_factory\"\n"
+  "  component: \"/first_anim/smudge_factory.factory\"\n"
+  "}\n"
   ""
 }
 embedded_instances {

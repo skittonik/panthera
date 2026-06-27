@@ -116,12 +116,15 @@ local function apply_damage(self, attacker_id, defender_id, amount)
 		msg.post(defender.hp_bg_path, "disable")
 		msg.post(defender.hp_fill_path, "disable")
 
-		-- Swap shadow to smudge.png from effects atlas, and animate it spreading out
-		local shadow_sprite_url = msg.url(nil, defender.shadow_path, "sprite")
-		sprite.set_texture(shadow_sprite_url, "/first_anim/effects.atlas")
-		sprite.play_flipbook(shadow_sprite_url, "smudge")
-		go.set_scale(vmath.vector3(0, 0, 1.0), defender.shadow_path)
-		go.animate(defender.shadow_path, "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(0.6, 0.6, 1.0), go.EASING_OUTQUAD, 0.45)
+		-- Disable unit's default shadow and spawn a separate smudge GO that remains on the ground
+		msg.post(defender.shadow_path, "disable")
+		local pos = go.get_position(defender.root_path)
+		pos.z = 0.02
+		local smudge_id = factory.create("/factories#smudge_factory", pos)
+		table.insert(self.spawned_paths, smudge_id)
+
+		go.set_scale(vmath.vector3(0, 0, 1.0), smudge_id)
+		go.animate(smudge_id, "scale", go.PLAYBACK_ONCE_FORWARD, vmath.vector3(0.55, 0.55, 1.0), go.EASING_OUTQUAD, 0.45)
 	else
 		panthera.play(defender.overlay, "damage", { is_loop = false })
 		play_flash(defender.p_ids)
