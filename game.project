@@ -1,5 +1,5 @@
 [bootstrap]
-main_collection = /first_anim/autobattle.collectionc
+main_collection = /first_anim/scenes/autobattle.collectionc
 render = /example/default.renderc
 
 [script]
@@ -18,7 +18,7 @@ title = Panthera Runtime
 version = 5.0
 publisher = Insality
 developer = Maksim Tuprikov
-custom_resources = /first_anim/skins.json, /first_anim/autobattle_config.json, /first_anim/enemies_config.json
+custom_resources = /first_anim/data/skins.json, /first_anim/data/weapons.json, /first_anim/data/units.json, /first_anim/data/player.json, /first_anim/data/waves.json, /first_anim/data/enemies.json
 dependencies#0 = https://github.com/Insality/defold-log/archive/refs/heads/develop.zip
 dependencies#1 = https://github.com/Insality/defold-tweener/archive/refs/tags/5.zip
 dependencies#2 = https://github.com/Insality/druid/archive/refs/heads/develop.zip

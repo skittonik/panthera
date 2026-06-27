@@ -1,0 +1,106 @@
+local panthera = require("panthera.panthera")
+local animation = require("first_anim.rigs.human.human_panthera")
+local skins = require("first_anim.modules.skins")
+local weapons = require("first_anim.modules.weapons")
+local fx = require("first_anim.modules.fx")
+
+local CROSSFADE = 0.15
+
+-- The sandbox rig is placed statically at /human, so address it by prefix.
+local resolve = skins.resolver_from_prefix("/human")
+
+function init(self)
+	msg.post("@render:", "use_fixed_fit_projection")
+
+	-- Base state: drives the body (idle / walk / attack / death).
+	self.anim = panthera.create_go(animation, "human")
+
+	-- Overlay state: an INDEPENDENT Panthera state on the same rig.
+	-- "damage" only animates the dedicated "hit" / "head_pivot" nodes,
+	-- which no base clip touches, so the overlay runs fully decoupled
+	-- from the base - never clobbered by attack/crossfade.
+	self.overlay = panthera.create_go(animation, "human")
+
+	skins.apply_defaults(resolve)
+	self.weapon_attachment = weapons.default_weapon()
+	weapons.equip(resolve, self.weapon_attachment)
+
+	self.base_anim = "default"
+	self.base_loop = true
+	self.is_playing_action = false
+
+	panthera.play(self.anim, self.base_anim, { is_loop = self.base_loop })
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("apply_skin_attachment") then
+		if message.slot == "weapon" then
+			self.weapon_attachment = message.attachment_id
+			weapons.equip(resolve, message.attachment_id)
+		else
+			skins.apply_attachment(resolve, message.slot, message.attachment_id)
+		end
+		return
+	end
+
+	if message_id ~= hash("play_anim") then
+		return
+	end
+
+	local anim = message.anim
+
+	-- OVERLAY: damage layers on top of whatever the base is doing.
+	if anim == "damage" then
+		panthera.play(self.overlay, "damage", { is_loop = false })
+		fx.flash(resolve)
+		return
+	end
+
+	-- ONE-SHOT ACTION: only allowed from IDLE, no-op otherwise.
+	if anim == "attack" then
+		if self.base_anim ~= "default" or self.is_playing_action then
+			return
+		end
+		self.is_playing_action = true
+		local wdef = weapons.get_weapon_def(self.weapon_attachment)
+		fx.muzzle(resolve, false, wdef)
+		panthera.play(self.anim, (wdef and wdef.attack_animation) or "attack_impact", {
+			is_loop = false,
+			callback = function()
+				-- Hold is_playing_action=true through the crossfade window
+				-- so rapid clicks can't re-trigger attack during the blend.
+				panthera.crossfade(self.anim, self.base_anim, CROSSFADE, { is_loop = self.base_loop })
+				timer.delay(CROSSFADE, false, function()
+					self.is_playing_action = false
+				end)
+			end
+		})
+		return
+	end
+
+	-- TERMINAL STATE: permanently overrides everything.
+	if anim == "death" then
+		self.base_anim = "death"
+		self.base_loop = false
+		self.is_playing_action = false
+		panthera.crossfade(self.anim, "death", CROSSFADE, { is_loop = false })
+		return
+	end
+
+	-- BASE STATE CHANGE (default / walk) - both loop.
+	local coming_from_death = (self.base_anim == "death")
+	self.base_anim = anim
+	self.base_loop = true
+
+	if not self.is_playing_action then
+		if coming_from_death then
+			-- crossfade can't restore color_a=0 that death left behind, because
+			-- idle has no color_a keys. A plain play() calls reset_animation_state
+			-- on "death", which snaps all properties (including alpha) back to
+			-- their node defaults before starting idle.
+			panthera.play(self.anim, anim, { is_loop = true })
+		else
+			panthera.crossfade(self.anim, anim, CROSSFADE, { is_loop = true })
+		end
+	end
+end

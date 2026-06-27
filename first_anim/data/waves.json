@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "id": 1,
+      "name": "Group 1: Bat + 2 Rats",
+      "enemies": ["zombie_bat", "rat", "rat"]
+    },
+    {
+      "id": 2,
+      "name": "Group 2: 2 Ranged (Pistol/AK)",
+      "enemies": ["zombie_pistol", "bandit_ak"]
+    },
+    {
+      "id": 3,
+      "name": "Group 3: 2 Irons, 2 AKs (75hp)",
+      "enemies": [
+        "zombie_iron",
+        "zombie_iron",
+        { "key": "bandit_ak", "hp": 75 },
+        { "key": "bandit_ak", "hp": 75 }
+      ]
+    }
+  ]
+}

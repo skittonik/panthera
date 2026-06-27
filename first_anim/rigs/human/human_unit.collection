@@ -1,0 +1,29 @@
+name: "unit"
+collection_instances {
+  id: "human"
+  collection: "/first_anim/rigs/human/human.collection"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+}
+instances {
+  id: "hp_bg"
+  prototype: "/first_anim/rigs/shared/hp_bg.go"
+  position {
+    x: 0.0
+    y: 420.0
+    z: 0.8
+  }
+}
+instances {
+  id: "hp_fill"
+  prototype: "/first_anim/rigs/shared/hp_fill.go"
+  position {
+    x: -80.0
+    y: 420.0
+    z: 0.81
+  }
+}
+scale_along_z: 0

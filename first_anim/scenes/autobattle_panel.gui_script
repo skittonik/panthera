@@ -1,0 +1,200 @@
+local skins = require("first_anim.modules.skins")
+local weapons = require("first_anim.modules.weapons")
+local theme = require("first_anim.modules.theme")
+
+local CONTROLLER = "/system#autobattle"
+
+local EQUIP_COLOR = vmath.vector4(0.18, 0.22, 0.28, 1.0)
+
+local function flash_node(node)
+	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
+		gui.animate(node, "color.w", 1.0, gui.EASING_OUTQUAD, 0.15)
+	end)
+end
+
+-- Paint a toggle button: teal when active, grey otherwise, dimmed when locked.
+local function paint(node, active, enabled)
+	local c = active and theme.color.ui_active or theme.color.ui_inactive
+	gui.set_color(node, vmath.vector4(c.x, c.y, c.z, enabled and 1.0 or 0.4))
+end
+
+local function index_of(list, id)
+	for i, entry in ipairs(list) do
+		if entry.id == id then return i end
+	end
+	return 1
+end
+
+local function current_id(self, slot)
+	return self.slots[slot].list[self.slots[slot].idx].id
+end
+
+-- A battle is "in progress" (running or paused) - groups are locked then.
+local function battle_locked(self)
+	return self.phase == "running" or self.phase == "paused"
+end
+
+-- Refresh ---------------------------------------------------------------------
+
+local function refresh_play_pause(self)
+	local running = (self.phase == "running")
+	paint(self.btn_play, running, true)
+	paint(self.btn_pause, not running, true)
+end
+
+local function refresh_speed(self)
+	for speed_val, node in pairs(self.speed_buttons) do
+		paint(node, speed_val == self.active_speed, true)
+	end
+end
+
+local function refresh_groups(self)
+	local enabled = not battle_locked(self)
+	for group_val, node in pairs(self.group_buttons) do
+		paint(node, group_val == self.active_group, enabled)
+	end
+end
+
+local function refresh_equip(self)
+	local alpha = (self.phase == "running") and 0.4 or 1.0
+	for _, data in pairs(self.slots) do
+		gui.set_color(data.node, vmath.vector4(EQUIP_COLOR.x, EQUIP_COLOR.y, EQUIP_COLOR.z, alpha))
+		gui.set_text(data.label, data.list[data.idx].label)
+	end
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	self.status_lbl = gui.get_node("status_lbl")
+	self.log_text = gui.get_node("log_text")
+
+	self.btn_play = gui.get_node("btn_play")
+	self.btn_pause = gui.get_node("btn_pause")
+
+	self.speed_buttons = {
+		[1] = gui.get_node("speed_1x"),
+		[2] = gui.get_node("speed_2x"),
+		[4] = gui.get_node("speed_4x"),
+	}
+	self.group_buttons = {
+		[1] = gui.get_node("btn_group1"),
+		[2] = gui.get_node("btn_group2"),
+		[3] = gui.get_node("btn_group3"),
+	}
+
+	-- Equipment selectors are driven entirely by skins.json (UI-flagged entries).
+	self.slots = {
+		weapon = { list = weapons.get_ui_list(), idx = 1, node = gui.get_node("btn_equip_weapon"), label = gui.get_node("lbl_equip_weapon") },
+		body   = { list = skins.get_ui_list("body"),   idx = 1, node = gui.get_node("btn_equip_body"),   label = gui.get_node("lbl_equip_body") },
+		head   = { list = skins.get_ui_list("head"),   idx = 1, node = gui.get_node("btn_equip_head"),   label = gui.get_node("lbl_equip_head") },
+	}
+
+	-- Sensible defaults; the controller refines them via messages on boot.
+	self.phase = "idle"
+	self.active_speed = 1
+	self.active_group = 1
+
+	refresh_play_pause(self)
+	refresh_speed(self)
+	refresh_groups(self)
+	refresh_equip(self)
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("update_logs") then
+		gui.set_text(self.log_text, table.concat(message.logs, "\n"))
+
+	elseif message_id == hash("set_status") then
+		gui.set_text(self.status_lbl, message.text)
+		if message.color then
+			gui.set_color(self.status_lbl, message.color)
+		end
+
+	elseif message_id == hash("phase_changed") then
+		self.phase = message.phase
+		refresh_play_pause(self)
+		refresh_groups(self)
+		refresh_equip(self)
+
+	elseif message_id == hash("speed_changed") then
+		self.active_speed = message.speed
+		refresh_speed(self)
+
+	elseif message_id == hash("group_changed") then
+		self.active_group = message.group_id
+		refresh_groups(self)
+
+	elseif message_id == hash("init_equipment") then
+		self.slots.weapon.idx = index_of(self.slots.weapon.list, message.weapon)
+		self.slots.body.idx = index_of(self.slots.body.list, message.body)
+		self.slots.head.idx = index_of(self.slots.head.list, message.head)
+		refresh_equip(self)
+	end
+end
+
+local function cycle_slot(self, slot)
+	local data = self.slots[slot]
+	data.idx = (data.idx % #data.list) + 1
+	refresh_equip(self)
+	msg.post(CONTROLLER, "equip_player", {
+		weapon = current_id(self, "weapon"),
+		body = current_id(self, "body"),
+		head = current_id(self, "head"),
+	})
+end
+
+function on_input(self, action_id, action)
+	if action_id ~= hash("touch") or not action.pressed then
+		return
+	end
+
+	-- PLAY / PAUSE: mutually exclusive, the active one can't be re-pressed.
+	if gui.pick_node(self.btn_play, action.x, action.y) then
+		if self.phase ~= "running" then
+			flash_node(self.btn_play)
+			msg.post(CONTROLLER, "play")
+		end
+		return
+	end
+	if gui.pick_node(self.btn_pause, action.x, action.y) then
+		if self.phase == "running" then
+			flash_node(self.btn_pause)
+			msg.post(CONTROLLER, "pause")
+		end
+		return
+	end
+
+	-- Speed: pure multiplier, can't re-select the active one.
+	for speed_val, btn in pairs(self.speed_buttons) do
+		if gui.pick_node(btn, action.x, action.y) then
+			if speed_val ~= self.active_speed then
+				flash_node(btn)
+				msg.post(CONTROLLER, "set_speed", { speed = speed_val })
+			end
+			return
+		end
+	end
+
+	-- Group: a setting, locked during battle and not re-selectable.
+	for group_val, btn in pairs(self.group_buttons) do
+		if gui.pick_node(btn, action.x, action.y) then
+			if not battle_locked(self) and group_val ~= self.active_group then
+				flash_node(btn)
+				msg.post(CONTROLLER, "select_group", { group_id = group_val })
+			end
+			return
+		end
+	end
+
+	-- Loadout cyclers: only while not running.
+	if self.phase ~= "running" then
+		for slot, data in pairs(self.slots) do
+			if gui.pick_node(data.node, action.x, action.y) then
+				flash_node(data.node)
+				cycle_slot(self, slot)
+				return
+			end
+		end
+	end
+end

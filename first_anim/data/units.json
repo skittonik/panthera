@@ -1,0 +1,13 @@
+{
+  "human": {
+    "rig": "human",
+    "factory": "human_factory",
+    "uses_weapons": true
+  },
+  "rat": {
+    "rig": "rat",
+    "factory": "rat_factory",
+    "uses_weapons": false,
+    "melee": { "attack_range": 70, "hit_delay": 0.3 }
+  }
+}

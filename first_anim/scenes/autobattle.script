@@ -1,0 +1,65 @@
+-- autobattle.script
+-- Thin controller: owns the combat world, forwards UI messages into it and
+-- routes combat events back out to the panel. All logic lives in combat.lua.
+
+local panthera = require("panthera.panthera")
+local combat = require("first_anim.modules.combat")
+local theme = require("first_anim.modules.theme")
+
+local UI = "/ui#panel"
+
+-- Translate combat events into panel messages, keeping a trimmed log buffer.
+local function make_emit(self)
+	return function(ev)
+		if ev.type == "log" then
+			local buf = self.battle_log
+			buf[#buf + 1] = ev.text
+			while #buf > theme.log_max_lines do
+				table.remove(buf, 1)
+			end
+			msg.post(UI, "update_logs", { logs = buf })
+		elseif ev.type == "phase" then
+			msg.post(UI, "phase_changed", { phase = ev.phase })
+		elseif ev.type == "status" then
+			msg.post(UI, "set_status", { text = ev.text, color = ev.color })
+		elseif ev.type == "speed" then
+			msg.post(UI, "speed_changed", { speed = ev.speed })
+		elseif ev.type == "group" then
+			msg.post(UI, "group_changed", { group_id = ev.group_id })
+		elseif ev.type == "loadout" then
+			msg.post(UI, "init_equipment", { weapon = ev.weapon, body = ev.body, head = ev.head })
+		end
+	end
+end
+
+function init(self)
+	msg.post("@render:", "use_fixed_fit_projection")
+	math.randomseed(os.time())
+	panthera.SPEED = 1
+
+	self.battle_log = {}
+
+	self.world = combat.new({
+		emit = make_emit(self),
+		smudge_factory_url = "/factories#smudge_factory",
+	})
+	combat.start(self.world)
+end
+
+function update(self, dt)
+	combat.update(self.world, dt)
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("play") then
+		combat.play(self.world)
+	elseif message_id == hash("pause") then
+		combat.pause(self.world)
+	elseif message_id == hash("set_speed") then
+		combat.set_speed(self.world, message.speed)
+	elseif message_id == hash("select_group") then
+		combat.set_group(self.world, message.group_id)
+	elseif message_id == hash("equip_player") then
+		combat.set_loadout(self.world, message.weapon, message.body, message.head)
+	end
+end

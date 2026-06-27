@@ -1,0 +1,22 @@
+{
+  "slots": {
+    "body": {
+      "node": "body",
+      "component": "sprite",
+      "default": "body_default",
+      "attachments": {
+        "body_default": { "animation": "body",       "ui_label": "ARMOR: NONE",   "ui_order": 1, "show_in_ui": true },
+        "body_armor":   { "animation": "body_armor",  "ui_label": "ARMOR: KEVLAR", "ui_order": 2, "show_in_ui": true }
+      }
+    },
+    "head": {
+      "node": "head",
+      "component": "sprite",
+      "default": "head_default",
+      "attachments": {
+        "head_default":  { "animation": "head",         "ui_label": "HELMET: NONE",    "ui_order": 1, "show_in_ui": true },
+        "head_gasmask":  { "animation": "head_gasmask",  "ui_label": "HELMET: GASMASK", "ui_order": 2, "show_in_ui": true }
+      }
+    }
+  }
+}

@@ -1,0 +1,146 @@
+local CONTROLLER = "/controller#sandbox"
+local skins = require("first_anim.modules.skins")
+local weapons = require("first_anim.modules.weapons")
+
+local function play(anim)
+	msg.post(CONTROLLER, "play_anim", { anim = anim })
+end
+
+local function update_visuals(self)
+	for anim, node in pairs(self.states) do
+		-- Selected state is fully bright (alpha=1.0), others are dimmed (alpha=0.45)
+		local alpha = (anim == self.active_state) and 1.0 or 0.45
+		gui.animate(node, "color.w", alpha, gui.EASING_OUTQUAD, 0.2)
+	end
+end
+
+-- Helper to update the text label and apply skin attachment change
+local function switch_skin_attachment(self, slot, dir)
+	local attachments = self.slot_attachments[slot]
+	local count = #attachments
+	if count == 0 then return end
+
+	local current_idx = self.current_indices[slot]
+	current_idx = current_idx + dir
+	if current_idx < 1 then
+		current_idx = count
+	elseif current_idx > count then
+		current_idx = 1
+	end
+	self.current_indices[slot] = current_idx
+
+	local attachment_id = attachments[current_idx]
+	gui.set_text(self.slot_labels[slot], slot:upper() .. ": " .. attachment_id)
+
+	-- Send command to sandbox controller to apply the change
+	msg.post(CONTROLLER, "apply_skin_attachment", { slot = slot, attachment_id = attachment_id })
+end
+
+-- Brief visual feedback flash on clicking button nodes
+local function flash_node(node)
+	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
+		gui.animate(node, "color.w", 1.0, gui.EASING_OUTQUAD, 0.15)
+	end)
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	-- States act as radio buttons: only one can be active at a time
+	self.states = {
+		default = gui.get_node("btn_default"),
+		walk = gui.get_node("btn_walk"),
+		death = gui.get_node("btn_death"),
+	}
+
+	-- Actions act as simple triggers: they flash on click, but don't hold state
+	self.actions = {
+		attack = gui.get_node("btn_attack"),
+		damage = gui.get_node("btn_damage"),
+	}
+
+	self.active_state = "default"
+	
+	-- Apply initial selection visuals for animations
+	update_visuals(self)
+
+	-- SKIN SYSTEM INITIALIZATION
+	self.slot_attachments = {
+		head = skins.get_attachments_for_slot("head"),
+		body = skins.get_attachments_for_slot("body"),
+		weapon = weapons.get_all_ids(),
+	}
+
+	self.slot_labels = {
+		head = gui.get_node("head_lbl"),
+		body = gui.get_node("body_lbl"),
+		weapon = gui.get_node("weapon_lbl"),
+	}
+
+	self.skin_buttons = {
+		head_left   = { node = gui.get_node("head_left"),   slot = "head",   dir = -1 },
+		head_right  = { node = gui.get_node("head_right"),  slot = "head",   dir = 1  },
+		body_left   = { node = gui.get_node("body_left"),   slot = "body",   dir = -1 },
+		body_right  = { node = gui.get_node("body_right"),  slot = "body",   dir = 1  },
+		weapon_left  = { node = gui.get_node("weapon_left"),  slot = "weapon", dir = -1 },
+		weapon_right = { node = gui.get_node("weapon_right"), slot = "weapon", dir = 1  },
+	}
+
+	self.current_indices = {
+		head = 1,
+		body = 1,
+		weapon = 1,
+	}
+
+	-- Find index of defaults
+	for i, attachment_id in ipairs(self.slot_attachments.head) do
+		if attachment_id == "head_default" then self.current_indices.head = i end
+	end
+	for i, attachment_id in ipairs(self.slot_attachments.body) do
+		if attachment_id == "body_default" then self.current_indices.body = i end
+	end
+	for i, attachment_id in ipairs(self.slot_attachments.weapon) do
+		if attachment_id == "impact_bat" then self.current_indices.weapon = i end
+	end
+
+	-- Update labels with active values
+	gui.set_text(self.slot_labels.head,   "HEAD: "   .. self.slot_attachments.head[self.current_indices.head])
+	gui.set_text(self.slot_labels.body,   "BODY: "   .. self.slot_attachments.body[self.current_indices.body])
+	gui.set_text(self.slot_labels.weapon, "WEAPON: " .. self.slot_attachments.weapon[self.current_indices.weapon])
+end
+
+function on_input(self, action_id, action)
+	if action_id ~= hash("touch") or not action.pressed then
+		return
+	end
+
+	-- Check skin switching buttons click
+	for btn_id, btn in pairs(self.skin_buttons) do
+		if gui.pick_node(btn.node, action.x, action.y) then
+			flash_node(btn.node)
+			switch_skin_attachment(self, btn.slot, btn.dir)
+			return
+		end
+	end
+
+	-- Check states click
+	for anim, node in pairs(self.states) do
+		if gui.pick_node(node, action.x, action.y) then
+			if self.active_state ~= anim then
+				self.active_state = anim
+				update_visuals(self)
+				play(anim)
+			end
+			return
+		end
+	end
+
+	-- Check actions click
+	for anim, node in pairs(self.actions) do
+		if gui.pick_node(node, action.x, action.y) then
+			flash_node(node)
+			play(anim)
+			return
+		end
+	end
+end

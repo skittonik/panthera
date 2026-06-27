@@ -1,0 +1,148 @@
+name: "human"
+instances {
+  id: "shadow"
+  prototype: "/first_anim/rigs/human/shadow.go"
+  position {
+    z: -0.03
+  }
+}
+instances {
+  id: "left_leg"
+  prototype: "/first_anim/rigs/human/left_leg.go"
+  position {
+    x: -40.0
+    y: 145.0
+    z: -0.01
+  }
+}
+instances {
+  id: "right_leg"
+  prototype: "/first_anim/rigs/human/right_leg.go"
+  position {
+    x: 40.0
+    y: 145.0
+    z: -0.02
+  }
+}
+instances {
+  id: "body"
+  prototype: "/first_anim/rigs/human/body.go"
+  position {
+    y: 70.0
+  }
+}
+instances {
+  id: "head"
+  prototype: "/first_anim/rigs/human/head.go"
+  position {
+    y: 109.0
+    z: 0.01
+  }
+}
+instances {
+  id: "weapon"
+  prototype: "/first_anim/rigs/human/weapon.go"
+  children: "hand_left"
+  children: "muzzle"
+  children: "weapon_impact"
+  children: "weapon_pistol"
+  children: "weapon_rifle"
+  children: "weapon_shotgun"
+  children: "weapon_stabbing"
+  position {
+    x: -15.0
+    y: 129.0
+    z: 0.02
+  }
+}
+instances {
+  id: "hand_right"
+  prototype: "/first_anim/rigs/human/hand_right.go"
+  position {
+    x: 105.0
+    y: 181.0
+    z: -0.005
+  }
+}
+instances {
+  id: "weapon_impact"
+  prototype: "/first_anim/rigs/human/weapon_impact.go"
+  position {
+    x: -35.0
+    y: 33.0
+  }
+}
+instances {
+  id: "weapon_stabbing"
+  prototype: "/first_anim/rigs/human/weapon_stabbing.go"
+  position {
+    x: -18.0
+    y: 39.0
+  }
+}
+instances {
+  id: "weapon_pistol"
+  prototype: "/first_anim/rigs/human/weapon_pistol.go"
+  position {
+    x: -11.0
+    y: 47.0
+  }
+}
+instances {
+  id: "weapon_rifle"
+  prototype: "/first_anim/rigs/human/weapon_rifle.go"
+  position {
+    x: -15.0
+    y: 41.0
+  }
+}
+instances {
+  id: "weapon_shotgun"
+  prototype: "/first_anim/rigs/human/weapon_shotgun.go"
+  position {
+    x: -4.0
+    y: 43.0
+  }
+}
+instances {
+  id: "hand_left"
+  prototype: "/first_anim/rigs/human/hand_left.go"
+  position {
+    x: -14.0
+    y: 36.0
+    z: 0.01
+  }
+}
+instances {
+  id: "muzzle"
+  prototype: "/first_anim/rigs/human/muzzle.go"
+  position {
+    x: 348.0
+    y: 83.0
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "root"
+  children: "hit"
+  children: "shadow"
+  data: ""
+}
+embedded_instances {
+  id: "hit"
+  children: "body"
+  children: "hand_right"
+  children: "head_pivot"
+  children: "left_leg"
+  children: "right_leg"
+  children: "weapon"
+  data: ""
+}
+embedded_instances {
+  id: "head_pivot"
+  children: "head"
+  data: ""
+  position {
+    y: 131.0
+  }
+}

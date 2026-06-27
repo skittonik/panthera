@@ -1,0 +1,11 @@
+{
+  "name": "Survivor",
+  "hp": 220,
+  "move_speed": 130,
+  "attack_cooldown": 1.2,
+  "damage": 30,
+  "unit": "human",
+  "weapon_skin": "rifle_ak",
+  "body_skin": "body_armor",
+  "head_skin": "head_gasmask"
+}
