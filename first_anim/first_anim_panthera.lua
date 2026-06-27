@@ -118,13 +118,16 @@ return {
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.25, start_value = 70.0, end_value = 67.0, easing = "outquad" },
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.25, duration = 0.12, start_value = 67.0, end_value = 73.0, easing = "outquad" },
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.37, duration = 0.33, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
-                    -- Weapon: modest backswing (38 deg), fast drive (-60 deg), recover
+                    -- Weapon: backswing pulls back in x, drives forward through target, recover
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = 38.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = 38.0, end_value = -60.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = -60.0, end_value = 0.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.25, start_value = 129.0, end_value = 145.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.25, duration = 0.12, start_value = 145.0, end_value = 118.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.37, duration = 0.33, start_value = 118.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.0, duration = 0.25, start_value = -15.0, end_value = -28.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.25, duration = 0.12, start_value = -28.0, end_value = 22.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.37, duration = 0.33, start_value = 22.0, end_value = -15.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = -4.0, easing = "outquad" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = -4.0, end_value = 5.0, easing = "outquad" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
@@ -166,13 +169,16 @@ return {
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.12, start_value = 70.0, end_value = 68.0, easing = "outquad" },
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.12, duration = 0.08, start_value = 68.0, end_value = 72.0, easing = "outquad" },
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.25, start_value = 72.0, end_value = 70.0, easing = "inoutsine" },
-                    -- Weapon: already in hand, small natural motion during thrust (no repositioning)
+                    -- Weapon: pull back, then explosive thrust far forward in x, retract
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = 6.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.12, duration = 0.08, start_value = 6.0, end_value = -10.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.2, duration = 0.25, start_value = -10.0, end_value = 0.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.12, start_value = 129.0, end_value = 127.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.12, duration = 0.08, start_value = 127.0, end_value = 133.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.2, duration = 0.25, start_value = 133.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.0, duration = 0.12, start_value = -15.0, end_value = -32.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.12, duration = 0.08, start_value = -32.0, end_value = 38.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.2, duration = 0.25, start_value = 38.0, end_value = -15.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = 3.0, easing = "outquad" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.12, duration = 0.08, start_value = 3.0, end_value = -4.0, easing = "outquad" },
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.2, duration = 0.25, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
@@ -188,6 +194,9 @@ return {
                     { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.12, start_value = 181.0, end_value = 179.0, easing = "outquad" },
                     { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.12, duration = 0.08, start_value = 179.0, end_value = 185.0, easing = "outquad" },
                     { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.2, duration = 0.25, start_value = 185.0, end_value = 181.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_x", start_time = 0.0, duration = 0.12, start_value = 85.0, end_value = 68.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_x", start_time = 0.12, duration = 0.08, start_value = 68.0, end_value = 138.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_x", start_time = 0.2, duration = 0.25, start_value = 138.0, end_value = 85.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
