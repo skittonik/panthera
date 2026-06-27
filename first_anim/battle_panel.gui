@@ -1,0 +1,1151 @@
+script: "/first_anim/battle_panel.gui_script"
+fonts {
+  name: "troika"
+  font: "/example/assets/troika.font"
+}
+nodes {
+  position {
+    x: 230.0
+    y: 540.0
+  }
+  size {
+    x: 400.0
+    y: 1000.0
+  }
+  color {
+    x: 0.11
+    y: 0.12
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "player_bg"
+  inherit_alpha: true
+  alpha: 0.95
+}
+nodes {
+  position {
+    x: 230.0
+    y: 970.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 50.0
+  }
+  color {
+    x: 0.85
+    y: 0.9
+    z: 1.0
+  }
+  type: TYPE_TEXT
+  text: "PLAYER 1"
+  font: "troika"
+  id: "player_title"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 900.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 360.0
+    y: 32.0
+  }
+  color {
+    x: 0.5
+    y: 0.7
+    z: 0.6
+  }
+  type: TYPE_TEXT
+  text: "SKINS"
+  font: "troika"
+  id: "player_sub_skins"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 830.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "player_head_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 830.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "HEAD: head_default"
+  font: "troika"
+  id: "player_head_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 70.0
+    y: 830.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_head_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 70.0
+    y: 830.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "player_head_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 390.0
+    y: 830.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_head_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 390.0
+    y: 830.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "player_head_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 750.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "player_body_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 750.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "BODY: body_default"
+  font: "troika"
+  id: "player_body_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 70.0
+    y: 750.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_body_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 70.0
+    y: 750.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "player_body_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 390.0
+    y: 750.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_body_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 390.0
+    y: 750.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "player_body_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 670.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "player_weapon_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 670.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "WEAPON: impact_bat"
+  font: "troika"
+  id: "player_weapon_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 70.0
+    y: 670.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_weapon_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 70.0
+    y: 670.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "player_weapon_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 390.0
+    y: 670.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "player_weapon_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 390.0
+    y: 670.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "player_weapon_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 570.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 360.0
+    y: 32.0
+  }
+  color {
+    x: 0.7
+    y: 0.55
+    z: 0.4
+  }
+  type: TYPE_TEXT
+  text: "ACTIONS"
+  font: "troika"
+  id: "player_sub_actions"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 500.0
+  }
+  size {
+    x: 320.0
+    y: 58.0
+  }
+  color {
+    x: 0.85
+    y: 0.35
+    z: 0.2
+  }
+  type: TYPE_BOX
+  id: "player_btn_attack"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 500.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 340.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "ATTACK"
+  font: "troika"
+  id: "player_lbl_attack"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 230.0
+    y: 420.0
+  }
+  size {
+    x: 320.0
+    y: 58.0
+  }
+  color {
+    x: 0.2
+    y: 0.6
+    z: 0.4
+  }
+  type: TYPE_BOX
+  id: "player_btn_heal"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 230.0
+    y: 420.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 340.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "HEAL / REVIVE"
+  font: "troika"
+  id: "player_lbl_heal"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 540.0
+  }
+  size {
+    x: 400.0
+    y: 1000.0
+  }
+  color {
+    x: 0.11
+    y: 0.12
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "enemy_bg"
+  inherit_alpha: true
+  alpha: 0.95
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 970.0
+  }
+  scale {
+    x: 0.85
+    y: 0.85
+  }
+  size {
+    x: 360.0
+    y: 50.0
+  }
+  color {
+    x: 0.85
+    y: 0.9
+    z: 1.0
+  }
+  type: TYPE_TEXT
+  text: "ENEMY"
+  font: "troika"
+  id: "enemy_title"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 900.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 360.0
+    y: 32.0
+  }
+  color {
+    x: 0.5
+    y: 0.7
+    z: 0.6
+  }
+  type: TYPE_TEXT
+  text: "SKINS"
+  font: "troika"
+  id: "enemy_sub_skins"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 830.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "enemy_head_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 830.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "HEAD: head_default"
+  font: "troika"
+  id: "enemy_head_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 830.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_head_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 830.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "enemy_head_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 830.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_head_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 830.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "enemy_head_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 750.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "enemy_body_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 750.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "BODY: body_default"
+  font: "troika"
+  id: "enemy_body_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 750.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_body_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 750.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "enemy_body_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 750.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_body_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 750.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "enemy_body_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 670.0
+  }
+  size {
+    x: 360.0
+    y: 52.0
+  }
+  color {
+    x: 0.18
+    y: 0.2
+    z: 0.23
+  }
+  type: TYPE_BOX
+  id: "enemy_weapon_bg"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 670.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 240.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "WEAPON: impact_bat"
+  font: "troika"
+  id: "enemy_weapon_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 670.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_weapon_left"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1530.0
+    y: 670.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: "<"
+  font: "troika"
+  id: "enemy_weapon_left_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 670.0
+  }
+  size {
+    x: 48.0
+    y: 52.0
+  }
+  color {
+    x: 0.28
+    y: 0.3
+    z: 0.35
+  }
+  type: TYPE_BOX
+  id: "enemy_weapon_right"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1850.0
+    y: 670.0
+  }
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 48.0
+    y: 45.0
+  }
+  type: TYPE_TEXT
+  text: ">"
+  font: "troika"
+  id: "enemy_weapon_right_lbl"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 570.0
+  }
+  scale {
+    x: 0.55
+    y: 0.55
+  }
+  size {
+    x: 360.0
+    y: 32.0
+  }
+  color {
+    x: 0.7
+    y: 0.55
+    z: 0.4
+  }
+  type: TYPE_TEXT
+  text: "ACTIONS"
+  font: "troika"
+  id: "enemy_sub_actions"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 500.0
+  }
+  size {
+    x: 320.0
+    y: 58.0
+  }
+  color {
+    x: 0.85
+    y: 0.35
+    z: 0.2
+  }
+  type: TYPE_BOX
+  id: "enemy_btn_attack"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 500.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 340.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "ATTACK"
+  font: "troika"
+  id: "enemy_lbl_attack"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 420.0
+  }
+  size {
+    x: 320.0
+    y: 58.0
+  }
+  color {
+    x: 0.2
+    y: 0.6
+    z: 0.4
+  }
+  type: TYPE_BOX
+  id: "enemy_btn_heal"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 1690.0
+    y: 420.0
+  }
+  scale {
+    x: 0.75
+    y: 0.75
+  }
+  size {
+    x: 340.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "HEAL / REVIVE"
+  font: "troika"
+  id: "enemy_lbl_heal"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 600.0
+    y: 770.0
+  }
+  size {
+    x: 160.0
+    y: 20.0
+  }
+  color {
+    x: 0.11
+    y: 0.12
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "player_hp_bg"
+  inherit_alpha: true
+  alpha: 0.8
+}
+nodes {
+  position {
+    x: -80.0
+    y: 0.0
+  }
+  size {
+    x: 160.0
+    y: 20.0
+  }
+  color {
+    x: 0.85
+    y: 0.15
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "player_hp_fill"
+  parent: "player_hp_bg"
+  inherit_alpha: true
+  pivot: PIVOT_W
+}
+nodes {
+  position {
+    x: 0.0
+    y: 22.0
+  }
+  scale {
+    x: 0.45
+    y: 0.45
+  }
+  size {
+    x: 160.0
+    y: 25.0
+  }
+  type: TYPE_TEXT
+  text: "100 / 100"
+  font: "troika"
+  id: "player_hp_lbl"
+  parent: "player_hp_bg"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 1320.0
+    y: 770.0
+  }
+  size {
+    x: 160.0
+    y: 20.0
+  }
+  color {
+    x: 0.11
+    y: 0.12
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "enemy_hp_bg"
+  inherit_alpha: true
+  alpha: 0.8
+}
+nodes {
+  position {
+    x: -80.0
+    y: 0.0
+  }
+  size {
+    x: 160.0
+    y: 20.0
+  }
+  color {
+    x: 0.85
+    y: 0.15
+    z: 0.15
+  }
+  type: TYPE_BOX
+  id: "enemy_hp_fill"
+  parent: "enemy_hp_bg"
+  inherit_alpha: true
+  pivot: PIVOT_W
+}
+nodes {
+  position {
+    x: 0.0
+    y: 22.0
+  }
+  scale {
+    x: 0.45
+    y: 0.45
+  }
+  size {
+    x: 160.0
+    y: 25.0
+  }
+  type: TYPE_TEXT
+  text: "100 / 100"
+  font: "troika"
+  id: "enemy_hp_lbl"
+  parent: "enemy_hp_bg"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

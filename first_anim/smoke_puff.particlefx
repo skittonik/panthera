@@ -31,12 +31,6 @@ emitters {
     }
   }
   properties {
-    key: EMITTER_KEY_SIZE_Z
-    points {
-      y: 0.0
-    }
-  }
-  properties {
     key: EMITTER_KEY_PARTICLE_LIFE_TIME
     points {
       y: 0.5
@@ -88,18 +82,6 @@ emitters {
     spread: 180.0
   }
   properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
-    }
-  }
-  properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
       y: 20.0
@@ -114,7 +96,6 @@ emitters {
     points {
       x: 1.0
       y: 2.5
-      t_x: 1.0
     }
   }
   particle_properties {
@@ -143,25 +124,6 @@ emitters {
     points {
       x: 1.0
       y: 0.0
-      t_x: 1.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_ROTATION
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
     }
   }
   particle_properties {
@@ -176,12 +138,6 @@ emitters {
       key: MODIFIER_KEY_MAGNITUDE
       points {
         y: 8.0
-      }
-    }
-    properties {
-      key: MODIFIER_KEY_MAX_DISTANCE
-      points {
-        y: 0.0
       }
     }
   }
@@ -216,12 +172,6 @@ emitters {
     key: EMITTER_KEY_SIZE_Y
     points {
       y: 30.0
-    }
-  }
-  properties {
-    key: EMITTER_KEY_SIZE_Z
-    points {
-      y: 0.0
     }
   }
   properties {
@@ -276,18 +226,6 @@ emitters {
     spread: 180.0
   }
   properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
-    }
-  }
-  properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
       y: 20.0
@@ -302,7 +240,6 @@ emitters {
     points {
       x: 1.0
       y: 2.8
-      t_x: 1.0
     }
   }
   particle_properties {
@@ -331,25 +268,6 @@ emitters {
     points {
       x: 1.0
       y: 0.0
-      t_x: 1.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_ROTATION
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
     }
   }
   particle_properties {
@@ -364,12 +282,6 @@ emitters {
       key: MODIFIER_KEY_MAGNITUDE
       points {
         y: 8.0
-      }
-    }
-    properties {
-      key: MODIFIER_KEY_MAX_DISTANCE
-      points {
-        y: 0.0
       }
     }
   }
@@ -404,12 +316,6 @@ emitters {
     key: EMITTER_KEY_SIZE_Y
     points {
       y: 30.0
-    }
-  }
-  properties {
-    key: EMITTER_KEY_SIZE_Z
-    points {
-      y: 0.0
     }
   }
   properties {
@@ -464,18 +370,6 @@ emitters {
     spread: 180.0
   }
   properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  properties {
-    key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
-    }
-  }
-  properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
       y: 20.0
@@ -490,7 +384,6 @@ emitters {
     points {
       x: 1.0
       y: 3.0
-      t_x: 1.0
     }
   }
   particle_properties {
@@ -519,25 +412,6 @@ emitters {
     points {
       x: 1.0
       y: 0.0
-      t_x: 1.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_ROTATION
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_X
-    points {
-      y: 0.0
-    }
-  }
-  particle_properties {
-    key: PARTICLE_KEY_STRETCH_FACTOR_Y
-    points {
-      y: 0.0
     }
   }
   particle_properties {
@@ -552,12 +426,6 @@ emitters {
       key: MODIFIER_KEY_MAGNITUDE
       points {
         y: 8.0
-      }
-    }
-    properties {
-      key: MODIFIER_KEY_MAX_DISTANCE
-      points {
-        y: 0.0
       }
     }
   }

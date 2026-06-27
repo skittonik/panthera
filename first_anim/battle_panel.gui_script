@@ -1,0 +1,198 @@
+local CONTROLLER = "/system#battle"
+local skins = require("first_anim.skins")
+
+-- Brief visual feedback flash on clicking button nodes
+local function flash_node(node)
+	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
+		gui.animate(node, "color.w", 1.0, gui.EASING_OUTQUAD, 0.15)
+	end)
+end
+
+local function update_label(self, char, slot)
+	local idx = (char == "player") and self.player_indices[slot] or self.enemy_indices[slot]
+	local list = self.slot_attachments[slot]
+	local attachment_id = list[idx]
+
+	local label_node = self.labels[char][slot]
+	gui.set_text(label_node, slot:upper() .. ": " .. attachment_id)
+
+	-- Send to the battle script controller
+	msg.post(CONTROLLER, "apply_skin_attachment", { character = char, slot = slot, attachment_id = attachment_id })
+end
+
+local function switch_attachment(self, char, slot, dir)
+	local list = self.slot_attachments[slot]
+	local count = #list
+	if count == 0 then return end
+
+	local current_indices = (char == "player") and self.player_indices or self.enemy_indices
+	local idx = current_indices[slot] + dir
+	if idx < 1 then
+		idx = count
+	elseif idx > count then
+		idx = 1
+	end
+	current_indices[slot] = idx
+
+	update_label(self, char, slot)
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	-- Floating HP nodes
+	self.player_hp_bg = gui.get_node("player_hp_bg")
+	self.player_hp_fill = gui.get_node("player_hp_fill")
+	self.player_hp_lbl = gui.get_node("player_hp_lbl")
+
+	self.enemy_hp_bg = gui.get_node("enemy_hp_bg")
+	self.enemy_hp_fill = gui.get_node("enemy_hp_fill")
+	self.enemy_hp_lbl = gui.get_node("enemy_hp_lbl")
+
+	-- Selectors setup
+	self.slot_attachments = {
+		head = skins.get_attachments_for_slot("head"),
+		body = skins.get_attachments_for_slot("body"),
+		weapon = skins.get_attachments_for_slot("weapon"),
+	}
+
+	self.player_indices = { head = 1, body = 1, weapon = 1 }
+	self.enemy_indices = { head = 1, body = 1, weapon = 1 }
+
+	-- Find default index offsets
+	for idx, id in ipairs(self.slot_attachments.head) do
+		if id == "head_default" then
+			self.player_indices.head = idx
+			self.enemy_indices.head = idx
+		end
+	end
+	for idx, id in ipairs(self.slot_attachments.body) do
+		if id == "body_default" then
+			self.player_indices.body = idx
+			self.enemy_indices.body = idx
+		end
+	end
+	for idx, id in ipairs(self.slot_attachments.weapon) do
+		if id == "impact_bat" then
+			self.player_indices.weapon = idx
+			self.enemy_indices.weapon = idx
+		end
+	end
+
+	-- Label cache
+	self.labels = {
+		player = {
+			head = gui.get_node("player_head_lbl"),
+			body = gui.get_node("player_body_lbl"),
+			weapon = gui.get_node("player_weapon_lbl"),
+		},
+		enemy = {
+			head = gui.get_node("enemy_head_lbl"),
+			body = gui.get_node("enemy_body_lbl"),
+			weapon = gui.get_node("enemy_weapon_lbl"),
+		}
+	}
+
+	-- Input configurations
+	self.skin_buttons = {
+		{ node = gui.get_node("player_head_left"),  char = "player", slot = "head",   dir = -1 },
+		{ node = gui.get_node("player_head_right"), char = "player", slot = "head",   dir = 1  },
+		{ node = gui.get_node("player_body_left"),  char = "player", slot = "body",   dir = -1 },
+		{ node = gui.get_node("player_body_right"), char = "player", slot = "body",   dir = 1  },
+		{ node = gui.get_node("player_weapon_left"), char = "player", slot = "weapon", dir = -1 },
+		{ node = gui.get_node("player_weapon_right"),char = "player", slot = "weapon", dir = 1  },
+
+		{ node = gui.get_node("enemy_head_left"),   char = "enemy",  slot = "head",   dir = -1 },
+		{ node = gui.get_node("enemy_head_right"),  char = "enemy",  slot = "head",   dir = 1  },
+		{ node = gui.get_node("enemy_body_left"),   char = "enemy",  slot = "body",   dir = -1 },
+		{ node = gui.get_node("enemy_body_right"),  char = "enemy",  slot = "body",   dir = 1  },
+		{ node = gui.get_node("enemy_weapon_left"),  char = "enemy",  slot = "weapon", dir = -1 },
+		{ node = gui.get_node("enemy_weapon_right"), char = "enemy",  slot = "weapon", dir = 1  },
+	}
+
+	self.action_buttons = {
+		{ node = gui.get_node("player_btn_attack"), char = "player", action = "attack" },
+		{ node = gui.get_node("player_btn_heal"),   char = "player", action = "heal"   },
+		{ node = gui.get_node("enemy_btn_attack"),   char = "enemy",  action = "attack" },
+		{ node = gui.get_node("enemy_btn_heal"),     char = "enemy",  action = "heal"   },
+	}
+
+	self.player_btn_attack = gui.get_node("player_btn_attack")
+	self.enemy_btn_attack = gui.get_node("enemy_btn_attack")
+
+	self.player_locked = false
+	self.enemy_locked = false
+
+	-- Setup starting label values
+	for _, char in ipairs({"player", "enemy"}) do
+		for _, slot in ipairs({"head", "body", "weapon"}) do
+			update_label(self, char, slot)
+		end
+	end
+end
+
+function update(self, dt)
+	-- Float health bars 420px above character roots in world space
+	local p_ok, p_pos = pcall(go.get_position, "/player/root")
+	if p_ok then
+		gui.set_position(self.player_hp_bg, vmath.vector3(p_pos.x, p_pos.y + 420, 0))
+	end
+
+	local e_ok, e_pos = pcall(go.get_position, "/enemy/root")
+	if e_ok then
+		gui.set_position(self.enemy_hp_bg, vmath.vector3(e_pos.x, e_pos.y + 420, 0))
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("update_hp") then
+		local hp = message.hp
+		local char = message.character
+		local fill = (char == "player") and self.player_hp_fill or self.enemy_hp_fill
+		local lbl = (char == "player") and self.player_hp_lbl or self.enemy_hp_lbl
+
+		gui.animate(fill, "scale.x", hp / 100, gui.EASING_OUTQUAD, 0.25)
+		gui.set_text(lbl, string.format("%d / 100", hp))
+
+	elseif message_id == hash("lock_controls") then
+		local char = message.character
+		local lock = message.lock
+		if char == "player" then
+			self.player_locked = lock
+			gui.animate(self.player_btn_attack, "color.w", lock and 0.45 or 1.0, gui.EASING_OUTQUAD, 0.2)
+		elseif char == "enemy" then
+			self.enemy_locked = lock
+			gui.animate(self.enemy_btn_attack, "color.w", lock and 0.45 or 1.0, gui.EASING_OUTQUAD, 0.2)
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id ~= hash("touch") or not action.pressed then
+		return
+	end
+
+	-- Skin buttons
+	for _, btn in ipairs(self.skin_buttons) do
+		-- Don't allow changing skins while character is performing an action
+		local locked = (btn.char == "player") and self.player_locked or self.enemy_locked
+		if not locked and gui.pick_node(btn.node, action.x, action.y) then
+			flash_node(btn.node)
+			switch_attachment(self, btn.char, btn.slot, btn.dir)
+			return
+		end
+	end
+
+	-- Action buttons
+	for _, btn in ipairs(self.action_buttons) do
+		if gui.pick_node(btn.node, action.x, action.y) then
+			local locked = (btn.char == "player") and self.player_locked or self.enemy_locked
+			-- Let HEAL be accessible even when locked (e.g. to revive a dead character)
+			if btn.action == "heal" or not locked then
+				flash_node(btn.node)
+				msg.post(CONTROLLER, btn.action, { character = btn.char })
+				return
+			end
+		end
+	end
+end
