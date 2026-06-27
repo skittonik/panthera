@@ -1,4 +1,4 @@
-return {
+﻿return {
     data = {
         animations = {
             -- =========================================================
@@ -96,291 +96,228 @@ return {
                 }
             },
             -- =========================================================
-            -- ATTACK_IMPACT - full baseball / blunt swing (bat, tire iron)
-            -- coil (wind-up) → drive (strike) → settle → recover.
-            -- Impact at ~0.42s.
+            -- =========================================================
+            -- ATTACK_IMPACT - blunt melee (bat, tire iron).
+            -- Compact backswing (38 deg) -> fast drive through target -> settle.
+            -- Impact at ~0.3s.
             -- =========================================================
             {
                 animation_id = "attack_impact",
-                duration = 0.9,
+                duration = 0.7,
                 animation_keys = {
-                    -- Whole-body coil back, then lean into the strike
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 6.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 6.0, end_value = -9.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -9.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -6.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -6.0, end_value = 9.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = 9.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Weight shifts back on the coil, drives forward on the hit
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -8.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.3, duration = 0.15, start_value = -8.0, end_value = 18.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.45, duration = 0.13, start_value = 18.0, end_value = 13.0, easing = "outsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.58, duration = 0.32, start_value = 13.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Crouch on the coil, rise through the swing
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.3, start_value = 70.0, end_value = 66.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.3, duration = 0.15, start_value = 66.0, end_value = 73.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.45, duration = 0.45, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
-
-                    -- Weapon: cock over the shoulder, whip forward with overshoot, return
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 115.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 115.0, end_value = -100.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.45, duration = 0.13, start_value = -100.0, end_value = -78.0, easing = "outback" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.58, duration = 0.32, start_value = -78.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.3, start_value = 129.0, end_value = 150.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.3, duration = 0.15, start_value = 150.0, end_value = 120.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.45, duration = 0.45, start_value = 120.0, end_value = 129.0, easing = "inoutsine" },
-
-                    -- Head leads into the target, snaps with the strike
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 8.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 8.0, end_value = -10.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -10.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Legs brace and push off through the swing
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = -4.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = -4.0, end_value = 5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 4.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 4.0, end_value = -3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- hand_right = lower grip / pivot of the swing.
-                    -- Barely rotates compared to weapon (0→115°). Stays near body.
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.3, start_value = 0.0, end_value = 18.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.3, duration = 0.15, start_value = 18.0, end_value = -22.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.45, duration = 0.45, start_value = -22.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.3, start_value = 129.0, end_value = 132.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.3, duration = 0.15, start_value = 132.0, end_value = 125.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.45, duration = 0.45, start_value = 125.0, end_value = 129.0, easing = "inoutsine" },
+                    -- Body winds back on coil, follows through on strike
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = -5.0, end_value = 3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = 3.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = 5.0, end_value = -3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = -10.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.25, duration = 0.12, start_value = -10.0, end_value = 14.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.37, duration = 0.33, start_value = 14.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.25, start_value = 70.0, end_value = 67.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.25, duration = 0.12, start_value = 67.0, end_value = 73.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.37, duration = 0.33, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
+                    -- Weapon: modest backswing (38 deg), fast drive (-60 deg), recover
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = 38.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = 38.0, end_value = -60.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = -60.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.25, start_value = 129.0, end_value = 145.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.25, duration = 0.12, start_value = 145.0, end_value = 118.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.37, duration = 0.33, start_value = 118.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = -4.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = -4.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = -4.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = 4.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = 4.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
+                    -- hand_right = lower grip / pivot of swing (smaller arc than weapon)
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.25, start_value = 0.0, end_value = 16.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.25, duration = 0.12, start_value = 16.0, end_value = -22.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.37, duration = 0.33, start_value = -22.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.25, start_value = 129.0, end_value = 136.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.25, duration = 0.12, start_value = 136.0, end_value = 122.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.37, duration = 0.33, start_value = 122.0, end_value = 129.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
-            -- ATTACK_STABBING - knife thrust: coil → lunge → recover.
-            -- Weapon rotates to a stabbing angle and thrusts forward.
+            -- =========================================================
+            -- ATTACK_STABBING - knife/blade thrust: coil -> explosive lunge -> retract.
             -- Impact at ~0.22s.
             -- =========================================================
             {
                 animation_id = "attack_stabbing",
-                duration = 0.6,
+                duration = 0.55,
                 animation_keys = {
-                    -- Root: brief tilt back then lunge forward
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = 5.0, end_value = -8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = -8.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -5.0, end_value = 8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Body: coil back, explosive lunge, settle
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -10.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.15, duration = 0.1, start_value = -10.0, end_value = 22.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.25, duration = 0.35, start_value = 22.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 70.0, end_value = 67.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.15, duration = 0.1, start_value = 67.0, end_value = 72.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.25, duration = 0.35, start_value = 72.0, end_value = 70.0, easing = "inoutsine" },
-
-                    -- Weapon: rotate to stabbing angle (forward / horizontal) then retract
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -40.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -40.0, end_value = -75.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = -75.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 125.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.15, duration = 0.1, start_value = 125.0, end_value = 142.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.25, duration = 0.35, start_value = 142.0, end_value = 129.0, easing = "inoutsine" },
-
-                    -- Head snaps forward on the lunge
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = 4.0, end_value = -7.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = -7.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Legs push into the lunge
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -6.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -6.0, end_value = 8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 6.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = 6.0, end_value = -5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = -5.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- hand_right mirrors weapon (both hands grip and thrust)
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -40.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -40.0, end_value = -75.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.25, duration = 0.35, start_value = -75.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 125.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.15, duration = 0.1, start_value = 125.0, end_value = 142.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.25, duration = 0.35, start_value = 142.0, end_value = 129.0, easing = "inoutsine" },
+                    -- Root coils back then lunges forward
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = 5.0, end_value = -8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = -8.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = -5.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -14.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.14, duration = 0.08, start_value = -14.0, end_value = 20.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.22, duration = 0.33, start_value = 20.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 70.0, end_value = 67.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.14, duration = 0.08, start_value = 67.0, end_value = 73.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.22, duration = 0.33, start_value = 73.0, end_value = 70.0, easing = "inoutsine" },
+                    -- Weapon: slight pull-back, then drives to near-horizontal (stab angle)
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = 8.0, end_value = -68.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = -68.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 126.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.14, duration = 0.08, start_value = 126.0, end_value = 140.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.22, duration = 0.33, start_value = 140.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = 4.0, end_value = -7.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = -7.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -7.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = -7.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 7.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = 7.0, end_value = -6.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = -6.0, end_value = 0.0, easing = "inoutsine" },
+                    -- hand_right mirrors weapon (both hands thrust)
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.14, duration = 0.08, start_value = 8.0, end_value = -68.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.22, duration = 0.33, start_value = -68.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 126.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.14, duration = 0.08, start_value = 126.0, end_value = 140.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.22, duration = 0.33, start_value = 140.0, end_value = 129.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
-            -- ATTACK_PISTOL - draw and fire: raise arm → aim → recoil → return.
-            -- Arm (weapon) raises to ~chest height. Single sharp recoil.
-            -- Impact at ~0.18s.
+            -- ATTACK_PISTOL - one-handed: raise arm to aim -> fire -> recoil -> lower.
+            -- Right hand barely moves (pistol is single-handed). Impact at ~0.17s.
             -- =========================================================
             {
                 animation_id = "attack_pistol",
-                duration = 0.7,
+                duration = 0.65,
                 animation_keys = {
-                    -- Slight forward lean to square up
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.15, duration = 0.08, start_value = -4.0, end_value = 2.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.23, duration = 0.47, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.15, duration = 0.08, start_value = 4.0, end_value = -2.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.23, duration = 0.47, start_value = -2.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Body steps into aim stance
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 6.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.15, duration = 0.08, start_value = 6.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.23, duration = 0.47, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Weapon arm raises to aim level, hard recoil snap, settle
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -78.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.15, duration = 0.06, start_value = -78.0, end_value = -55.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.21, duration = 0.12, start_value = -55.0, end_value = -76.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.33, duration = 0.37, start_value = -76.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 155.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.15, duration = 0.18, start_value = 155.0, end_value = 152.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.33, duration = 0.37, start_value = 152.0, end_value = 129.0, easing = "inoutsine" },
-
-                    -- Head levels off to aim, slight recoil nod
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.15, duration = 0.08, start_value = -5.0, end_value = 2.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.23, duration = 0.47, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Legs brace
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.55, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.55, start_value = 3.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- hand_right mirrors weapon (two-handed pistol grip)
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -78.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.15, duration = 0.06, start_value = -78.0, end_value = -55.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.21, duration = 0.12, start_value = -55.0, end_value = -76.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.33, duration = 0.37, start_value = -76.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 155.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.15, duration = 0.18, start_value = 155.0, end_value = 152.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.33, duration = 0.37, start_value = 152.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.14, duration = 0.07, start_value = -3.0, end_value = 1.5, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.21, duration = 0.44, start_value = 1.5, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.14, duration = 0.07, start_value = 3.0, end_value = -1.5, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.21, duration = 0.44, start_value = -1.5, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.14, duration = 0.51, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Arm raises to eye level (-76 deg), fires, barrel kicks up, lowers
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -76.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.14, duration = 0.05, start_value = -76.0, end_value = -52.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.19, duration = 0.1, start_value = -52.0, end_value = -73.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.29, duration = 0.36, start_value = -73.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 152.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.14, duration = 0.15, start_value = 152.0, end_value = 149.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.29, duration = 0.36, start_value = 149.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.14, duration = 0.07, start_value = -4.0, end_value = 2.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.21, duration = 0.44, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.51, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 3.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.51, start_value = 3.0, end_value = 0.0, easing = "inoutsine" },
+                    -- hand_right: one-handed - barely moves (stays down at side)
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -14.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.14, duration = 0.07, start_value = -14.0, end_value = -8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.21, duration = 0.44, start_value = -8.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 135.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.14, duration = 0.51, start_value = 135.0, end_value = 129.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
-            -- ATTACK_RIFLE - raise and fire 3-shot burst.
-            -- Three recoil pulses at 0.18s, 0.28s, 0.38s.
+            -- ATTACK_RIFLE - two-handed: brace -> raise to shoulder -> 3-burst -> lower.
+            -- Both hands follow weapon. Impact at ~0.17s (first shot).
             -- =========================================================
             {
                 animation_id = "attack_rifle",
                 duration = 0.85,
                 animation_keys = {
-                    -- Root braces slightly forward
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.15, duration = 0.7, start_value = -3.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.15, duration = 0.7, start_value = 3.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Body holds forward
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.15, duration = 0.7, start_value = 8.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Weapon raises to shoulder, 3 recoil kicks, lowers
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -80.0, easing = "outquad" },
-                    -- Recoil 1 (t=0.18)
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.15, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.20, duration = 0.05, start_value = -60.0, end_value = -80.0, easing = "outquad" },
-                    -- Recoil 2 (t=0.28)
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.25, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.30, duration = 0.05, start_value = -60.0, end_value = -80.0, easing = "outquad" },
-                    -- Recoil 3 (t=0.38)
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.35, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.40, duration = 0.45, start_value = -60.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 158.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.40, duration = 0.45, start_value = 158.0, end_value = 129.0, easing = "inoutsine" },
-
-                    -- Head stable, slight nods per burst
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.15, duration = 0.05, start_value = -4.0, end_value = -1.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.20, duration = 0.05, start_value = -1.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.25, duration = 0.05, start_value = -4.0, end_value = -1.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.30, duration = 0.05, start_value = -1.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.35, duration = 0.05, start_value = -4.0, end_value = -1.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.40, duration = 0.45, start_value = -1.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Legs wide stable stance
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.7, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.7, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- hand_right mirrors weapon (rifle stock grip, 3-burst recoil)
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -80.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.15, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.20, duration = 0.05, start_value = -60.0, end_value = -80.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.25, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.30, duration = 0.05, start_value = -60.0, end_value = -80.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.35, duration = 0.05, start_value = -80.0, end_value = -60.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.40, duration = 0.45, start_value = -60.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 158.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.40, duration = 0.45, start_value = 158.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.14, duration = 0.71, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.14, duration = 0.71, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 10.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.14, duration = 0.71, start_value = 10.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Weapon snaps to shoulder, 3-burst recoil (barrel kicks +18 deg each), lowers
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.14, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.18, duration = 0.06, start_value = -62.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.24, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.28, duration = 0.06, start_value = -62.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.34, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.38, duration = 0.47, start_value = -62.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 158.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.38, duration = 0.47, start_value = 158.0, end_value = 129.0, easing = "inoutsine" },
+                    -- Head keeps steady aim, micro-nods per shot
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.14, duration = 0.04, start_value = -4.0, end_value = -1.5, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.18, duration = 0.06, start_value = -1.5, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.24, duration = 0.04, start_value = -4.0, end_value = -1.5, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.28, duration = 0.06, start_value = -1.5, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.34, duration = 0.04, start_value = -4.0, end_value = -1.5, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.38, duration = 0.47, start_value = -1.5, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.71, start_value = -5.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.71, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
+                    -- hand_right mirrors weapon exactly (two-handed grip)
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.14, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.18, duration = 0.06, start_value = -62.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.24, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.28, duration = 0.06, start_value = -62.0, end_value = -80.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.34, duration = 0.04, start_value = -80.0, end_value = -62.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.38, duration = 0.47, start_value = -62.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 158.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.38, duration = 0.47, start_value = 158.0, end_value = 129.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
-            -- ATTACK_SHOTGUN - heavy single blast: raise → aim → hard
-            -- recoil pushes the whole body back → slow recovery.
-            -- Impact at ~0.18s.
+            -- ATTACK_SHOTGUN - two-handed: raise to shoulder -> single hard blast
+            -- -> body blown back by recoil -> slow recovery. Impact at ~0.17s.
             -- =========================================================
             {
                 animation_id = "attack_shotgun",
-                duration = 0.75,
+                duration = 0.8,
                 animation_keys = {
-                    -- Root gets knocked backward by heavy recoil
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.15, duration = 0.08, start_value = -4.0, end_value = 5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.23, duration = 0.52, start_value = 5.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.15, duration = 0.08, start_value = 4.0, end_value = -5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.23, duration = 0.52, start_value = -5.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Body: step forward to aim, blown back by recoil
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 8.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.15, duration = 0.1, start_value = 8.0, end_value = -18.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.25, duration = 0.5, start_value = -18.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Weapon: raise to shoulder, fire and kick hard, return slowly
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -75.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -75.0, end_value = -48.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.25, duration = 0.5, start_value = -48.0, end_value = 0.0, easing = "inoutsine" },
-
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 155.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.15, duration = 0.1, start_value = 155.0, end_value = 148.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.25, duration = 0.5, start_value = 148.0, end_value = 129.0, easing = "inoutsine" },
-
-                    -- Head aims then snaps back from recoil
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -5.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -5.0, end_value = 3.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.25, duration = 0.5, start_value = 3.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- Legs absorb the recoil
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -4.0, end_value = 6.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.5, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = 4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = 4.0, end_value = -4.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.25, duration = 0.5, start_value = -4.0, end_value = 0.0, easing = "inoutsine" },
-
-                    -- hand_right mirrors weapon (shotgun stock grip, heavy recoil)
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.15, start_value = 0.0, end_value = -75.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.15, duration = 0.1, start_value = -75.0, end_value = -48.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.25, duration = 0.5, start_value = -48.0, end_value = 0.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.15, start_value = 129.0, end_value = 155.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.15, duration = 0.1, start_value = 155.0, end_value = 148.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.25, duration = 0.5, start_value = 148.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = -4.0, end_value = 6.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "root", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = 6.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = 4.0, end_value = -6.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = -6.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Body: step forward to brace, blown hard backward by recoil
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 8.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.14, duration = 0.09, start_value = 8.0, end_value = -22.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "body", property_id = "position_x", start_time = 0.23, duration = 0.57, start_value = -22.0, end_value = 0.0, easing = "inoutsine" },
+                    -- Weapon: raise to shoulder, single hard blast recoil (+34 deg kick), slow return
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -76.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = -76.0, end_value = -42.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = -42.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 155.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.14, duration = 0.09, start_value = 155.0, end_value = 146.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.23, duration = 0.57, start_value = 146.0, end_value = 129.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = -5.0, end_value = 4.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = 4.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = -5.0, end_value = 7.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = 7.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = 5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = 5.0, end_value = -5.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = -5.0, end_value = 0.0, easing = "inoutsine" },
+                    -- hand_right mirrors weapon (two-handed grip, absorbs recoil)
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.14, start_value = 0.0, end_value = -76.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.14, duration = 0.09, start_value = -76.0, end_value = -42.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.23, duration = 0.57, start_value = -42.0, end_value = 0.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.14, start_value = 129.0, end_value = 155.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.14, duration = 0.09, start_value = 155.0, end_value = 146.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.23, duration = 0.57, start_value = 146.0, end_value = 129.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================
