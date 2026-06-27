@@ -1,25 +1,7 @@
+local skins = require("first_anim.skins")
+local theme = require("first_anim.theme")
+
 local CONTROLLER = "/system#autobattle"
-
-local WEAPONS = { "rifle_ak", "impact_bat", "fists_default", "pistol_pm", "shotgun_short" }
-local WEAPON_LABELS = {
-	rifle_ak = "WEAPON: AK-47",
-	impact_bat = "WEAPON: BAT",
-	fists_default = "WEAPON: FISTS",
-	pistol_pm = "WEAPON: PISTOL",
-	shotgun_short = "WEAPON: SHOTGUN"
-}
-
-local BODIES = { "body_default", "body_armor" }
-local BODY_LABELS = {
-	body_default = "ARMOR: NONE",
-	body_armor = "ARMOR: KEVLAR"
-}
-
-local HEADS = { "head_default", "head_gasmask" }
-local HEAD_LABELS = {
-	head_default = "HELMET: NONE",
-	head_gasmask = "HELMET: GASMASK"
-}
 
 local function flash_node(node)
 	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
@@ -27,75 +9,71 @@ local function flash_node(node)
 	end)
 end
 
-local function get_index(tbl, val)
-	for i, v in ipairs(tbl) do
-		if v == val then return i end
+-- Index of an attachment id within a UI list ({ id, label } entries).
+local function index_of(list, id)
+	for i, entry in ipairs(list) do
+		if entry.id == id then return i end
 	end
 	return 1
 end
 
-local function update_equip_ui(self)
-	local w_id = WEAPONS[self.weapon_idx]
-	local b_id = BODIES[self.body_idx]
-	local h_id = HEADS[self.head_idx]
+local function current_id(self, slot)
+	return self.slots[slot].list[self.slots[slot].idx].id
+end
 
-	gui.set_text(self.lbl_equip_weapon, WEAPON_LABELS[w_id] or "WEAPON")
-	gui.set_text(self.lbl_equip_body, BODY_LABELS[b_id] or "ARMOR")
-	gui.set_text(self.lbl_equip_head, HEAD_LABELS[h_id] or "HELMET")
+local function update_equip_ui(self)
+	for slot, data in pairs(self.slots) do
+		gui.set_text(data.label, data.list[data.idx].label)
+	end
+end
+
+local function post_loadout(self)
+	msg.post(CONTROLLER, "equip_player", {
+		weapon = current_id(self, "weapon"),
+		body = current_id(self, "body"),
+		head = current_id(self, "head"),
+	})
 end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
-	-- Title and log nodes
 	self.status_lbl = gui.get_node("status_lbl")
 	self.log_text = gui.get_node("log_text")
 
-	-- Speed control panel & buttons (only 1x, 2x, 4x)
 	self.speed_buttons = {
 		[1] = gui.get_node("speed_1x"),
 		[2] = gui.get_node("speed_2x"),
-		[4] = gui.get_node("speed_4x")
+		[4] = gui.get_node("speed_4x"),
 	}
 	self.active_speed = 0
 
-	-- Pause button (separate, placed above restart)
 	self.btn_pause = gui.get_node("btn_pause")
 	self.lbl_pause = gui.get_node("lbl_pause")
-
-	-- Restart button
 	self.btn_restart = gui.get_node("btn_restart")
 
-	-- Group selection buttons
 	self.group_buttons = {
 		[1] = gui.get_node("btn_group1"),
 		[2] = gui.get_node("btn_group2"),
-		[3] = gui.get_node("btn_group3")
+		[3] = gui.get_node("btn_group3"),
 	}
 	self.active_group = 1
 
-	-- Equipment buttons
-	self.btn_equip_weapon = gui.get_node("btn_equip_weapon")
-	self.btn_equip_body = gui.get_node("btn_equip_body")
-	self.btn_equip_head = gui.get_node("btn_equip_head")
+	-- Equipment selectors are driven entirely by skins.json (UI-flagged entries).
+	self.slots = {
+		weapon = { list = skins.get_ui_list("weapon"), idx = 1, node = gui.get_node("btn_equip_weapon"), label = gui.get_node("lbl_equip_weapon") },
+		body   = { list = skins.get_ui_list("body"),   idx = 1, node = gui.get_node("btn_equip_body"),   label = gui.get_node("lbl_equip_body") },
+		head   = { list = skins.get_ui_list("head"),   idx = 1, node = gui.get_node("btn_equip_head"),   label = gui.get_node("lbl_equip_head") },
+	}
+	update_equip_ui(self)
 
-	self.lbl_equip_weapon = gui.get_node("lbl_equip_weapon")
-	self.lbl_equip_body = gui.get_node("lbl_equip_body")
-	self.lbl_equip_head = gui.get_node("lbl_equip_head")
-
-	self.weapon_idx = 1
-	self.body_idx = 1
-	self.head_idx = 1
-
-	-- Color tokens
-	self.color_active = vmath.vector4(0.15, 0.75, 0.55, 1.0)
-	self.color_inactive = vmath.vector4(0.22, 0.25, 0.3, 1.0)
+	self.color_active = theme.color.ui_active
+	self.color_inactive = theme.color.ui_inactive
 end
 
-function on_message(self, message_id, message, sender)
+function on_message(self, message_id, message)
 	if message_id == hash("update_logs") then
-		local log_text = table.concat(message.logs, "\n")
-		gui.set_text(self.log_text, log_text)
+		gui.set_text(self.log_text, table.concat(message.logs, "\n"))
 
 	elseif message_id == hash("set_status") then
 		gui.set_text(self.status_lbl, message.text)
@@ -105,16 +83,9 @@ function on_message(self, message_id, message, sender)
 
 	elseif message_id == hash("speed_changed") then
 		self.active_speed = message.speed
-		if self.active_speed == 0 then
-			gui.set_color(self.btn_pause, self.color_active)
-			for _, node in pairs(self.speed_buttons) do
-				gui.set_color(node, self.color_inactive)
-			end
-		else
-			gui.set_color(self.btn_pause, self.color_inactive)
-			for speed_val, node in pairs(self.speed_buttons) do
-				gui.set_color(node, speed_val == self.active_speed and self.color_active or self.color_inactive)
-			end
+		gui.set_color(self.btn_pause, self.active_speed == 0 and self.color_active or self.color_inactive)
+		for speed_val, node in pairs(self.speed_buttons) do
+			gui.set_color(node, speed_val == self.active_speed and self.color_active or self.color_inactive)
 		end
 
 	elseif message_id == hash("group_changed") then
@@ -124,11 +95,18 @@ function on_message(self, message_id, message, sender)
 		end
 
 	elseif message_id == hash("init_equipment") then
-		self.weapon_idx = get_index(WEAPONS, message.weapon)
-		self.body_idx = get_index(BODIES, message.body)
-		self.head_idx = get_index(HEADS, message.head)
+		self.slots.weapon.idx = index_of(self.slots.weapon.list, message.weapon)
+		self.slots.body.idx = index_of(self.slots.body.list, message.body)
+		self.slots.head.idx = index_of(self.slots.head.list, message.head)
 		update_equip_ui(self)
 	end
+end
+
+local function cycle_slot(self, slot)
+	local data = self.slots[slot]
+	data.idx = (data.idx % #data.list) + 1
+	update_equip_ui(self)
+	post_loadout(self)
 end
 
 function on_input(self, action_id, action)
@@ -164,40 +142,11 @@ function on_input(self, action_id, action)
 		end
 	end
 
-	-- Equipment selections
-	if gui.pick_node(self.btn_equip_weapon, action.x, action.y) then
-		flash_node(self.btn_equip_weapon)
-		self.weapon_idx = (self.weapon_idx % #WEAPONS) + 1
-		update_equip_ui(self)
-		msg.post(CONTROLLER, "equip_player", {
-			weapon = WEAPONS[self.weapon_idx],
-			body = BODIES[self.body_idx],
-			head = HEADS[self.head_idx]
-		})
-		return
-	end
-
-	if gui.pick_node(self.btn_equip_body, action.x, action.y) then
-		flash_node(self.btn_equip_body)
-		self.body_idx = (self.body_idx % #BODIES) + 1
-		update_equip_ui(self)
-		msg.post(CONTROLLER, "equip_player", {
-			weapon = WEAPONS[self.weapon_idx],
-			body = BODIES[self.body_idx],
-			head = HEADS[self.head_idx]
-		})
-		return
-	end
-
-	if gui.pick_node(self.btn_equip_head, action.x, action.y) then
-		flash_node(self.btn_equip_head)
-		self.head_idx = (self.head_idx % #HEADS) + 1
-		update_equip_ui(self)
-		msg.post(CONTROLLER, "equip_player", {
-			weapon = WEAPONS[self.weapon_idx],
-			body = BODIES[self.body_idx],
-			head = HEADS[self.head_idx]
-		})
-		return
+	for slot, data in pairs(self.slots) do
+		if gui.pick_node(data.node, action.x, action.y) then
+			flash_node(data.node)
+			cycle_slot(self, slot)
+			return
+		end
 	end
 end
