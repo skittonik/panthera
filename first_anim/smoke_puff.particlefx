@@ -10,25 +10,24 @@ emitters {
   tile_source: "/first_anim/effects.atlas"
   animation: "smoke_puff_1"
   material: "/builtins/materials/particlefx.material"
-  max_particle_count: 1
+  max_particle_count: 2
   type: EMITTER_TYPE_2DCONE
-  start_delay: 0.04
   properties {
     key: EMITTER_KEY_SPAWN_RATE
     points {
-      y: 100.0
+      y: 200.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_X
     points {
-      y: 10.0
+      y: 60.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_Y
     points {
-      y: 0.0
+      y: 30.0
     }
   }
   properties {
@@ -40,20 +39,21 @@ emitters {
   properties {
     key: EMITTER_KEY_PARTICLE_LIFE_TIME
     points {
-      y: 0.45
+      y: 0.5
     }
+    spread: 0.1
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SPEED
     points {
-      y: 220.0
+      y: 400.0
     }
-    spread: 50.0
+    spread: 150.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SIZE
     points {
-      y: 100.0
+      y: 35.0
     }
   }
   properties {
@@ -85,6 +85,7 @@ emitters {
     points {
       y: 0.0
     }
+    spread: 180.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
@@ -101,8 +102,9 @@ emitters {
   properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 20.0
     }
+    spread: 20.0
   }
   particle_properties {
     key: PARTICLE_KEY_SCALE
@@ -111,7 +113,7 @@ emitters {
     }
     points {
       x: 1.0
-      y: 1.8
+      y: 2.5
       t_x: 1.0
     }
   }
@@ -136,12 +138,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ALPHA
     points {
-      y: 0.0
-    }
-    points {
-      x: 0.2
-      y: 0.7
-      t_x: 1.0
+      y: 0.75
     }
     points {
       x: 1.0
@@ -170,7 +167,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 1.0
     }
   }
   modifiers {
@@ -178,7 +175,7 @@ emitters {
     properties {
       key: MODIFIER_KEY_MAGNITUDE
       points {
-        y: 3.0
+        y: 8.0
       }
     }
     properties {
@@ -194,9 +191,6 @@ emitters {
   mode: PLAY_MODE_ONCE
   duration: 0.01
   space: EMISSION_SPACE_WORLD
-  position {
-    y: 8.0
-  }
   rotation {
     z: -0.7071068
     w: 0.7071068
@@ -204,25 +198,24 @@ emitters {
   tile_source: "/first_anim/effects.atlas"
   animation: "smoke_puff_2"
   material: "/builtins/materials/particlefx.material"
-  max_particle_count: 1
+  max_particle_count: 2
   type: EMITTER_TYPE_2DCONE
-  start_delay: 0.06
   properties {
     key: EMITTER_KEY_SPAWN_RATE
     points {
-      y: 100.0
+      y: 200.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_X
     points {
-      y: 10.0
+      y: 60.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_Y
     points {
-      y: 0.0
+      y: 30.0
     }
   }
   properties {
@@ -236,18 +229,19 @@ emitters {
     points {
       y: 0.55
     }
+    spread: 0.1
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SPEED
     points {
-      y: 170.0
+      y: 350.0
     }
-    spread: 40.0
+    spread: 120.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SIZE
     points {
-      y: 120.0
+      y: 42.0
     }
   }
   properties {
@@ -279,6 +273,7 @@ emitters {
     points {
       y: 0.0
     }
+    spread: 180.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
@@ -295,8 +290,9 @@ emitters {
   properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 20.0
     }
+    spread: 20.0
   }
   particle_properties {
     key: PARTICLE_KEY_SCALE
@@ -305,7 +301,7 @@ emitters {
     }
     points {
       x: 1.0
-      y: 2.0
+      y: 2.8
       t_x: 1.0
     }
   }
@@ -330,12 +326,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ALPHA
     points {
-      y: 0.0
-    }
-    points {
-      x: 0.2
       y: 0.65
-      t_x: 1.0
     }
     points {
       x: 1.0
@@ -364,7 +355,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 1.0
     }
   }
   modifiers {
@@ -372,7 +363,7 @@ emitters {
     properties {
       key: MODIFIER_KEY_MAGNITUDE
       points {
-        y: 3.0
+        y: 8.0
       }
     }
     properties {
@@ -388,9 +379,6 @@ emitters {
   mode: PLAY_MODE_ONCE
   duration: 0.01
   space: EMISSION_SPACE_WORLD
-  position {
-    y: -8.0
-  }
   rotation {
     z: -0.7071068
     w: 0.7071068
@@ -398,25 +386,24 @@ emitters {
   tile_source: "/first_anim/effects.atlas"
   animation: "smoke_puff_3"
   material: "/builtins/materials/particlefx.material"
-  max_particle_count: 1
+  max_particle_count: 2
   type: EMITTER_TYPE_2DCONE
-  start_delay: 0.08
   properties {
     key: EMITTER_KEY_SPAWN_RATE
     points {
-      y: 100.0
+      y: 200.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_X
     points {
-      y: 10.0
+      y: 60.0
     }
   }
   properties {
     key: EMITTER_KEY_SIZE_Y
     points {
-      y: 0.0
+      y: 30.0
     }
   }
   properties {
@@ -428,20 +415,21 @@ emitters {
   properties {
     key: EMITTER_KEY_PARTICLE_LIFE_TIME
     points {
-      y: 0.65
+      y: 0.6
     }
+    spread: 0.1
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SPEED
     points {
-      y: 120.0
+      y: 300.0
     }
-    spread: 30.0
+    spread: 100.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_SIZE
     points {
-      y: 150.0
+      y: 53.0
     }
   }
   properties {
@@ -473,6 +461,7 @@ emitters {
     points {
       y: 0.0
     }
+    spread: 180.0
   }
   properties {
     key: EMITTER_KEY_PARTICLE_STRETCH_FACTOR_X
@@ -489,8 +478,9 @@ emitters {
   properties {
     key: EMITTER_KEY_PARTICLE_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 20.0
     }
+    spread: 20.0
   }
   particle_properties {
     key: PARTICLE_KEY_SCALE
@@ -499,7 +489,7 @@ emitters {
     }
     points {
       x: 1.0
-      y: 1.6
+      y: 3.0
       t_x: 1.0
     }
   }
@@ -524,12 +514,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ALPHA
     points {
-      y: 0.0
-    }
-    points {
-      x: 0.2
       y: 0.55
-      t_x: 1.0
     }
     points {
       x: 1.0
@@ -558,7 +543,7 @@ emitters {
   particle_properties {
     key: PARTICLE_KEY_ANGULAR_VELOCITY
     points {
-      y: 0.0
+      y: 1.0
     }
   }
   modifiers {
@@ -566,7 +551,7 @@ emitters {
     properties {
       key: MODIFIER_KEY_MAGNITUDE
       points {
-        y: 3.0
+        y: 8.0
       }
     }
     properties {

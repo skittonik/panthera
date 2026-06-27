@@ -1,3 +1,19 @@
+components {
+  id: "muzzle_flash"
+  component: "/first_anim/muzzle_flash.particlefx"
+  position {
+    x: 331.0
+    y: 48.0
+  }
+}
+components {
+  id: "smoke_puff"
+  component: "/first_anim/smoke_puff.particlefx"
+  position {
+    x: 331.0
+    y: 48.0
+  }
+}
 embedded_components {
   id: "sprite"
   type: "sprite"
@@ -8,18 +24,4 @@ embedded_components {
   "  texture: \"/first_anim/weapons.atlas\"\n"
   "}\n"
   ""
-}
-components {
-  id: "muzzle_flash"
-  component: "/first_anim/muzzle_flash.particlefx"
-  position {
-    x: 130.0
-  }
-}
-components {
-  id: "smoke_puff"
-  component: "/first_anim/smoke_puff.particlefx"
-  position {
-    x: 130.0
-  }
 }

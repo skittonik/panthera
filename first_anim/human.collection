@@ -58,7 +58,7 @@ instances {
   id: "hand_right"
   prototype: "/first_anim/hand_right.go"
   position {
-    x: 85.0
+    x: 105.0
     y: 181.0
     z: -0.005
   }

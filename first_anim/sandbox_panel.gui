@@ -10,7 +10,7 @@ nodes {
   }
   size {
     x: 460.0
-    y: 1060.0
+    y: 1040.0
   }
   color {
     x: 0.13
@@ -25,15 +25,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 990.0
+    y: 1015.0
   }
   scale {
-    x: 0.9
-    y: 0.9
+    x: 0.85
+    y: 0.85
   }
   size {
-    x: 420.0
-    y: 60.0
+    x: 400.0
+    y: 50.0
   }
   color {
     x: 0.85
@@ -50,15 +50,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 920.0
+    y: 964.0
   }
   scale {
-    x: 0.6
-    y: 0.6
+    x: 0.55
+    y: 0.55
   }
   size {
-    x: 380.0
-    y: 40.0
+    x: 360.0
+    y: 32.0
   }
   color {
     x: 0.5
@@ -75,11 +75,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 840.0
+    y: 909.0
   }
   size {
-    x: 380.0
-    y: 84.0
+    x: 360.0
+    y: 58.0
   }
   color {
     x: 0.22
@@ -93,11 +93,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 740.0
+    y: 841.0
   }
   size {
-    x: 380.0
-    y: 84.0
+    x: 360.0
+    y: 58.0
   }
   color {
     x: 0.22
@@ -111,11 +111,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 640.0
+    y: 773.0
   }
   size {
-    x: 380.0
-    y: 84.0
+    x: 360.0
+    y: 58.0
   }
   color {
     x: 0.45
@@ -129,15 +129,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 550.0
+    y: 718.0
   }
   scale {
-    x: 0.6
-    y: 0.6
+    x: 0.55
+    y: 0.55
   }
   size {
-    x: 380.0
-    y: 40.0
+    x: 360.0
+    y: 32.0
   }
   color {
     x: 0.7
@@ -154,11 +154,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 470.0
+    y: 663.0
   }
   size {
-    x: 380.0
-    y: 84.0
+    x: 360.0
+    y: 58.0
   }
   color {
     x: 0.85
@@ -172,11 +172,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 370.0
+    y: 595.0
   }
   size {
-    x: 380.0
-    y: 84.0
+    x: 360.0
+    y: 58.0
   }
   color {
     x: 0.8
@@ -190,15 +190,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 840.0
+    y: 909.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
-    x: 360.0
-    y: 70.0
+    x: 340.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "IDLE"
@@ -210,15 +210,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 740.0
+    y: 841.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
-    x: 360.0
-    y: 70.0
+    x: 340.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "WALK"
@@ -230,15 +230,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 640.0
+    y: 773.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
-    x: 360.0
-    y: 70.0
+    x: 340.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "DEATH"
@@ -250,15 +250,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 470.0
+    y: 663.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
-    x: 360.0
-    y: 70.0
+    x: 340.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "ATTACK"
@@ -270,15 +270,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 370.0
+    y: 595.0
   }
   scale {
-    x: 0.8
-    y: 0.8
+    x: 0.75
+    y: 0.75
   }
   size {
-    x: 360.0
-    y: 70.0
+    x: 340.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "DAMAGE"
@@ -290,15 +290,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 310.0
+    y: 540.0
   }
   scale {
-    x: 0.6
-    y: 0.6
+    x: 0.55
+    y: 0.55
   }
   size {
-    x: 380.0
-    y: 40.0
+    x: 360.0
+    y: 32.0
   }
   color {
     x: 0.5
@@ -315,11 +315,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 230.0
+    y: 488.0
   }
   size {
-    x: 380.0
-    y: 60.0
+    x: 360.0
+    y: 52.0
   }
   color {
     x: 0.18
@@ -333,15 +333,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 230.0
+    y: 488.0
   }
   scale {
     x: 0.55
     y: 0.55
   }
   size {
-    x: 260.0
-    y: 50.0
+    x: 240.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "HEAD: default_head"
@@ -352,12 +352,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 230.0
+    x: 1510.0
+    y: 488.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -370,16 +370,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 230.0
+    x: 1510.0
+    y: 488.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "<"
@@ -390,12 +390,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 230.0
+    x: 1850.0
+    y: 488.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -408,16 +408,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 230.0
+    x: 1850.0
+    y: 488.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: ">"
@@ -429,11 +429,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 130.0
+    y: 426.0
   }
   size {
-    x: 380.0
-    y: 60.0
+    x: 360.0
+    y: 52.0
   }
   color {
     x: 0.18
@@ -447,15 +447,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 130.0
+    y: 426.0
   }
   scale {
     x: 0.55
     y: 0.55
   }
   size {
-    x: 260.0
-    y: 50.0
+    x: 240.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "BODY: default_body"
@@ -466,12 +466,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 130.0
+    x: 1510.0
+    y: 426.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -484,16 +484,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 130.0
+    x: 1510.0
+    y: 426.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "<"
@@ -504,12 +504,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 130.0
+    x: 1850.0
+    y: 426.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -522,16 +522,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 130.0
+    x: 1850.0
+    y: 426.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: ">"
@@ -543,11 +543,11 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 30.0
+    y: 364.0
   }
   size {
-    x: 380.0
-    y: 60.0
+    x: 360.0
+    y: 52.0
   }
   color {
     x: 0.18
@@ -561,15 +561,15 @@ nodes {
 nodes {
   position {
     x: 1680.0
-    y: 30.0
+    y: 364.0
   }
   scale {
     x: 0.55
     y: 0.55
   }
   size {
-    x: 260.0
-    y: 50.0
+    x: 240.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "WEAPON: impact_bat"
@@ -580,12 +580,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 30.0
+    x: 1510.0
+    y: 364.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -598,16 +598,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1520.0
-    y: 30.0
+    x: 1510.0
+    y: 364.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: "<"
@@ -618,12 +618,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 30.0
+    x: 1850.0
+    y: 364.0
   }
   size {
-    x: 50.0
-    y: 60.0
+    x: 48.0
+    y: 52.0
   }
   color {
     x: 0.28
@@ -636,16 +636,16 @@ nodes {
 }
 nodes {
   position {
-    x: 1840.0
-    y: 30.0
+    x: 1850.0
+    y: 364.0
   }
   scale {
     x: 0.7
     y: 0.7
   }
   size {
-    x: 50.0
-    y: 50.0
+    x: 48.0
+    y: 45.0
   }
   type: TYPE_TEXT
   text: ">"
