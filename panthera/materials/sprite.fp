@@ -19,5 +19,6 @@ void main()
     lowp vec4 tex = texture(texture_sampler, var_texcoord0.xy) * tint * color_pm;
     // flash.x = 1.0 → full white silhouette, 0.0 → normal
     tex.rgb = mix(tex.rgb, vec3(tex.a), flash.x);
+    if (tex.a < 0.01) discard;
     out_fragColor = tex;
 }

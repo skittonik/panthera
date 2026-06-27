@@ -71,6 +71,7 @@ function init(self)
 
 	self.btn_play = gui.get_node("btn_play")
 	self.btn_pause = gui.get_node("btn_pause")
+	self.btn_reset = gui.get_node("btn_reset")
 
 	self.speed_buttons = {
 		[1] = gui.get_node("speed_1x"),
@@ -146,6 +147,12 @@ end
 
 function on_input(self, action_id, action)
 	if action_id ~= hash("touch") or not action.pressed then
+		return
+	end
+
+	if gui.pick_node(self.btn_reset, action.x, action.y) then
+		flash_node(self.btn_reset)
+		msg.post(CONTROLLER, "reset")
 		return
 	end
 

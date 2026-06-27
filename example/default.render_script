@@ -190,7 +190,9 @@ function update(self)
     -- render the other components: sprites, tilemaps, particles etc
     --
     render.enable_state(render.STATE_BLEND)
+    render.set_depth_mask(true)
     render.draw(predicates.tile, camera_world.frustum)
+    render.set_depth_mask(false)
     render.draw(predicates.particle, camera_world.frustum)
     render.disable_state(render.STATE_DEPTH_TEST)
 

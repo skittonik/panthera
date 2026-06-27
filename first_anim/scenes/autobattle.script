@@ -61,5 +61,8 @@ function on_message(self, message_id, message)
 		combat.set_group(self.world, message.group_id)
 	elseif message_id == hash("equip_player") then
 		combat.set_loadout(self.world, message.weapon, message.body, message.head)
+	elseif message_id == hash("reset") then
+		self.battle_log = {}
+		combat.reset(self.world)
 	end
 end

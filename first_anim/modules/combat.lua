@@ -389,6 +389,10 @@ function M.set_group(world, group_id)
 	world.emit({ type = "group", group_id = group_id })
 end
 
+function M.reset(world)
+	setup_idle(world)
+end
+
 function M.set_loadout(world, weapon, body, head)
 	world.loadout = { weapon = weapon, body = body, head = head }
 	if world.phase ~= "running" and world.player then

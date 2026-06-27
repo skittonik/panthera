@@ -170,7 +170,46 @@ nodes {
 nodes {
   position {
     x: 490.0
-    y: 70.0
+    y: 30.0
+  }
+  size {
+    x: 180.0
+    y: 50.0
+  }
+  color {
+    x: 0.75
+    y: 0.25
+    z: 0.10
+  }
+  type: TYPE_BOX
+  id: "btn_reset"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+  }
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 180.0
+    y: 50.0
+  }
+  type: TYPE_TEXT
+  text: "RESET"
+  font: "troika"
+  id: "lbl_reset"
+  parent: "btn_reset"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 490.0
+    y: 90.0
   }
   size {
     x: 180.0
@@ -209,7 +248,7 @@ nodes {
 nodes {
   position {
     x: 490.0
-    y: 140.0
+    y: 160.0
   }
   size {
     x: 180.0
