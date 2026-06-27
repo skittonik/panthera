@@ -9,6 +9,7 @@ local function build_anim_objects(p_ids)
 		[hash("/shadow")] = p_ids[hash("/human/shadow")],
 		[hash("/body")] = p_ids[hash("/human/body")],
 		[hash("/head")] = p_ids[hash("/human/head")],
+		[hash("/head_pivot")] = p_ids[hash("/human/head_pivot")],
 		[hash("/left_leg")] = p_ids[hash("/human/left_leg")],
 		[hash("/right_leg")] = p_ids[hash("/human/right_leg")],
 		[hash("/hand_right")] = p_ids[hash("/human/hand_right")],
