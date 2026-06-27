@@ -1,4 +1,4 @@
-script: "/first_anim/autobattle_panel.gui"
+script: "/first_anim/autobattle_panel.gui_script"
 fonts {
   name: "troika"
   font: "/example/assets/troika.font"
