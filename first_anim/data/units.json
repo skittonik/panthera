@@ -2,12 +2,14 @@
   "human": {
     "rig": "human",
     "factory": "human_factory",
-    "uses_weapons": true
+    "uses_weapons": true,
+    "hp_bar_offset_y": 270
   },
   "rat": {
     "rig": "rat",
     "factory": "rat_factory",
     "uses_weapons": false,
-    "melee": { "attack_range": 70, "hit_delay": 0.3 }
+    "melee": { "attack_range": 110, "hit_delay": 0.3 },
+    "hp_bar_offset_y": 140
   }
 }

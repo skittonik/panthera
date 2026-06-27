@@ -26,7 +26,7 @@ function R.new(opts)
 	self.shadow_path = nil -- rat placeholder has no separate shadow
 	self.sprite_url = msg.url(nil, self.root_path, "sprite")
 
-	go.set_scale(vmath.vector3(flip * RAT_SCALE, RAT_SCALE, 1.0), self.root_path)
+	go.set_scale(vmath.vector3(RAT_SCALE, RAT_SCALE, 1.0), self.root_path)
 	return self
 end
 
@@ -43,8 +43,7 @@ function R:play(state, opts)
 	opts = opts or {}
 	if state == "attack" then
 		-- Quick lunge: punch scale up and back, firing the callback on return.
-		local s = self.is_enemy and -RAT_SCALE or RAT_SCALE
-		go.animate(self.root_path, "scale.x", go.PLAYBACK_ONCE_PINGPONG, s * 1.25,
+		go.animate(self.root_path, "scale.x", go.PLAYBACK_ONCE_PINGPONG, RAT_SCALE * 1.25,
 			go.EASING_OUTQUAD, 0.16, 0, opts.callback)
 	elseif state == "death" then
 		go.animate(self.sprite_url, "tint.w", go.PLAYBACK_ONCE_FORWARD, 0.0, go.EASING_INQUAD, 0.3)
