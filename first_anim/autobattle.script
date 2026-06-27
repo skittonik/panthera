@@ -149,14 +149,141 @@ local function load_enemies_config()
 	return data
 end
 
+local function spawn_enemies(self)
+	-- Clean up previous enemies first if any exist
+	for _, id in ipairs(self.enemy_ids) do
+		local enemy = self.characters[id]
+		if enemy then
+			if enemy.anim then pcall(panthera.stop, enemy.anim) end
+			if enemy.overlay then pcall(panthera.stop, enemy.overlay) end
+			for _, path in pairs(enemy.p_ids) do
+				pcall(go.delete, path, true)
+			end
+			self.characters[id] = nil
+		end
+	end
+	self.enemy_ids = {}
 
+	local pos_melee = go.get_position("/spawn_melee")
+	local pos_ranged = go.get_position("/spawn_ranged")
+	local pos_boss = go.get_position("/spawn_boss")
+
+	local group_cfg = self.config.groups[self.active_group] or self.config.groups[1]
+	
+	for i, e_entry in ipairs(group_cfg.enemies) do
+		local id = "enemy" .. i
+		
+		-- Resolve enemy configuration from reference key or override object
+		local e_cfg = {}
+		if type(e_entry) == "string" then
+			local template = self.enemy_templates[e_entry]
+			if template then
+				for k, v in pairs(template) do e_cfg[k] = v end
+			end
+		elseif type(e_entry) == "table" then
+			local template = self.enemy_templates[e_entry.key]
+			if template then
+				for k, v in pairs(template) do e_cfg[k] = v end
+			end
+			for k, v in pairs(e_entry) do
+				if k ~= "key" then e_cfg[k] = v end
+			end
+		end
+
+		-- Standard defaults in case configuration is incomplete
+		e_cfg.name = e_cfg.name or ("Zombie " .. i)
+		e_cfg.hp = e_cfg.hp or 80
+		e_cfg.move_speed = e_cfg.move_speed or 100
+		e_cfg.attack_cooldown = e_cfg.attack_cooldown or 1.5
+		e_cfg.damage = e_cfg.damage or 15
+		e_cfg.weapon_skin = e_cfg.weapon_skin or "stabbing_common"
+		
+		-- Determine weapon type and role to choose correct spawner
+		local e_wtype = skins.get_weapon_type(e_cfg.weapon_skin) or "impact"
+		local spawn_pos = pos_melee
+		if e_cfg.name:find("Boss") then
+			spawn_pos = pos_boss
+		elseif e_wtype == "pistol" or e_wtype == "rifle" or e_wtype == "shotgun" then
+			spawn_pos = pos_ranged
+		end
+
+		-- Add increased X and Y spawn offsets
+		local spawn_y = spawn_pos.y - 120 + math.random() * 240
+		local spawn_x = spawn_pos.x - 50 + math.random() * 100
+		local e_pos = vmath.vector3(spawn_x, spawn_y, 0.5 - (spawn_y / 10000))
+		
+		local e_ids = collectionfactory.create("/factories#unit_factory", e_pos, vmath.quat(), {}, vmath.vector3(-1.0, 1.0, 1.0))
+		for _, path in pairs(e_ids) do
+			table.insert(self.spawned_paths, path)
+		end
+
+		local e_root = e_ids[hash("/human/root")]
+		local e_hit = e_ids[hash("/human/hit")]
+		local e_shadow = e_ids[hash("/human/shadow")]
+		local e_hp_bg = e_ids[hash("/hp_bg")]
+		local e_hp_fill = e_ids[hash("/hp_fill")]
+		-- Scale child templates
+		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hit)
+		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_shadow)
+
+		-- Build enemy info
+		self.characters[id] = {
+			id = id,
+			p_ids = e_ids,
+			is_enemy = true,
+			name = e_cfg.name,
+			hp = e_cfg.hp,
+			max_hp = e_cfg.hp,
+			move_speed = e_cfg.move_speed,
+			attack_cooldown = e_cfg.attack_cooldown,
+			attack_timer = 0,
+			damage = e_cfg.damage,
+			attack_range = skins.get_attack_range(e_cfg.weapon_skin),
+			weapon_skin = e_cfg.weapon_skin,
+			state = "walk",
+			spawn_x = spawn_x,
+			spawn_y = spawn_y,
+			root_path = e_root,
+			hit_path = e_hit,
+			shadow_path = e_shadow,
+			hp_bg_path = e_hp_bg,
+			hp_fill_path = e_hp_fill,
+			anim = panthera.create_go(animation, nil, build_anim_objects(e_ids)),
+			overlay = panthera.create_go(animation, nil, build_anim_objects(e_ids))
+		}
+		table.insert(self.enemy_ids, id)
+
+		-- Apply skin and play walk
+		skins.apply_defaults(e_ids)
+		skins.apply_attachment(e_ids, "weapon", self.characters[id].weapon_skin)
+		self.characters[id].weapon_type = e_wtype
+		panthera.play(self.characters[id].anim, "walk", { is_loop = true })
+
+		-- Scale & configure enemy HP bar
+		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_bg)
+		go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_fill)
+		go.set(msg.url(nil, e_hp_fill, "sprite"), "tint", vmath.vector4(0.85, 0.15, 0.15, 1.0))
+		go.set(msg.url(nil, e_hp_bg, "sprite"), "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
+		label.set_text(msg.url(nil, e_hp_bg, "label"), string.format("%s: %d / %d", self.characters[id].name, self.characters[id].hp, self.characters[id].max_hp))
+	end
+
+	-- Put player into walk mode
+	local player = self.characters.player
+	if player then
+		player.state = "walk"
+		panthera.play(player.anim, "walk", { is_loop = true })
+	end
+
+	self.battle_state = "fighting"
+	add_log(self, string.format("Simulating %s", group_cfg.name or "Wave"))
+	msg.post("/ui#panel", "set_status", { text = "BATTLE IN PROGRESS", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+end
 
 local function start_simulation(self)
 	-- Reload config if possible
-	local config = load_config()
-	if not config then
-		-- Incase config load fails, use fallback mock
-		config = {
+	self.config = load_config()
+	if not self.config then
+		self.config = {
 			player = {
 				name = "Survivor", hp = 220, move_speed = 130, attack_cooldown = 1.2, damage = 30, weapon_skin = "rifle_ak", body_skin = "body_armor", head_skin = "head_gasmask"
 			},
@@ -168,10 +295,9 @@ local function start_simulation(self)
 		}
 	end
 
-	local enemy_templates = load_enemies_config()
-	if not enemy_templates or not next(enemy_templates) then
-		-- Mock templates incase loading fails
-		enemy_templates = {
+	self.enemy_templates = load_enemies_config()
+	if not self.enemy_templates or not next(self.enemy_templates) then
+		self.enemy_templates = {
 			zombie_bat = { name = "Zombie Bat", hp = 100, move_speed = 90, attack_cooldown = 1.6, damage = 12, weapon_skin = "impact_bat" },
 			zombie_pistol = { name = "Zombie Pistol", hp = 80, move_speed = 100, attack_cooldown = 2.0, damage = 15, weapon_skin = "pistol_pm" },
 			bandit_ak = { name = "Bandit AK", hp = 90, move_speed = 100, attack_cooldown = 2.2, damage = 18, weapon_skin = "rifle_ak" },
@@ -181,7 +307,6 @@ local function start_simulation(self)
 	end
 
 	self.battle_log = {}
-	self.battle_state = "fighting"
 
 	-- Clean up previous game objects and stop their active animations
 	for _, char in pairs(self.characters) do
@@ -190,18 +315,15 @@ local function start_simulation(self)
 	end
 	if self.spawned_paths then
 		for _, path in ipairs(self.spawned_paths) do
-			-- CRITICAL: recursive deletion is set to true to ensure all child parts disappear!
 			pcall(go.delete, path, true)
 		end
 	end
 	self.spawned_paths = {}
 	self.characters = {}
+	self.enemy_ids = {}
 
 	-- 1. Read, scale & tint spawner placeholders to visually display the spawn zone bounds
 	local pos_player = go.get_position("/spawn_player")
-	local pos_melee = go.get_position("/spawn_melee")
-	local pos_ranged = go.get_position("/spawn_ranged")
-	local pos_boss = go.get_position("/spawn_boss")
 
 	-- Scale enemy spawners to represent spawn zones (width 100, height 240)
 	-- base size of sprite is 64x64, so scale is X = 1.5625, Y = 3.75
@@ -219,7 +341,7 @@ local function start_simulation(self)
 	pcall(go.set, "/spawn_boss#sprite", "tint", vmath.vector4(0.7, 0.1, 0.8, 0.35))
 
 	-- 2. Spawn Player (within random X/Y offset zone)
-	local p_cfg = config.player
+	local p_cfg = self.config.player
 	if not self.player_weapon then
 		self.player_weapon = p_cfg.weapon_skin or "rifle_ak"
 		self.player_body = p_cfg.body_skin or "body_armor"
@@ -298,119 +420,14 @@ local function start_simulation(self)
 	go.set(msg.url(nil, p_hp_bg, "sprite"), "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
 	label.set_text(msg.url(nil, p_hp_bg, "label"), string.format("%s: %d / %d", self.characters.player.name, self.characters.player.hp, self.characters.player.max_hp))
 
-	-- 3. Spawn Enemies from the Selected Group
-	self.enemy_ids = {}
-	local group_cfg = config.groups[self.active_group] or config.groups[1]
-	
 	if self.simulation_speed > 0 then
-		for i, e_entry in ipairs(group_cfg.enemies) do
-			local id = "enemy" .. i
-			
-			-- Resolve enemy configuration from reference key or override object
-			local e_cfg = {}
-			if type(e_entry) == "string" then
-				local template = enemy_templates[e_entry]
-				if template then
-					for k, v in pairs(template) do e_cfg[k] = v end
-				end
-			elseif type(e_entry) == "table" then
-				local template = enemy_templates[e_entry.key]
-				if template then
-					for k, v in pairs(template) do e_cfg[k] = v end
-				end
-				for k, v in pairs(e_entry) do
-					if k ~= "key" then e_cfg[k] = v end
-				end
-			end
-
-			-- Standard defaults in case configuration is incomplete
-			e_cfg.name = e_cfg.name or ("Zombie " .. i)
-			e_cfg.hp = e_cfg.hp or 80
-			e_cfg.move_speed = e_cfg.move_speed or 100
-			e_cfg.attack_cooldown = e_cfg.attack_cooldown or 1.5
-			e_cfg.damage = e_cfg.damage or 15
-			e_cfg.weapon_skin = e_cfg.weapon_skin or "stabbing_common"
-			
-			-- Determine weapon type and role to choose correct spawner
-			local e_wtype = skins.get_weapon_type(e_cfg.weapon_skin) or "impact"
-			local spawn_pos = pos_melee
-			if e_cfg.name:find("Boss") then
-				spawn_pos = pos_boss
-			elseif e_wtype == "pistol" or e_wtype == "rifle" or e_wtype == "shotgun" then
-				spawn_pos = pos_ranged
-			end
-
-			-- Add increased X and Y spawn offsets
-			local spawn_y = spawn_pos.y - 120 + math.random() * 240
-			local spawn_x = spawn_pos.x - 50 + math.random() * 100
-			local e_pos = vmath.vector3(spawn_x, spawn_y, 0.5 - (spawn_y / 10000))
-			
-			local e_ids = collectionfactory.create("/factories#unit_factory", e_pos, vmath.quat(), {}, vmath.vector3(-1.0, 1.0, 1.0))
-			for _, path in pairs(e_ids) do
-				table.insert(self.spawned_paths, path)
-			end
-
-			local e_root = e_ids[hash("/human/root")]
-			local e_hit = e_ids[hash("/human/hit")]
-			local e_shadow = e_ids[hash("/human/shadow")]
-			local e_hp_bg = e_ids[hash("/hp_bg")]
-			local e_hp_fill = e_ids[hash("/hp_fill")]
-			-- Scale child templates
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hit)
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_shadow)
-
-			-- Build enemy info
-			self.characters[id] = {
-				id = id,
-				p_ids = e_ids,
-				is_enemy = true,
-				name = e_cfg.name,
-				hp = e_cfg.hp,
-				max_hp = e_cfg.hp,
-				move_speed = e_cfg.move_speed,
-				attack_cooldown = e_cfg.attack_cooldown,
-				attack_timer = 0,
-				damage = e_cfg.damage,
-				attack_range = skins.get_attack_range(e_cfg.weapon_skin),
-				weapon_skin = e_cfg.weapon_skin,
-				state = "walk",
-				spawn_x = spawn_x,
-				spawn_y = spawn_y,
-				root_path = e_root,
-				hit_path = e_hit,
-				shadow_path = e_shadow,
-				hp_bg_path = e_hp_bg,
-				hp_fill_path = e_hp_fill,
-				anim = panthera.create_go(animation, nil, build_anim_objects(e_ids)),
-				overlay = panthera.create_go(animation, nil, build_anim_objects(e_ids))
-			}
-			table.insert(self.enemy_ids, id)
-
-			-- Apply skin and play walk
-			skins.apply_defaults(e_ids)
-			skins.apply_attachment(e_ids, "weapon", self.characters[id].weapon_skin)
-			self.characters[id].weapon_type = e_wtype
-			panthera.play(self.characters[id].anim, "walk", { is_loop = true })
-
-			-- Scale & configure enemy HP bar
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_bg)
-			go.set_scale(vmath.vector3(0.5, 0.5, 1.0), e_hp_fill)
-			go.set(msg.url(nil, e_hp_fill, "sprite"), "tint", vmath.vector4(0.85, 0.15, 0.15, 1.0))
-			go.set(msg.url(nil, e_hp_bg, "sprite"), "tint", vmath.vector4(0.11, 0.12, 0.15, 0.8))
-			label.set_text(msg.url(nil, e_hp_bg, "label"), string.format("%s: %d / %d", self.characters[id].name, self.characters[id].hp, self.characters[id].max_hp))
-		end
-	end
-
-	-- Sync GUI speed, active group, and player equipment highlights
-	msg.post("/ui#panel", "speed_changed", { speed = self.simulation_speed })
-	msg.post("/ui#panel", "group_changed", { group_id = self.active_group })
-	msg.post("/ui#panel", "init_equipment", { weapon = self.player_weapon, body = self.player_body, head = self.player_head })
-
-	if self.simulation_speed == 0 then
-		msg.post("/ui#panel", "set_status", { text = "PAUSED - EDIT LOADOUT", color = vmath.vector4(0.9, 0.6, 0.1, 1.0) })
+		spawn_enemies(self)
 	else
-		add_log(self, string.format("Simulating %s", group_cfg.name or "Wave"))
-		msg.post("/ui#panel", "set_status", { text = "BATTLE IN PROGRESS", color = vmath.vector4(0.15, 0.75, 0.55, 1.0) })
+		self.battle_state = "paused"
+		msg.post("/ui#panel", "speed_changed", { speed = self.simulation_speed })
+		msg.post("/ui#panel", "group_changed", { group_id = self.active_group })
+		msg.post("/ui#panel", "init_equipment", { weapon = self.player_weapon, body = self.player_body, head = self.player_head })
+		msg.post("/ui#panel", "set_status", { text = "PAUSED - EDIT LOADOUT", color = vmath.vector4(0.9, 0.6, 0.1, 1.0) })
 	end
 end
 
@@ -678,7 +695,7 @@ function on_message(self, message_id, message, sender)
 			msg.post("/ui#panel", "speed_changed", { speed = message.speed })
 			add_log(self, string.format("Speed changed to %dx", message.speed))
 			if prev_speed == 0 then
-				start_simulation(self)
+				spawn_enemies(self)
 			end
 		end
 	elseif message_id == hash("select_group") then

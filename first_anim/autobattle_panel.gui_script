@@ -51,14 +51,17 @@ function init(self)
 	self.status_lbl = gui.get_node("status_lbl")
 	self.log_text = gui.get_node("log_text")
 
-	-- Speed control panel & buttons
+	-- Speed control panel & buttons (only 1x, 2x, 4x)
 	self.speed_buttons = {
-		[0] = gui.get_node("speed_0x"),
 		[1] = gui.get_node("speed_1x"),
 		[2] = gui.get_node("speed_2x"),
 		[4] = gui.get_node("speed_4x")
 	}
-	self.active_speed = 1
+	self.active_speed = 0
+
+	-- Pause button (separate, placed above restart)
+	self.btn_pause = gui.get_node("btn_pause")
+	self.lbl_pause = gui.get_node("lbl_pause")
 
 	-- Restart button
 	self.btn_restart = gui.get_node("btn_restart")
@@ -102,8 +105,16 @@ function on_message(self, message_id, message, sender)
 
 	elseif message_id == hash("speed_changed") then
 		self.active_speed = message.speed
-		for speed_val, node in pairs(self.speed_buttons) do
-			gui.set_color(node, speed_val == self.active_speed and self.color_active or self.color_inactive)
+		if self.active_speed == 0 then
+			gui.set_color(self.btn_pause, self.color_active)
+			for _, node in pairs(self.speed_buttons) do
+				gui.set_color(node, self.color_inactive)
+			end
+		else
+			gui.set_color(self.btn_pause, self.color_inactive)
+			for speed_val, node in pairs(self.speed_buttons) do
+				gui.set_color(node, speed_val == self.active_speed and self.color_active or self.color_inactive)
+			end
 		end
 
 	elseif message_id == hash("group_changed") then
@@ -128,6 +139,12 @@ function on_input(self, action_id, action)
 	if gui.pick_node(self.btn_restart, action.x, action.y) then
 		flash_node(self.btn_restart)
 		msg.post(CONTROLLER, "restart")
+		return
+	end
+
+	if gui.pick_node(self.btn_pause, action.x, action.y) then
+		flash_node(self.btn_pause)
+		msg.post(CONTROLLER, "set_speed", { speed = 0 })
 		return
 	end
 

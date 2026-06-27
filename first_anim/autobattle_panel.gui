@@ -1,4 +1,4 @@
-script: "/first_anim/autobattle_panel.gui_script"
+script: "/first_anim/autobattle_panel.gui"
 fonts {
   name: "troika"
   font: "/example/assets/troika.font"
@@ -30,12 +30,12 @@ nodes {
 }
 nodes {
   position {
-    x: 270.0
-    y: 80.0
+    x: 220.0
+    y: 70.0
   }
   size {
-    x: 420.0
-    y: 80.0
+    x: 320.0
+    y: 60.0
   }
   color {
     x: 0.11
@@ -49,52 +49,12 @@ nodes {
 }
 nodes {
   position {
-    x: -150.0
+    x: -100.0
     y: 0.0
   }
   size {
     x: 80.0
-    y: 50.0
-  }
-  color {
-    x: 0.22
-    y: 0.25
-    z: 0.3
-  }
-  type: TYPE_BOX
-  id: "speed_0x"
-  parent: "speed_panel_bg"
-  inherit_alpha: true
-}
-nodes {
-  position {
-    x: 0.0
-    y: 0.0
-  }
-  scale {
-    x: 0.35
-    y: 0.35
-  }
-  size {
-    x: 80.0
-    y: 50.0
-  }
-  type: TYPE_TEXT
-  text: "PAUSE"
-  font: "troika"
-  id: "speed_0x_lbl"
-  parent: "speed_0x"
-  inherit_alpha: true
-  shadow_alpha: 0.0
-}
-nodes {
-  position {
-    x: -50.0
-    y: 0.0
-  }
-  size {
-    x: 80.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.15
@@ -112,12 +72,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.4
-    y: 0.4
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 80.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "1X"
@@ -129,12 +89,12 @@ nodes {
 }
 nodes {
   position {
-    x: 50.0
+    x: 0.0
     y: 0.0
   }
   size {
     x: 80.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.22
@@ -152,12 +112,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.4
-    y: 0.4
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 80.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "2X"
@@ -169,12 +129,12 @@ nodes {
 }
 nodes {
   position {
-    x: 150.0
+    x: 100.0
     y: 0.0
   }
   size {
     x: 80.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.22
@@ -192,12 +152,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.4
-    y: 0.4
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 80.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "4X"
@@ -210,11 +170,11 @@ nodes {
 nodes {
   position {
     x: 490.0
-    y: 80.0
+    y: 70.0
   }
   size {
     x: 180.0
-    y: 80.0
+    y: 60.0
   }
   color {
     x: 0.18
@@ -231,12 +191,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.45
-    y: 0.45
+    x: 0.4
+    y: 0.4
   }
   size {
     x: 180.0
-    y: 80.0
+    y: 60.0
   }
   type: TYPE_TEXT
   text: "RESTART"
@@ -248,12 +208,51 @@ nodes {
 }
 nodes {
   position {
+    x: 490.0
+    y: 140.0
+  }
+  size {
+    x: 180.0
+    y: 60.0
+  }
+  color {
+    x: 0.15
+    y: 0.75
+    z: 0.55
+  }
+  type: TYPE_BOX
+  id: "btn_pause"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+  }
+  scale {
+    x: 0.4
+    y: 0.4
+  }
+  size {
+    x: 180.0
+    y: 60.0
+  }
+  type: TYPE_TEXT
+  text: "PAUSE"
+  font: "troika"
+  id: "lbl_pause"
+  parent: "btn_pause"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
     x: 830.0
-    y: 80.0
+    y: 70.0
   }
   size {
     x: 440.0
-    y: 80.0
+    y: 60.0
   }
   color {
     x: 0.11
@@ -272,7 +271,7 @@ nodes {
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.22
@@ -290,12 +289,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.38
-    y: 0.38
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "GRP 1"
@@ -312,7 +311,7 @@ nodes {
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.22
@@ -330,12 +329,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.38
-    y: 0.38
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "GRP 2"
@@ -352,7 +351,7 @@ nodes {
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   color {
     x: 0.22
@@ -370,12 +369,12 @@ nodes {
     y: 0.0
   }
   scale {
-    x: 0.38
-    y: 0.38
+    x: 0.35
+    y: 0.35
   }
   size {
     x: 110.0
-    y: 50.0
+    y: 40.0
   }
   type: TYPE_TEXT
   text: "GRP 3"
@@ -388,11 +387,11 @@ nodes {
 nodes {
   position {
     x: 220.0
-    y: 170.0
+    y: 210.0
   }
   size {
     x: 260.0
-    y: 60.0
+    y: 50.0
   }
   color {
     x: 0.18
@@ -414,7 +413,7 @@ nodes {
   }
   size {
     x: 260.0
-    y: 60.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "WEAPON: AK-47"
@@ -427,11 +426,11 @@ nodes {
 nodes {
   position {
     x: 490.0
-    y: 170.0
+    y: 210.0
   }
   size {
     x: 240.0
-    y: 60.0
+    y: 50.0
   }
   color {
     x: 0.18
@@ -453,7 +452,7 @@ nodes {
   }
   size {
     x: 240.0
-    y: 60.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "ARMOR: KEVLAR"
@@ -466,11 +465,11 @@ nodes {
 nodes {
   position {
     x: 740.0
-    y: 170.0
+    y: 210.0
   }
   size {
     x: 220.0
-    y: 60.0
+    y: 50.0
   }
   color {
     x: 0.18
@@ -492,7 +491,7 @@ nodes {
   }
   size {
     x: 220.0
-    y: 60.0
+    y: 50.0
   }
   type: TYPE_TEXT
   text: "HELMET: GASMASK"
@@ -505,11 +504,11 @@ nodes {
 nodes {
   position {
     x: 1550.0
-    y: 100.0
+    y: 140.0
   }
   size {
     x: 640.0
-    y: 160.0
+    y: 240.0
   }
   color {
     x: 0.08
@@ -524,7 +523,7 @@ nodes {
 nodes {
   position {
     x: -300.0
-    y: 60.0
+    y: 100.0
   }
   scale {
     x: 0.35
@@ -532,7 +531,7 @@ nodes {
   }
   size {
     x: 1700.0
-    y: 350.0
+    y: 500.0
   }
   color {
     x: 0.85
