@@ -83,12 +83,20 @@ function M.equip(resolve, weapon_id)
 		sprite.play_flipbook(msg.url(nil, path, slot.component), w.animation)
 	end
 
-	-- Two-handed weapons have their own hand_right parented to the weapon GO.
-	-- Hide the rig's animated hand_right so only the weapon-local one is visible.
+	-- Two-handed weapons use a weapon-local hand_right child GO.
+	-- Disable/enable the rig's animated hand_right and each weapon's hand_right explicitly
+	-- (Defold does not propagate disable to children automatically).
 	local hand_right_path = resolve("hand_right")
 	if hand_right_path then
-		local is_two_handed = w.type == "rifle" or w.type == "shotgun"
-		msg.post(hand_right_path, is_two_handed and "disable" or "enable")
+		msg.post(hand_right_path, (w.type == "rifle" or w.type == "shotgun") and "disable" or "enable")
+	end
+	local hr_rifle = resolve("hand_right_rifle")
+	if hr_rifle then
+		msg.post(hr_rifle, w.type == "rifle" and "enable" or "disable")
+	end
+	local hr_shotgun = resolve("hand_right_shotgun")
+	if hr_shotgun then
+		msg.post(hr_shotgun, w.type == "shotgun" and "enable" or "disable")
 	end
 end
 
