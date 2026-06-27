@@ -31,6 +31,7 @@ local SPAWN_POINTS = {
 }
 local RANGED_ZONE = { pistol = true, rifle = true, shotgun = true }
 local EPSILON = 0.001
+local RANGE_ENTRY_DELAY = 0.3
 
 local function pick(list)
 	return list[math.random(#list)]
@@ -202,12 +203,18 @@ local function advance(world, unit, target, sim_dt)
 	unit.attack_timer = math.min(unit.attack_timer + sim_dt, unit.attack_cooldown)
 
 	if dist <= unit.attack_range then
-		if unit.attack_timer >= unit.attack_cooldown then
+		if not unit.in_range then
+			unit.in_range = true
+			unit.range_entry_timer = 0
+		end
+		unit.range_entry_timer = unit.range_entry_timer + sim_dt
+		if unit.attack_timer >= unit.attack_cooldown and unit.range_entry_timer >= RANGE_ENTRY_DELAY then
 			perform_attack(world, unit, target)
 		else
 			unit:ensure_anim("idle", true)
 		end
 	else
+		unit.in_range = false
 		unit:ensure_anim("walk", true)
 		if dist > EPSILON then
 			upos.x = upos.x + (dx / dist) * unit.move_speed * sim_dt

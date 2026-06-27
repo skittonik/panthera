@@ -57,6 +57,8 @@ function Unit.spawn(opts)
 	self.attack_timer = cfg.attack_cooldown
 	self.damage = cfg.damage
 	self.attacking = false
+	self.in_range = false
+	self.range_entry_timer = 0
 	self.current_anim = nil
 	self:resolve_combat(cfg.weapon_skin)
 
@@ -152,6 +154,8 @@ end
 function Unit:revive()
 	self:reset_hp()
 	self.attacking = false
+	self.in_range = false
+	self.range_entry_timer = 0
 	if self.rig.shadow_path then
 		msg.post(self.rig.shadow_path, "enable")
 	end
