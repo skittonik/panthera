@@ -117,9 +117,8 @@ instances {
   id: "muzzle"
   prototype: "/first_anim/muzzle.go"
   position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
+    x: 348.0
+    y: 83.0
   }
 }
 scale_along_z: 0

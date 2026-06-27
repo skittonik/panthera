@@ -1,7 +1,7 @@
 embedded_components {
   id: "sprite"
   type: "sprite"
-  data: "default_animation: \"shotgun_long\"\n"
+  data: "default_animation: \"shotgun_short\"\n"
   "material: \"/panthera/materials/sprite.material\"\n"
   "textures {\n"
   "  sampler: \"texture_sampler\"\n"
