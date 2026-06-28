@@ -14,16 +14,18 @@ local M = {}
 local ENEMY_DEFAULTS = {
 	hp = 80,
 	move_speed = 100,
-	attack_cooldown = 1.5,
+	attack_speed = 100,
 	damage = 15,
+	defense = 0,
 }
 
 local PLAYER_DEFAULTS = {
 	name = "Survivor",
 	hp = 220,
 	move_speed = 130,
-	attack_cooldown = 1.2,
+	attack_speed = 83,
 	damage = 30,
+	defense = 0,
 	unit = "human",
 	weapon_skin = "rifle_ak",
 	body_skin = "body_armor",

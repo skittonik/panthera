@@ -51,6 +51,7 @@ function Unit.spawn(opts)
 	self.unit_type = opts.unit_type
 	self.uses_weapons = udef.uses_weapons
 	self.hp_bar_offset_y = udef.hp_bar_offset_y or theme.hp_bar.offset_y
+	self.aim_offset_y = udef.aim_offset_y or 0
 	self.rig = rig
 	self.is_enemy = opts.is_enemy
 	self.p_ids = rig.p_ids
@@ -63,9 +64,12 @@ function Unit.spawn(opts)
 	self.hp = cfg.hp
 	self.max_hp = cfg.hp
 	self.move_speed = cfg.move_speed
-	self.attack_cooldown = cfg.attack_cooldown
-	self.attack_timer = cfg.attack_cooldown
+	-- attack_speed is the canonical stat (100 = 1 atk/s); cooldown is derived once.
+	self.attack_speed = math.max(cfg.attack_speed or 100, 1)
+	self.attack_cooldown = 100 / self.attack_speed
+	self.attack_timer = self.attack_cooldown
 	self.damage = cfg.damage
+	self.defense = cfg.defense or 0
 	self.attacking = false
 	self.in_range = false
 	self.range_entry_timer = 0
@@ -73,6 +77,7 @@ function Unit.spawn(opts)
 	self.slow_mult = 1.0
 	self.slow_timer = 0
 	self:resolve_combat(cfg.weapon_skin)
+	self.power = self:compute_power()
 
 	local s = vmath.vector3(theme.unit_scale, theme.unit_scale, 1.0)
 	go.set_scale(s, self.hp_bg_path)
@@ -87,6 +92,13 @@ function Unit.spawn(opts)
 	self:set_hp_bar_visible(false)
 
 	return self
+end
+
+-- Analytic build strength (doc "Power"): DPS * effective HP. Static per loadout,
+-- recomputed whenever weapon-derived stats change. Used only for the matchup readout.
+function Unit:compute_power()
+	local dps = (self.damage * (self.damage_mult or 1.0)) / self.attack_cooldown
+	return math.floor(dps * self.max_hp * (1 + self.defense / 100) + 0.5)
 end
 
 function Unit:is_alive()
@@ -126,6 +138,13 @@ function Unit:attack(callback)
 	self.rig:play("attack", { is_loop = false, callback = callback })
 end
 
+-- Where incoming projectiles should aim: the unit's body center (root + a
+-- per-type vertical offset), not its feet.
+function Unit:aim_world_position()
+	local p = self:get_position()
+	return vmath.vector3(p.x, p.y + self.aim_offset_y, p.z)
+end
+
 -- World position of the weapon muzzle, used as the projectile origin. nil for
 -- rigs without a muzzle (e.g. the rat).
 function Unit:muzzle_world_position()
@@ -157,6 +176,7 @@ end
 function Unit:set_equipment(weapon_skin, body_skin, head_skin)
 	self.rig:set_equipment(weapon_skin, body_skin, head_skin)
 	self:resolve_combat(weapon_skin)
+	self.power = self:compute_power()
 end
 
 -- HP bar ----------------------------------------------------------------------

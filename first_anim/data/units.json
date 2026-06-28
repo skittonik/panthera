@@ -3,13 +3,15 @@
     "rig": "human",
     "factory": "human_factory",
     "uses_weapons": true,
-    "hp_bar_offset_y": 270
+    "hp_bar_offset_y": 270,
+    "aim_offset_y": 150
   },
   "rat": {
     "rig": "rat",
     "factory": "rat_factory",
     "uses_weapons": false,
     "melee": { "attack_range": 110, "hit_delay": 0.3 },
-    "hp_bar_offset_y": 140
+    "hp_bar_offset_y": 140,
+    "aim_offset_y": 55
   }
 }

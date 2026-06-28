@@ -37,16 +37,19 @@ local function spawn(pos, animation, scale)
 	return id
 end
 
--- A quick spark where a single bullet lands: grow + fade, then delete.
+-- A punchy spark where a single bullet lands: snap to full size, spin a touch,
+-- then fade out and delete.
 local function spark(at, denom)
-	local id = spawn(at, theme.projectile.spark_anim, 0.05)
+	local p = theme.projectile
+	local id = spawn(at, p.spark_anim, 0.2)
 	if not id then return end
-	local t = theme.projectile.spark_time / denom
+	local pop = p.spark_pop / denom
+	local life = p.spark_time / denom
 	go.animate(id, "scale", go.PLAYBACK_ONCE_FORWARD,
-		vmath.vector3(theme.projectile.spark_scale, theme.projectile.spark_scale, 1),
-		go.EASING_OUTQUAD, t, 0)
+		vmath.vector3(p.spark_scale, p.spark_scale, 1), go.EASING_OUTBACK, pop, 0)
+	go.animate(id, "euler.z", go.PLAYBACK_ONCE_FORWARD, p.spark_spin, go.EASING_OUTQUAD, life, 0)
 	go.animate(msg.url(nil, id, "sprite"), "tint.w", go.PLAYBACK_ONCE_FORWARD, 0,
-		go.EASING_INQUAD, t, 0, function() go.delete(id) end)
+		go.EASING_INQUAD, life, pop * 0.5, function() go.delete(id) end)
 end
 
 -- Fly one ball from -> to, then delete (and optionally spark on arrival).
@@ -62,18 +65,6 @@ local function travel(from, to, denom, scale, do_spark)
 			if do_spark then spark(to, denom) end
 			go.delete(id)
 		end)
-end
-
--- Expanding shockwave ring marking the shotgun's area blast.
-function M.shockwave(at, denom)
-	local id = spawn(at, theme.projectile.wave_anim, 0.1)
-	if not id then return end
-	local t = theme.projectile.wave_time / denom
-	go.animate(id, "scale", go.PLAYBACK_ONCE_FORWARD,
-		vmath.vector3(theme.projectile.wave_scale, theme.projectile.wave_scale, 1),
-		go.EASING_OUTQUAD, t, 0)
-	go.animate(msg.url(nil, id, "sprite"), "tint.w", go.PLAYBACK_ONCE_FORWARD, 0,
-		go.EASING_INQUAD, t, 0, function() go.delete(id) end)
 end
 
 -- Launch the visual for one attack. `attacker` supplies the live muzzle world
@@ -104,9 +95,6 @@ function M.launch(attacker, weapon_def, target_pos, denom)
 				local to = vmath.vector3(o.x + math.cos(a) * dist, o.y + math.sin(a) * dist, 0)
 				travel(o, to, denom, theme.projectile.pellet_scale, false)
 			end
-		end)
-		fire_at(weapon_def.hit_delay or 0.12, function()
-			M.shockwave(target_pos, denom)
 		end)
 	else
 		-- pistol: one ball per (single) delay; rifle: one ball per burst shot.

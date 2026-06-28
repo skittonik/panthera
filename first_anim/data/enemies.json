@@ -3,40 +3,45 @@
     "name": "Zombie Bat",
     "hp": 100,
     "move_speed": 90,
-    "attack_cooldown": 1.6,
+    "attack_speed": 63,
     "damage": 12,
+    "defense": 0,
     "weapon_skin": "impact_bat"
   },
   "zombie_pistol": {
     "name": "Zombie Pistol",
     "hp": 80,
     "move_speed": 100,
-    "attack_cooldown": 2.0,
+    "attack_speed": 50,
     "damage": 15,
+    "defense": 0,
     "weapon_skin": "pistol_pm"
   },
   "bandit_ak": {
     "name": "Bandit AK",
     "hp": 90,
     "move_speed": 100,
-    "attack_cooldown": 2.2,
+    "attack_speed": 45,
     "damage": 18,
+    "defense": 5,
     "weapon_skin": "rifle_ak"
   },
   "zombie_fists": {
     "name": "Zombie Fists",
     "hp": 100,
     "move_speed": 95,
-    "attack_cooldown": 1.4,
+    "attack_speed": 71,
     "damage": 10,
+    "defense": 0,
     "weapon_skin": "fists_default"
   },
   "zombie_iron": {
     "name": "Zombie Iron",
     "hp": 100,
     "move_speed": 90,
-    "attack_cooldown": 1.7,
+    "attack_speed": 59,
     "damage": 15,
+    "defense": 10,
     "weapon_skin": "impact_tire_iron"
   },
   "rat": {
@@ -44,7 +49,8 @@
     "unit": "rat",
     "hp": 40,
     "move_speed": 120,
-    "attack_cooldown": 1.0,
-    "damage": 6
+    "attack_speed": 100,
+    "damage": 6,
+    "defense": 0
   }
 }

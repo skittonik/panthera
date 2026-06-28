@@ -75,12 +75,11 @@ function M.equip(resolve, weapon_id)
 		end
 	end
 
-	if w.node == "none" then
-		return
-	end
-	local path = resolve(w.node)
-	if path then
-		sprite.play_flipbook(msg.url(nil, path, slot.component), w.animation)
+	if w.node ~= "none" then
+		local path = resolve(w.node)
+		if path then
+			sprite.play_flipbook(msg.url(nil, path, slot.component), w.animation)
+		end
 	end
 
 	-- Two-handed weapons use a weapon-local hand_right child GO.

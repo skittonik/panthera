@@ -61,20 +61,18 @@ M.projectile = {
 	z            = 0.8,         -- above units, below the HP bars
 	speed        = 4200,        -- px/sec bullet travel
 	min_time     = 0.05,        -- never snap instantly
-	bullet_scale = 3.0,         -- bullet.png is 23px; read at rig scale
-	pellet_scale = 2.0,         -- shotgun fan pellets are smaller
+	bullet_scale = 0.7,         -- bullet.png is 23px
+	pellet_scale = 0.5,         -- shotgun fan pellets are smaller
 	bullet_anim  = "bullet",
-	-- single-bullet impact spark
+	-- single-bullet impact spark: fast punch-in, spin, then fade
 	spark_anim   = "hit_sparkle",
-	spark_scale  = 1.0,
-	spark_time   = 0.18,
-	-- shotgun pellet fan
+	spark_scale  = 1.3,
+	spark_pop    = 0.07,        -- snap to full size
+	spark_time   = 0.22,        -- fade-out duration
+	spark_spin   = 70,          -- degrees of spin over its life
+	-- shotgun pellet fan (no area blast effect)
 	pellets      = 6,
 	spread       = math.rad(38),
-	-- shotgun area blast (shockwave ring grows + fades)
-	wave_anim    = "shockwave_ring",
-	wave_scale   = 4.2,
-	wave_time    = 0.35,
 }
 
 -- Painter's-algorithm depth sorting of alive units.

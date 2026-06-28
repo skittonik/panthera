@@ -92,7 +92,7 @@ local function spawn_player(world, in_battle)
 		is_enemy = false,
 		cfg = {
 			name = p.name, hp = p.hp, move_speed = p.move_speed,
-			attack_cooldown = p.attack_cooldown, damage = p.damage,
+			attack_speed = p.attack_speed, damage = p.damage, defense = p.defense,
 			weapon_skin = world.loadout.weapon,
 			body_skin = world.loadout.body,
 			head_skin = world.loadout.head,
@@ -195,14 +195,17 @@ local function perform_attack(world, attacker, defender)
 
 	local function hit_one(target, amount)
 		if not (target:is_alive()) then return end
-		local result = target:apply_damage(amount, ctx)
+		-- Armor (doc): FinalDamage = Damage * 100 / (100 + Defense). Per-target so
+		-- splash mitigates correctly, and the log shows the real post-armor number.
+		local dmg = math.floor(amount * 100 / (100 + target.defense) + 0.5)
+		local result = target:apply_damage(dmg, ctx)
 		if slow and result ~= "already_dead" then
 			target:apply_slow(slow.factor, slow.duration)
 		end
 		if result == "dead" then
 			log(world, string.format("%s defeated %s!", attacker.name, target.name))
 		elseif result == "hit" then
-			log(world, string.format("%s hit %s for %d DMG!", attacker.name, target.name, amount))
+			log(world, string.format("%s hit %s for %d DMG!", attacker.name, target.name, dmg))
 		end
 	end
 
@@ -237,7 +240,7 @@ local function perform_attack(world, attacker, defender)
 
 	-- Cosmetic flying bullets over the hitscan damage above.
 	if projectile.is_ranged(attacker.weapon_def) then
-		projectile.launch(attacker, attacker.weapon_def, defender:get_position(), denom)
+		projectile.launch(attacker, attacker.weapon_def, defender:aim_world_position(), denom)
 	end
 end
 
@@ -316,6 +319,13 @@ local function setup_idle(world)
 	status(world, "READY - PRESS PLAY", theme.color.status_paused)
 end
 
+-- Summed analytic Power of a unit list, for the at-a-glance matchup readout.
+local function total_power(units)
+	local sum = 0
+	for _, u in ipairs(units) do sum = sum + (u.power or 0) end
+	return sum
+end
+
 -- Spawn a fresh battle for the current group and start fighting.
 local function begin_battle(world)
 	cleanup(world)
@@ -327,6 +337,8 @@ local function begin_battle(world)
 	emit_phase(world)
 	local group = world.config.groups[world.active_group] or world.config.groups[1]
 	log(world, string.format("Simulating %s", group.name or "Wave"))
+	log(world, string.format("Power  You: %d  vs  Enemies: %d",
+		world.player.power, total_power(world.enemies)))
 	status(world, "BATTLE IN PROGRESS", theme.color.status_battle)
 end
 
