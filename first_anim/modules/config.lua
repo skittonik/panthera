@@ -21,10 +21,10 @@ local ENEMY_DEFAULTS = {
 
 local PLAYER_DEFAULTS = {
 	name = "Survivor",
-	hp = 220,
+	hp = 100,
 	move_speed = 130,
-	attack_speed = 83,
-	damage = 30,
+	attack_speed = 100,
+	damage = 10,
 	defense = 0,
 	unit = "human",
 	weapon_skin = "rifle_ak",

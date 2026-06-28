@@ -31,8 +31,16 @@ function R.new(opts)
 end
 
 function R:apply_appearance(cfg)
-	-- Placeholder: tint the box so the rat reads as a distinct unit.
-	go.set(self.sprite_url, "tint", PLACEHOLDER_TINT)
+	-- Placeholder: tint + scale the box so each rat-rig stand-in (rat/dog/boar/
+	-- burelom) reads as a distinct, escalating threat until real rigs exist.
+	local tint = PLACEHOLDER_TINT
+	if cfg and cfg.tint then
+		tint = vmath.vector4(cfg.tint[1], cfg.tint[2], cfg.tint[3], 1.0)
+	end
+	go.set(self.sprite_url, "tint", tint)
+	if cfg and cfg.scale then
+		go.set_scale(vmath.vector3(cfg.scale, cfg.scale, 1.0), self.root_path)
+	end
 end
 
 -- Rats carry no weapons; equipment calls are no-ops.

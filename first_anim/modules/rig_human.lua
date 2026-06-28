@@ -22,6 +22,8 @@ R.__index = R
 -- Normalized state -> Panthera clip. "attack" is resolved from the weapon.
 local CLIP = { idle = "default", walk = "walk", death = "death" }
 
+local CROSSFADE = 0.15
+
 local ANIM_NODES = {
 	"root", "hit", "shadow", "body", "head", "head_pivot",
 	"left_leg", "right_leg", "hand_right", "hand_left", "weapon", "muzzle",
@@ -83,19 +85,43 @@ function R:set_equipment(weapon_id, body_id, head_id)
 end
 
 function R:play(state, opts)
+	opts = opts or {}
 	local clip
 	if state == "attack" then
 		clip = (self.weapon_def and self.weapon_def.attack_animation) or "attack_impact"
 	else
 		clip = CLIP[state] or state
 	end
+
+	-- Attack is a hard one-shot: its muzzle/hit beats are driven by combat's own
+	-- timers, so it must start instantly and stay in sync. The smooth blend back
+	-- to idle/walk lands on the next state change (crossfade branch below).
+	if state == "attack" then
+		panthera.play(self.anim, clip, opts)
+		return
+	end
+
 	if state == "death" then
 		local hr_rifle = self.resolve("hand_right_rifle")
 		if hr_rifle then msg.post(hr_rifle, "disable") end
 		local hr_shotgun = self.resolve("hand_right_shotgun")
 		if hr_shotgun then msg.post(hr_shotgun, "disable") end
+		panthera.crossfade(self.anim, clip, CROSSFADE, opts)
+		self.prev_was_death = true
+		return
 	end
-	panthera.play(self.anim, clip, opts)
+
+	-- Base loop (idle / walk): crossfade for a smooth blend, except on the first
+	-- play (nothing to blend from) or when leaving the terminal death pose, where
+	-- crossfade can't restore the properties death zeroed out - a plain play resets
+	-- them back to node defaults first.
+	if not self.has_played or self.prev_was_death then
+		panthera.play(self.anim, clip, opts)
+	else
+		panthera.crossfade(self.anim, clip, CROSSFADE, opts)
+	end
+	self.has_played = true
+	self.prev_was_death = false
 end
 
 function R:muzzle()

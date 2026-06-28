@@ -2,23 +2,18 @@
   "groups": [
     {
       "id": 1,
-      "name": "Group 1: Bat + 2 Rats",
-      "enemies": ["zombie_bat", "rat", "rat"]
+      "name": "Fight 1: Bandit + 2 Rats",
+      "enemies": ["bandit_farm", "rat", "rat"]
     },
     {
       "id": 2,
-      "name": "Group 2: 2 Ranged (Pistol/AK)",
-      "enemies": ["zombie_pistol", "bandit_ak"]
+      "name": "Fight 2: Pack + Sniper",
+      "enemies": ["dog", "dog", "bandit_sniper"]
     },
     {
       "id": 3,
-      "name": "Group 3: 2 Irons, 2 AKs (75hp)",
-      "enemies": [
-        "zombie_iron",
-        "zombie_iron",
-        { "key": "bandit_ak", "hp": 75 },
-        { "key": "bandit_ak", "hp": 75 }
-      ]
+      "name": "Fight 3: Assault + Boss Burelom",
+      "enemies": ["bandit_assault", "burelom"]
     }
   ]
 }

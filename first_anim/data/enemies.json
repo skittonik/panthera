@@ -1,56 +1,83 @@
 {
-  "zombie_bat": {
-    "name": "Zombie Bat",
-    "hp": 100,
-    "move_speed": 90,
-    "attack_speed": 63,
-    "damage": 12,
-    "defense": 0,
-    "weapon_skin": "impact_bat"
-  },
-  "zombie_pistol": {
-    "name": "Zombie Pistol",
-    "hp": 80,
-    "move_speed": 100,
-    "attack_speed": 50,
-    "damage": 15,
-    "defense": 0,
-    "weapon_skin": "pistol_pm"
-  },
-  "bandit_ak": {
-    "name": "Bandit AK",
-    "hp": 90,
-    "move_speed": 100,
-    "attack_speed": 45,
-    "damage": 18,
-    "defense": 5,
-    "weapon_skin": "rifle_ak"
-  },
-  "zombie_fists": {
-    "name": "Zombie Fists",
-    "hp": 100,
-    "move_speed": 95,
-    "attack_speed": 71,
-    "damage": 10,
-    "defense": 0,
-    "weapon_skin": "fists_default"
-  },
-  "zombie_iron": {
-    "name": "Zombie Iron",
-    "hp": 100,
-    "move_speed": 90,
-    "attack_speed": 59,
-    "damage": 15,
-    "defense": 10,
-    "weapon_skin": "impact_tire_iron"
-  },
   "rat": {
     "name": "Rat",
     "unit": "rat",
-    "hp": 40,
-    "move_speed": 120,
+    "hp": 30,
+    "move_speed": 130,
+    "attack_speed": 120,
+    "damage": 4,
+    "defense": 0
+  },
+  "dog": {
+    "name": "Dog",
+    "unit": "rat",
+    "hp": 50,
+    "move_speed": 115,
     "attack_speed": 100,
     "damage": 6,
-    "defense": 0
+    "defense": 5,
+    "scale": 1.7,
+    "tint": [0.5, 0.45, 0.4],
+    "hp_bar_offset_y": 170
+  },
+  "boar": {
+    "name": "Boar",
+    "unit": "rat",
+    "hp": 120,
+    "move_speed": 75,
+    "attack_speed": 60,
+    "damage": 12,
+    "defense": 20,
+    "scale": 2.2,
+    "tint": [0.35, 0.3, 0.32],
+    "hp_bar_offset_y": 210
+  },
+  "burelom": {
+    "name": "Burelom (Boss)",
+    "unit": "rat",
+    "hp": 250,
+    "move_speed": 60,
+    "attack_speed": 40,
+    "damage": 25,
+    "defense": 40,
+    "scale": 2.8,
+    "tint": [0.3, 0.38, 0.28],
+    "hp_bar_offset_y": 260
+  },
+  "bandit_farm": {
+    "name": "Bandit",
+    "hp": 40,
+    "move_speed": 120,
+    "attack_speed": 110,
+    "damage": 5,
+    "defense": 0,
+    "weapon_skin": "impact_bat"
+  },
+  "bandit_geared": {
+    "name": "Bandit Geared",
+    "hp": 60,
+    "move_speed": 100,
+    "attack_speed": 100,
+    "damage": 8,
+    "defense": 10,
+    "weapon_skin": "stabbing_common"
+  },
+  "bandit_assault": {
+    "name": "Bandit Assault",
+    "hp": 140,
+    "move_speed": 70,
+    "attack_speed": 55,
+    "damage": 14,
+    "defense": 25,
+    "weapon_skin": "impact_tire_iron"
+  },
+  "bandit_sniper": {
+    "name": "Bandit Sniper",
+    "hp": 45,
+    "move_speed": 95,
+    "attack_speed": 70,
+    "damage": 18,
+    "defense": 2,
+    "weapon_skin": "rifle_ak"
   }
 }
