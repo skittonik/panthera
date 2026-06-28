@@ -17,6 +17,7 @@ local panthera = require("panthera.panthera")
 local theme = require("first_anim.modules.theme")
 local config = require("first_anim.modules.config")
 local weapons = require("first_anim.modules.weapons")
+local projectile = require("first_anim.modules.projectile")
 local Unit = require("first_anim.modules.unit")
 
 local M = {}
@@ -32,6 +33,7 @@ local SPAWN_POINTS = {
 local RANGED_ZONE = { pistol = true, rifle = true, shotgun = true }
 local EPSILON = 0.001
 local RANGE_ENTRY_DELAY = 0.3
+local SHOTGUN_MAX_TARGETS = 5
 
 local function pick(list)
 	return list[math.random(#list)]
@@ -162,6 +164,24 @@ local function get_closest_enemy(world, from_pos)
 	return best
 end
 
+-- Enemies within `radius` of `center`, nearest first, capped to `max`.
+local function get_enemies_in_radius(world, center, radius, max)
+	local r2 = radius * radius
+	local hits = {}
+	for _, e in ipairs(world.enemies) do
+		if e:is_alive() then
+			local ep = e:get_position()
+			local dx, dy = ep.x - center.x, ep.y - center.y
+			local d2 = dx * dx + dy * dy
+			if d2 <= r2 then hits[#hits + 1] = { unit = e, d2 = d2 } end
+		end
+	end
+	table.sort(hits, function(a, b) return a.d2 < b.d2 end)
+	local out = {}
+	for i = 1, math.min(#hits, max or #hits) do out[i] = hits[i].unit end
+	return out
+end
+
 local function perform_attack(world, attacker, defender)
 	attacker.attacking = true
 	attacker.attack_timer = 0
@@ -169,29 +189,55 @@ local function perform_attack(world, attacker, defender)
 
 	local denom = math.max(world.speed, EPSILON)
 	local ctx = world.dmg_ctx
+	local slow = attacker.slow
+	-- Shotgun splash only makes sense for the player vs the enemy crowd.
+	local splash = (not attacker.is_enemy) and attacker.splash_radius or nil
+
+	local function hit_one(target, amount)
+		if not (target:is_alive()) then return end
+		local result = target:apply_damage(amount, ctx)
+		if slow and result ~= "already_dead" then
+			target:apply_slow(slow.factor, slow.duration)
+		end
+		if result == "dead" then
+			log(world, string.format("%s defeated %s!", attacker.name, target.name))
+		elseif result == "hit" then
+			log(world, string.format("%s hit %s for %d DMG!", attacker.name, target.name, amount))
+		end
+	end
+
+	-- amount is per-target; splash deals it to everyone in the blast radius.
 	local function deal(amount)
 		return function()
-			if world.phase == "running" and attacker:is_alive() and defender:is_alive() then
-				local result = defender:apply_damage(amount, ctx)
-				if result == "dead" then
-					log(world, string.format("%s defeated %s!", attacker.name, defender.name))
-				elseif result == "hit" then
-					log(world, string.format("%s hit %s for %d DMG!", attacker.name, defender.name, amount))
+			if world.phase ~= "running" or not attacker:is_alive() then return end
+			if splash then
+				local center = defender:get_position()
+				local cap = attacker.max_targets or SHOTGUN_MAX_TARGETS
+				for _, t in ipairs(get_enemies_in_radius(world, center, splash, cap)) do
+					hit_one(t, amount)
 				end
+			else
+				hit_one(defender, amount)
 			end
 		end
 	end
 
+	local total = math.floor(attacker.damage * (attacker.damage_mult or 1.0) + 0.5)
 	if attacker.burst then
 		local shots = attacker.burst.shots
-		local per = math.floor(attacker.damage / shots)
+		local per = math.floor(total / shots)
 		for i = 1, shots do
-			local amount = (i == shots) and (attacker.damage - per * (shots - 1)) or per
+			local amount = (i == shots) and (total - per * (shots - 1)) or per
 			local delay = attacker.burst.delays[i] or attacker.hit_delay or 0.12
 			timer.delay(delay / denom, false, deal(amount))
 		end
 	else
-		timer.delay((attacker.hit_delay or 0.12) / denom, false, deal(attacker.damage))
+		timer.delay((attacker.hit_delay or 0.12) / denom, false, deal(total))
+	end
+
+	-- Cosmetic flying bullets over the hitscan damage above.
+	if projectile.is_ranged(attacker.weapon_def) then
+		projectile.launch(attacker, attacker.weapon_def, defender:get_position(), denom)
 	end
 end
 
@@ -221,8 +267,9 @@ local function advance(world, unit, target, sim_dt)
 		unit.in_range = false
 		unit:ensure_anim("walk", true)
 		if dist > EPSILON then
-			upos.x = upos.x + (dx / dist) * unit.move_speed * sim_dt
-			upos.y = upos.y + (dy / dist) * unit.move_speed * sim_dt
+			local speed = unit.move_speed * unit.slow_mult
+			upos.x = upos.x + (dx / dist) * speed * sim_dt
+			upos.y = upos.y + (dy / dist) * speed * sim_dt
 			unit:set_position(upos)
 		end
 	end
@@ -299,6 +346,7 @@ function M.new(opts)
 		smudge_factory = opts.smudge_factory_url,
 		track = function(path) world.smudges[#world.smudges + 1] = path end,
 	}
+	projectile.init(opts.bullet_factory_url)
 	return world
 end
 
@@ -341,11 +389,13 @@ function M.update(world, dt)
 	end
 
 	advance(world, player, target, sim_dt)
+	player:update_slow(sim_dt)
 	player:position_hp_bar()
 
 	for _, e in ipairs(world.enemies) do
 		if e:is_alive() then
 			advance(world, e, player, sim_dt)
+			e:update_slow(sim_dt)
 			e:position_hp_bar()
 		end
 	end

@@ -25,17 +25,20 @@
     "pistol_deagle": {
       "node": "weapon_pistol", "animation": "pistol_deagle", "type": "pistol",
       "attack_range": 450, "attack_animation": "attack_pistol", "hit_delay": 0.12,
+      "damage_mult": 1.0, "slow": { "factor": 0.15, "duration": 0.6 },
       "muzzle": { "offset": { "x": 194.0, "y": 112.0 }, "fire_delays": [0.1] }
     },
     "pistol_pm": {
       "node": "weapon_pistol", "animation": "pistol_pm", "type": "pistol",
       "attack_range": 450, "attack_animation": "attack_pistol", "hit_delay": 0.12,
+      "damage_mult": 1.0, "slow": { "factor": 0.15, "duration": 0.6 },
       "muzzle": { "offset": { "x": 129.0, "y": 160.0 }, "fire_delays": [0.1] },
       "ui_label": "WEAPON: PISTOL", "ui_order": 4, "show_in_ui": true
     },
     "rifle_ak": {
       "node": "weapon_rifle", "animation": "rifle_ak", "type": "rifle",
       "attack_range": 600, "attack_animation": "attack_rifle", "hit_delay": 0.12,
+      "damage_mult": 1.0, "slow": { "factor": 0.1, "duration": 0.5 },
       "burst": { "shots": 3, "delays": [0.12, 0.25, 0.38] },
       "muzzle": { "offset": { "x": 316.0, "y": 89.0 }, "fire_delays": [0.0, 0.13, 0.26] },
       "ui_label": "WEAPON: AK-47", "ui_order": 1, "show_in_ui": true
@@ -43,17 +46,22 @@
     "rifle_m4": {
       "node": "weapon_rifle", "animation": "rifle_m4", "type": "rifle",
       "attack_range": 600, "attack_animation": "attack_rifle", "hit_delay": 0.12,
+      "damage_mult": 1.0, "slow": { "factor": 0.1, "duration": 0.5 },
       "burst": { "shots": 3, "delays": [0.12, 0.25, 0.38] },
       "muzzle": { "offset": { "x": 332.0, "y": 151.0 }, "fire_delays": [0.0, 0.13, 0.26] }
     },
     "shotgun_long": {
       "node": "weapon_shotgun", "animation": "shotgun_long", "type": "shotgun",
       "attack_range": 350, "attack_animation": "attack_shotgun", "hit_delay": 0.12,
+      "damage_mult": 0.5, "splash_radius": 180, "max_targets": 5,
+      "slow": { "factor": 0.35, "duration": 1.0 },
       "muzzle": { "offset": { "x": 353.0, "y": 120.0 }, "fire_delays": [0.0] }
     },
     "shotgun_short": {
       "node": "weapon_shotgun", "animation": "shotgun_short", "type": "shotgun",
       "attack_range": 350, "attack_animation": "attack_shotgun", "hit_delay": 0.12,
+      "damage_mult": 0.5, "splash_radius": 180, "max_targets": 5,
+      "slow": { "factor": 0.35, "duration": 1.0 },
       "muzzle": { "offset": { "x": 344.0, "y": 126.0 }, "fire_delays": [0.0] },
       "ui_label": "WEAPON: SHOTGUN", "ui_order": 5, "show_in_ui": true
     },

@@ -102,6 +102,14 @@ function R:muzzle()
 	fx.muzzle(self.resolve, self.is_enemy, self.weapon_def, function() return self.alive end)
 end
 
+-- World position of the muzzle GO (positioned by fx.muzzle at attack time).
+-- Guarded by `alive` so a delayed shot never reads a destroyed GO.
+function R:muzzle_position()
+	if not self.alive then return nil end
+	local m = self.resolve("muzzle")
+	return m and go.get_world_position(m) or nil
+end
+
 function R:hurt()
 	panthera.play(self.overlay, "damage", { is_loop = false })
 	fx.flash(self.resolve)

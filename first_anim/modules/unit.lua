@@ -17,14 +17,24 @@ local MIN_FILL = 0.0001
 function Unit:resolve_combat(weapon_skin)
 	if self.uses_weapons then
 		local w = weapons.get_weapon_def(weapon_skin)
+		self.weapon_def = w
 		self.attack_range = w and w.attack_range or 110
 		self.hit_delay = w and w.hit_delay or 0.12
 		self.burst = w and w.burst or nil
+		self.damage_mult = (w and w.damage_mult) or 1.0
+		self.splash_radius = w and w.splash_radius or nil
+		self.max_targets = w and w.max_targets or nil
+		self.slow = w and w.slow or nil
 	else
 		local m = units.get(self.unit_type).melee or {}
+		self.weapon_def = nil
 		self.attack_range = m.attack_range or 110
 		self.hit_delay = m.hit_delay or 0.3
 		self.burst = nil
+		self.damage_mult = 1.0
+		self.splash_radius = nil
+		self.max_targets = nil
+		self.slow = m.slow or nil
 	end
 end
 
@@ -60,6 +70,8 @@ function Unit.spawn(opts)
 	self.in_range = false
 	self.range_entry_timer = 0
 	self.current_anim = nil
+	self.slow_mult = 1.0
+	self.slow_timer = 0
 	self:resolve_combat(cfg.weapon_skin)
 
 	local s = vmath.vector3(theme.unit_scale, theme.unit_scale, 1.0)
@@ -114,6 +126,33 @@ function Unit:attack(callback)
 	self.rig:play("attack", { is_loop = false, callback = callback })
 end
 
+-- World position of the weapon muzzle, used as the projectile origin. nil for
+-- rigs without a muzzle (e.g. the rat).
+function Unit:muzzle_world_position()
+	if self.rig.muzzle_position then
+		return self.rig:muzzle_position()
+	end
+	return nil
+end
+
+-- Slow status: a hit shaves `factor` (0..1) off move speed for `duration`s.
+-- The strongest active slow wins; its timer is refreshed by later hits.
+function Unit:apply_slow(factor, duration)
+	local mult = 1.0 - factor
+	if mult < self.slow_mult then self.slow_mult = mult end
+	if duration > self.slow_timer then self.slow_timer = duration end
+end
+
+function Unit:update_slow(dt)
+	if self.slow_timer > 0 then
+		self.slow_timer = self.slow_timer - dt
+		if self.slow_timer <= 0 then
+			self.slow_timer = 0
+			self.slow_mult = 1.0
+		end
+	end
+end
+
 -- Live loadout edit (player only); recompute weapon-derived combat data.
 function Unit:set_equipment(weapon_skin, body_skin, head_skin)
 	self.rig:set_equipment(weapon_skin, body_skin, head_skin)
@@ -158,6 +197,8 @@ function Unit:revive()
 	self.attacking = false
 	self.in_range = false
 	self.range_entry_timer = 0
+	self.slow_mult = 1.0
+	self.slow_timer = 0
 	if self.rig.shadow_path then
 		msg.post(self.rig.shadow_path, "enable")
 	end

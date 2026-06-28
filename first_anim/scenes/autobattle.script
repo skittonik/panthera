@@ -42,6 +42,7 @@ function init(self)
 	self.world = combat.new({
 		emit = make_emit(self),
 		smudge_factory_url = "/factories#smudge_factory",
+		bullet_factory_url = "/factories#bullet_factory",
 	})
 	combat.start(self.world)
 end

@@ -16,4 +16,10 @@ images {
 images {
   image: "/first_anim/assets/effects/smudge.png"
 }
+images {
+  image: "/first_anim/assets/effects/bullet.png"
+}
+images {
+  image: "/first_anim/assets/effects/hit_sparkle.png"
+}
 extrude_borders: 2

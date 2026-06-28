@@ -53,6 +53,30 @@ M.smudge = {
 -- Damage flash on the rig sprites.
 M.flash_time = 0.3
 
+-- Flying projectiles (cosmetic, layered over the hitscan combat). All effects
+-- are built from effects.atlas: the bullet ball, muzzle_star spark and the
+-- shockwave_ring shotgun blast. Scales/speeds are tuned for the high-res rigs;
+-- tweak freely - nothing here affects damage.
+M.projectile = {
+	z            = 0.8,         -- above units, below the HP bars
+	speed        = 4200,        -- px/sec bullet travel
+	min_time     = 0.05,        -- never snap instantly
+	bullet_scale = 3.0,         -- bullet.png is 23px; read at rig scale
+	pellet_scale = 2.0,         -- shotgun fan pellets are smaller
+	bullet_anim  = "bullet",
+	-- single-bullet impact spark
+	spark_anim   = "hit_sparkle",
+	spark_scale  = 1.0,
+	spark_time   = 0.18,
+	-- shotgun pellet fan
+	pellets      = 6,
+	spread       = math.rad(38),
+	-- shotgun area blast (shockwave ring grows + fades)
+	wave_anim    = "shockwave_ring",
+	wave_scale   = 4.2,
+	wave_time    = 0.35,
+}
+
 -- Painter's-algorithm depth sorting of alive units.
 M.zsort = {
 	base = 0.1,
