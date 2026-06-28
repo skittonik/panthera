@@ -100,10 +100,8 @@ local function spawn_player(world, in_battle)
 
 	if in_battle then
 		unit:ensure_anim("walk", true)
-		unit:set_hp_bar_visible(true)
 	else
 		unit:ensure_anim("idle", true)
-		unit:set_hp_bar_visible(false)
 	end
 	unit:position_hp_bar()
 end

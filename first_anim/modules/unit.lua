@@ -72,6 +72,7 @@ function Unit.spawn(opts)
 	go.set(msg.url(nil, self.hp_fill_path, "sprite"), "tint", fill)
 	go.set(msg.url(nil, self.hp_bg_path, "sprite"), "tint", theme.color.hp_bg)
 	self:refresh_hp_label()
+	self:set_hp_bar_visible(false)
 
 	return self
 end
@@ -149,6 +150,7 @@ function Unit:reset_hp()
 	self.hp = self.max_hp
 	set_fill(self)
 	self:refresh_hp_label()
+	self:set_hp_bar_visible(false)
 end
 
 function Unit:revive()
@@ -173,6 +175,7 @@ function Unit:apply_damage(amount, ctx)
 	self:refresh_hp_label()
 
 	if self.hp > 0 then
+		self:set_hp_bar_visible(true)
 		self.rig:hurt()
 		return "hit"
 	end
