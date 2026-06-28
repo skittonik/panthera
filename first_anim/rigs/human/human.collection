@@ -68,24 +68,24 @@ instances {
   id: "weapon_impact"
   prototype: "/first_anim/rigs/human/weapon_impact.go"
   position {
-    x: -35.0
-    y: 33.0
+    x: -25.0
+    y: 13.0
   }
 }
 instances {
   id: "weapon_stabbing"
   prototype: "/first_anim/rigs/human/weapon_stabbing.go"
   position {
-    x: -18.0
-    y: 39.0
+    x: -8.0
+    y: 19.0
   }
 }
 instances {
   id: "weapon_pistol"
   prototype: "/first_anim/rigs/human/weapon_pistol.go"
   position {
-    x: -11.0
-    y: 47.0
+    x: -1.0
+    y: 27.0
   }
 }
 instances {
@@ -93,8 +93,8 @@ instances {
   prototype: "/first_anim/rigs/human/weapon_rifle.go"
   children: "hand_right_rifle"
   position {
-    x: -15.0
-    y: 41.0
+    x: -5.0
+    y: 21.0
   }
 }
 instances {
@@ -102,8 +102,8 @@ instances {
   prototype: "/first_anim/rigs/human/weapon_shotgun.go"
   children: "hand_right_shotgun"
   position {
-    x: -4.0
-    y: 43.0
+    x: 6.0
+    y: 23.0
   }
 }
 instances {
@@ -128,8 +128,8 @@ instances {
   id: "hand_left"
   prototype: "/first_anim/rigs/human/hand_left.go"
   position {
-    x: -14.0
-    y: 36.0
+    x: -4.0
+    y: 16.0
     z: 0.01
   }
 }
@@ -137,8 +137,8 @@ instances {
   id: "muzzle"
   prototype: "/first_anim/rigs/human/muzzle.go"
   position {
-    x: 348.0
-    y: 83.0
+    x: 358.0
+    y: 63.0
   }
 }
 scale_along_z: 0
