@@ -343,8 +343,8 @@ return {
                     { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.62, duration = 0.18, start_value = -32.0, end_value = -22.0, easing = "outquad" },
 
                     -- Weapon: brief grip, then swings positively (+85° local ≈ 0° world)
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = -12.0, easing = "outquad" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.12, duration = 0.4, start_value = -12.0, end_value = 85.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.12, start_value = 0.0, end_value = 12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.12, duration = 0.4, start_value = 12.0, end_value = -85.0, easing = "outquad" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_x", start_time = 0.0, duration = 0.12, start_value = -15.0, end_value = -15.0, easing = "linear" },
                     { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.52, start_value = 129.0, end_value = 75.0, easing = "outquad" },
 
