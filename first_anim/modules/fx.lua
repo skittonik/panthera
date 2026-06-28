@@ -39,7 +39,8 @@ end
 
 -- Fire muzzle flash + smoke for ranged weapons, following the weapon's
 -- data-driven offset and fire timing. weapon_def is a weapons definition.
-function M.muzzle(resolve, is_enemy, weapon_def)
+-- is_valid: optional function() -> bool; delayed shots are skipped if it returns false.
+function M.muzzle(resolve, is_enemy, weapon_def, is_valid)
 	if not weapon_def or not RANGED[weapon_def.type] then return end
 	local muzzle = weapon_def.muzzle
 	if not muzzle then return end
@@ -55,6 +56,7 @@ function M.muzzle(resolve, is_enemy, weapon_def)
 	local url_flash = msg.url(nil, muzzle_go, "muzzle_flash")
 	local url_smoke = msg.url(nil, muzzle_go, "smoke_puff")
 	local function fire()
+		if is_valid and not is_valid() then return end
 		particlefx.stop(url_flash)
 		particlefx.stop(url_smoke)
 		particlefx.play(url_flash)

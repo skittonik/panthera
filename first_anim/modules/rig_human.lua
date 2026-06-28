@@ -59,6 +59,8 @@ function R.new(opts)
 	self.anim = panthera.create_go(animation, nil, self.anim_objects)
 	self.overlay = panthera.create_go(animation, nil, self.anim_objects)
 
+	self.alive = true
+
 	return self
 end
 
@@ -87,11 +89,17 @@ function R:play(state, opts)
 	else
 		clip = CLIP[state] or state
 	end
+	if state == "death" then
+		local hr_rifle = self.resolve("hand_right_rifle")
+		if hr_rifle then msg.post(hr_rifle, "disable") end
+		local hr_shotgun = self.resolve("hand_right_shotgun")
+		if hr_shotgun then msg.post(hr_shotgun, "disable") end
+	end
 	panthera.play(self.anim, clip, opts)
 end
 
 function R:muzzle()
-	fx.muzzle(self.resolve, self.is_enemy, self.weapon_def)
+	fx.muzzle(self.resolve, self.is_enemy, self.weapon_def, function() return self.alive end)
 end
 
 function R:hurt()
@@ -100,6 +108,7 @@ function R:hurt()
 end
 
 function R:stop()
+	self.alive = false
 	if self.anim then panthera.stop(self.anim) end
 	if self.overlay then panthera.stop(self.overlay) end
 end
