@@ -18,6 +18,7 @@ local theme = require("first_anim.modules.theme")
 local config = require("first_anim.modules.config")
 local weapons = require("first_anim.modules.weapons")
 local projectile = require("first_anim.modules.projectile")
+local dmg_number = require("first_anim.modules.dmg_number")
 local Unit = require("first_anim.modules.unit")
 
 local M = {}
@@ -385,6 +386,7 @@ function M.new(opts)
 		track = function(path) world.smudges[#world.smudges + 1] = path end,
 	}
 	projectile.init(opts.bullet_factory_url)
+	dmg_number.init(opts.dmg_factory_url)
 	return world
 end
 

@@ -108,6 +108,10 @@ embedded_instances {
   "  id: \"bullet_factory\"\n"
   "  component: \"/first_anim/rigs/shared/bullet_factory.factory\"\n"
   "}\n"
+  "components {\n"
+  "  id: \"dmg_factory\"\n"
+  "  component: \"/first_anim/rigs/shared/damage_number_factory.factory\"\n"
+  "}\n"
   ""
 }
 embedded_instances {

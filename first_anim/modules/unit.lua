@@ -6,6 +6,7 @@
 local units = require("first_anim.modules.units")
 local weapons = require("first_anim.modules.weapons")
 local theme = require("first_anim.modules.theme")
+local dmg_number = require("first_anim.modules.dmg_number")
 
 local Unit = {}
 Unit.__index = Unit
@@ -242,6 +243,7 @@ function Unit:apply_damage(amount, ctx, recoil)
 
 	if self.hp > 0 then
 		self:set_hp_bar_visible(true)
+		dmg_number.spawn(self:aim_world_position(), amount)
 		if recoil and recoil > 0 and self.rig.recoil then
 			self.rig:recoil(recoil)
 		else
@@ -251,6 +253,7 @@ function Unit:apply_damage(amount, ctx, recoil)
 	end
 
 	self.attacking = false
+	dmg_number.spawn(self:aim_world_position(), amount)
 	self:play("death", { is_loop = false })
 	if recoil and recoil > 0 and self.rig.recoil then
 		self.rig:recoil(recoil)
