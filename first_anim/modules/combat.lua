@@ -35,6 +35,16 @@ local EPSILON = 0.001
 local RANGE_ENTRY_DELAY = 0.3
 local SHOTGUN_MAX_TARGETS = 5
 
+-- Wave auto-scaling (GDD section 4). Enemy HP and Damage are multiplied by
+--   Growth(wave) * RandomFactor * FightModifier
+-- at spawn. AttackSpeed / Defense stay at base, so archetypes keep their shape.
+local FIGHT_MOD = { 0.8, 1.0, 1.2 } -- fight 1 (easy) / 2 (mid) / 3 (boss)
+local RANDOM_MIN, RANDOM_MAX = 0.85, 1.35 -- the difficulty "swing", rolled per fight
+
+local function growth(n)
+	return 1 + 0.05 * (n ^ 0.7)
+end
+
 local function pick(list)
 	return list[math.random(#list)]
 end
@@ -118,10 +128,19 @@ end
 local function spawn_enemies(world)
 	destroy_enemies(world)
 
-	local group = world.config.groups[world.active_group] or world.config.groups[1]
+	local battle = world.active_battle
+	local group = world.config.groups[battle] or world.config.groups[1]
+	-- One swing per fight: every enemy in this fight shares the same roll, so the
+	-- whole wave reads as a single difficulty spike/dip ("качели").
+	local rand = RANDOM_MIN + math.random() * (RANDOM_MAX - RANDOM_MIN)
+	world.scale = growth(world.wave) * rand * (FIGHT_MOD[battle] or 1.0)
+
 	local used = {} -- per-zone counter, so enemies fan out across that zone's points
 	for i, entry in ipairs(group.enemies) do
 		local cfg = config.resolve_enemy(world.config, entry, i)
+		-- Scale HP / Damage only (doc): keeps AttackSpeed and Defense archetypal.
+		cfg.hp = math.max(1, math.floor(cfg.hp * world.scale + 0.5))
+		cfg.damage = math.max(1, math.floor(cfg.damage * world.scale + 0.5))
 		local zone = spawn_zone(cfg)
 		local points = SPAWN_POINTS[zone]
 		used[zone] = (used[zone] or 0) + 1
@@ -190,6 +209,7 @@ local function perform_attack(world, attacker, defender)
 	local denom = math.max(world.speed, EPSILON)
 	local ctx = world.dmg_ctx
 	local slow = attacker.slow
+	local kb = attacker.knockback
 	-- Shotgun splash only makes sense for the player vs the enemy crowd.
 	local splash = (not attacker.is_enemy) and attacker.splash_radius or nil
 
@@ -198,7 +218,9 @@ local function perform_attack(world, attacker, defender)
 		-- Armor (doc): FinalDamage = Damage * 100 / (100 + Defense). Per-target so
 		-- splash mitigates correctly, and the log shows the real post-armor number.
 		local dmg = math.floor(amount * 100 / (100 + target.defense) + 0.5)
-		local result = target:apply_damage(dmg, ctx)
+		-- knockback is a visual recoil only (no logical displacement), so the FSM
+		-- never chases a shoved target.
+		local result = target:apply_damage(dmg, ctx, kb)
 		if slow and result ~= "already_dead" then
 			target:apply_slow(slow.factor, slow.duration)
 		end
@@ -314,7 +336,8 @@ local function setup_idle(world)
 
 	emit_phase(world)
 	world.emit({ type = "speed", speed = world.speed })
-	world.emit({ type = "group", group_id = world.active_group })
+	world.emit({ type = "battle", battle = world.active_battle })
+	world.emit({ type = "wave", wave = world.wave })
 	world.emit({ type = "loadout", weapon = world.loadout.weapon, body = world.loadout.body, head = world.loadout.head })
 	status(world, "READY - PRESS PLAY", theme.color.status_paused)
 end
@@ -335,8 +358,9 @@ local function begin_battle(world)
 	panthera.SPEED = world.speed
 
 	emit_phase(world)
-	local group = world.config.groups[world.active_group] or world.config.groups[1]
-	log(world, string.format("Simulating %s", group.name or "Wave"))
+	local group = world.config.groups[world.active_battle] or world.config.groups[1]
+	log(world, string.format("Wave %d - Fight %d  (x%.2f)", world.wave, world.active_battle, world.scale))
+	log(world, string.format("%s", group.name or "Wave"))
 	log(world, string.format("Power  You: %d  vs  Enemies: %d",
 		world.player.power, total_power(world.enemies)))
 	status(world, "BATTLE IN PROGRESS", theme.color.status_battle)
@@ -350,7 +374,9 @@ function M.new(opts)
 		smudges = {},
 		phase = "idle",
 		speed = 1,
-		active_group = 1,
+		active_battle = 1,
+		wave = 1,
+		scale = 1,
 		loadout = nil,
 		config = nil,
 	}
@@ -456,10 +482,18 @@ function M.set_speed(world, speed)
 	world.emit({ type = "speed", speed = speed })
 end
 
-function M.set_group(world, group_id)
+-- Battle = which of the 3 fights (composition + FightModifier). Locked mid-battle.
+function M.set_battle(world, battle)
 	if world.phase == "running" or world.phase == "paused" then return end
-	world.active_group = group_id
-	world.emit({ type = "group", group_id = group_id })
+	world.active_battle = math.max(1, math.min(#world.config.groups, battle))
+	world.emit({ type = "battle", battle = world.active_battle })
+end
+
+-- Wave = difficulty level n driving Growth(n). Unbounded upward. Locked mid-battle.
+function M.set_wave(world, wave)
+	if world.phase == "running" or world.phase == "paused" then return end
+	world.wave = math.max(1, wave)
+	world.emit({ type = "wave", wave = world.wave })
 end
 
 function M.reset(world)

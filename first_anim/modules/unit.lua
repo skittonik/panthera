@@ -25,6 +25,7 @@ function Unit:resolve_combat(weapon_skin)
 		self.splash_radius = w and w.splash_radius or nil
 		self.max_targets = w and w.max_targets or nil
 		self.slow = w and w.slow or nil
+		self.knockback = w and w.knockback or nil
 	else
 		local m = units.get(self.unit_type).melee or {}
 		self.weapon_def = nil
@@ -35,6 +36,7 @@ function Unit:resolve_combat(weapon_skin)
 		self.splash_radius = nil
 		self.max_targets = nil
 		self.slow = m.slow or nil
+		self.knockback = nil
 	end
 end
 
@@ -50,7 +52,8 @@ function Unit.spawn(opts)
 	local self = setmetatable({}, Unit)
 	self.unit_type = opts.unit_type
 	self.uses_weapons = udef.uses_weapons
-	self.hp_bar_offset_y = udef.hp_bar_offset_y or theme.hp_bar.offset_y
+	-- cfg override lets scaled placeholders (boar/burelom on the rat rig) lift the bar.
+	self.hp_bar_offset_y = opts.cfg.hp_bar_offset_y or udef.hp_bar_offset_y or theme.hp_bar.offset_y
 	self.aim_offset_y = udef.aim_offset_y or 0
 	self.rig = rig
 	self.is_enemy = opts.is_enemy
@@ -228,7 +231,9 @@ end
 -- Damage / death --------------------------------------------------------------
 
 -- ctx = { smudge_factory, track(path) } for the death smudge.
-function Unit:apply_damage(amount, ctx)
+-- recoil (px, optional): a directional knockback lurch (visual only, via the
+-- rig) used instead of the normal flinch; composes with the death topple too.
+function Unit:apply_damage(amount, ctx, recoil)
 	if self.hp <= 0 then return "already_dead" end
 
 	self.hp = math.max(0, self.hp - amount)
@@ -237,12 +242,19 @@ function Unit:apply_damage(amount, ctx)
 
 	if self.hp > 0 then
 		self:set_hp_bar_visible(true)
-		self.rig:hurt()
+		if recoil and recoil > 0 and self.rig.recoil then
+			self.rig:recoil(recoil)
+		else
+			self.rig:hurt()
+		end
 		return "hit"
 	end
 
 	self.attacking = false
 	self:play("death", { is_loop = false })
+	if recoil and recoil > 0 and self.rig.recoil then
+		self.rig:recoil(recoil)
+	end
 	self:set_hp_bar_visible(false)
 	if self.rig.shadow_path then
 		msg.post(self.rig.shadow_path, "disable")

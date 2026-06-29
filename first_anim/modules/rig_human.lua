@@ -96,7 +96,13 @@ function R:play(state, opts)
 	-- Attack is a hard one-shot: its muzzle/hit beats are driven by combat's own
 	-- timers, so it must start instantly and stay in sync. The smooth blend back
 	-- to idle/walk lands on the next state change (crossfade branch below).
+	--
+	-- stop() before play() cancels any pending walk→idle crossfade timer. Without
+	-- this, at 2x/4x speed the crossfade fires AFTER the attack starts (RANGE_ENTRY_DELAY
+	-- is sim-time, crossfade timer is real-time), silently interrupting the attack
+	-- and leaving the attacking flag stuck true.
 	if state == "attack" then
+		panthera.stop(self.anim, true)
 		panthera.play(self.anim, clip, opts)
 		return
 	end
@@ -106,7 +112,9 @@ function R:play(state, opts)
 		if hr_rifle then msg.post(hr_rifle, "disable") end
 		local hr_shotgun = self.resolve("hand_right_shotgun")
 		if hr_shotgun then msg.post(hr_shotgun, "disable") end
-		panthera.crossfade(self.anim, clip, CROSSFADE, opts)
+		-- Instant switch (no crossfade): prevents a 0.15s ghost-attack visual where
+		-- the attack animation blends into death, making the unit look alive.
+		panthera.play(self.anim, clip, opts)
 		self.prev_was_death = true
 		return
 	end
@@ -139,6 +147,40 @@ end
 function R:hurt()
 	panthera.play(self.overlay, "damage", { is_loop = false })
 	fx.flash(self.resolve)
+end
+
+-- Directional knockback recoil: a hard backward lurch of the visual body that
+-- springs back. Driven on the "hit" node (the same flinch layer the "damage"
+-- clip uses) so it stays purely visual - the logical root never moves, so the
+-- combat FSM never chases or drifts. Local -x = backward for both facings.
+function R:recoil(strength)
+	fx.flash(self.resolve)
+	local hit = self.p_ids[hash("/human/hit")]
+	if not hit then return end
+	local shadow = self.shadow_path
+	local out = vmath.vector3(-strength, 0, 0)
+	local home = vmath.vector3(0, 0, 0)
+
+	go.cancel_animations(hit, "position")
+	if shadow then go.cancel_animations(shadow, "position") end
+	-- Reset to home first so a recoil interrupting an unfinished return can never
+	-- leave the body/shadow offset (units standing crooked after the battle).
+	go.set_position(home, hit)
+	if shadow then go.set_position(home, shadow) end
+
+	-- Shove out fast, then ease back smoothly (no elastic bounce -> reads as a
+	-- weighty hit, not a cartoon spring). The shadow rides along so the body
+	-- stays grounded instead of sliding off its own shadow.
+	local function settle()
+		go.animate(hit, "position", go.PLAYBACK_ONCE_FORWARD, home, go.EASING_INOUTCUBIC, 0.45)
+		if shadow then
+			go.animate(shadow, "position", go.PLAYBACK_ONCE_FORWARD, home, go.EASING_INOUTCUBIC, 0.45)
+		end
+	end
+	go.animate(hit, "position", go.PLAYBACK_ONCE_FORWARD, out, go.EASING_OUTCUBIC, 0.12, 0, settle)
+	if shadow then
+		go.animate(shadow, "position", go.PLAYBACK_ONCE_FORWARD, out, go.EASING_OUTCUBIC, 0.12)
+	end
 end
 
 function R:stop()

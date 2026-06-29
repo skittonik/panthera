@@ -26,6 +26,7 @@ function R.new(opts)
 	self.shadow_path = nil -- rat placeholder has no separate shadow
 	self.sprite_url = msg.url(nil, self.root_path, "sprite")
 
+	self.base_scale = RAT_SCALE
 	go.set_scale(vmath.vector3(RAT_SCALE, RAT_SCALE, 1.0), self.root_path)
 	return self
 end
@@ -39,6 +40,7 @@ function R:apply_appearance(cfg)
 	end
 	go.set(self.sprite_url, "tint", tint)
 	if cfg and cfg.scale then
+		self.base_scale = cfg.scale
 		go.set_scale(vmath.vector3(cfg.scale, cfg.scale, 1.0), self.root_path)
 	end
 end
@@ -66,6 +68,21 @@ function R:muzzle() end -- melee, no muzzle
 
 function R:hurt()
 	fx.flash_single(self.root_path)
+end
+
+-- Knockback recoil for the placeholder rat: a quick squash. Visual only (scale
+-- does not move the logical position), so the FSM is unaffected. strength is
+-- ignored for the box stand-in.
+function R:recoil(_)
+	fx.flash_single(self.root_path)
+	local base = self.base_scale or RAT_SCALE
+	go.cancel_animations(self.root_path, "scale.x")
+	-- Reset to base before the squash so a pingpong always returns to base,
+	-- never to a mid-squash value (which would accumulate and leave the rat
+	-- standing crooked after repeated splash hits).
+	go.set_scale(vmath.vector3(base, base, 1.0), self.root_path)
+	go.animate(self.root_path, "scale.x", go.PLAYBACK_ONCE_PINGPONG, base * 0.85,
+		go.EASING_OUTQUAD, 0.12)
 end
 
 function R:stop()

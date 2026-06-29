@@ -5,6 +5,7 @@ local theme = require("first_anim.modules.theme")
 local CONTROLLER = "/system#autobattle"
 
 local EQUIP_COLOR = vmath.vector4(0.18, 0.22, 0.28, 1.0)
+local BATTLE_COUNT = 3 -- the 3 fights of a wave (matches waves.json)
 
 local function flash_node(node)
 	gui.animate(node, "color.w", 0.5, gui.EASING_OUTQUAD, 0.06, 0, function()
@@ -29,7 +30,7 @@ local function current_id(self, slot)
 	return self.slots[slot].list[self.slots[slot].idx].id
 end
 
--- A battle is "in progress" (running or paused) - groups are locked then.
+-- A battle is "in progress" (running or paused) - battle/wave are locked then.
 local function battle_locked(self)
 	return self.phase == "running" or self.phase == "paused"
 end
@@ -48,10 +49,15 @@ local function refresh_speed(self)
 	end
 end
 
-local function refresh_groups(self)
-	local enabled = not battle_locked(self)
-	for group_val, node in pairs(self.group_buttons) do
-		paint(node, group_val == self.active_group, enabled)
+-- Battle / wave selectors: update labels and dim the arrows while locked.
+local function refresh_select(self)
+	gui.set_text(self.lbl_battle, string.format("BATTLE %d/%d", self.active_battle, BATTLE_COUNT))
+	gui.set_text(self.lbl_wave, string.format("WAVE %d", self.wave))
+	local alpha = battle_locked(self) and 0.35 or 1.0
+	for _, node in ipairs(self.select_arrows) do
+		local c = gui.get_color(node)
+		c.w = alpha
+		gui.set_color(node, c)
 	end
 end
 
@@ -78,27 +84,47 @@ function init(self)
 		[2] = gui.get_node("speed_2x"),
 		[4] = gui.get_node("speed_4x"),
 	}
-	self.group_buttons = {
-		[1] = gui.get_node("btn_group1"),
-		[2] = gui.get_node("btn_group2"),
-		[3] = gui.get_node("btn_group3"),
+
+	-- Battle (which fight) and wave (difficulty n) arrow selectors.
+	self.lbl_battle = gui.get_node("lbl_battle")
+	self.btn_battle_prev = gui.get_node("btn_battle_prev")
+	self.btn_battle_next = gui.get_node("btn_battle_next")
+	self.lbl_wave = gui.get_node("lbl_wave")
+	self.btn_wave_prev = gui.get_node("btn_wave_prev")
+	self.btn_wave_next = gui.get_node("btn_wave_next")
+	self.select_arrows = {
+		self.btn_battle_prev, self.btn_battle_next,
+		self.btn_wave_prev, self.btn_wave_next,
 	}
 
-	-- Equipment selectors are driven entirely by skins.json (UI-flagged entries).
+	-- Equipment selectors: a label box flanked by prev/next arrows.
 	self.slots = {
-		weapon = { list = weapons.get_ui_list(), idx = 1, node = gui.get_node("btn_equip_weapon"), label = gui.get_node("lbl_equip_weapon") },
-		body   = { list = skins.get_ui_list("body"),   idx = 1, node = gui.get_node("btn_equip_body"),   label = gui.get_node("lbl_equip_body") },
-		head   = { list = skins.get_ui_list("head"),   idx = 1, node = gui.get_node("btn_equip_head"),   label = gui.get_node("lbl_equip_head") },
+		weapon = {
+			list = weapons.get_ui_list(), idx = 1,
+			node = gui.get_node("btn_equip_weapon"), label = gui.get_node("lbl_equip_weapon"),
+			prev = gui.get_node("btn_weapon_prev"), next = gui.get_node("btn_weapon_next"),
+		},
+		body = {
+			list = skins.get_ui_list("body"), idx = 1,
+			node = gui.get_node("btn_equip_body"), label = gui.get_node("lbl_equip_body"),
+			prev = gui.get_node("btn_body_prev"), next = gui.get_node("btn_body_next"),
+		},
+		head = {
+			list = skins.get_ui_list("head"), idx = 1,
+			node = gui.get_node("btn_equip_head"), label = gui.get_node("lbl_equip_head"),
+			prev = gui.get_node("btn_head_prev"), next = gui.get_node("btn_head_next"),
+		},
 	}
 
 	-- Sensible defaults; the controller refines them via messages on boot.
 	self.phase = "idle"
 	self.active_speed = 1
-	self.active_group = 1
+	self.active_battle = 1
+	self.wave = 1
 
 	refresh_play_pause(self)
 	refresh_speed(self)
-	refresh_groups(self)
+	refresh_select(self)
 	refresh_equip(self)
 end
 
@@ -115,16 +141,20 @@ function on_message(self, message_id, message)
 	elseif message_id == hash("phase_changed") then
 		self.phase = message.phase
 		refresh_play_pause(self)
-		refresh_groups(self)
+		refresh_select(self)
 		refresh_equip(self)
 
 	elseif message_id == hash("speed_changed") then
 		self.active_speed = message.speed
 		refresh_speed(self)
 
-	elseif message_id == hash("group_changed") then
-		self.active_group = message.group_id
-		refresh_groups(self)
+	elseif message_id == hash("battle_changed") then
+		self.active_battle = message.battle
+		refresh_select(self)
+
+	elseif message_id == hash("wave_changed") then
+		self.wave = message.wave
+		refresh_select(self)
 
 	elseif message_id == hash("init_equipment") then
 		self.slots.weapon.idx = index_of(self.slots.weapon.list, message.weapon)
@@ -134,9 +164,10 @@ function on_message(self, message_id, message)
 	end
 end
 
-local function cycle_slot(self, slot)
+-- Cycle a loadout slot by dir (+1 next / -1 prev), wrapping, and push to combat.
+local function cycle_slot(self, slot, dir)
 	local data = self.slots[slot]
-	data.idx = (data.idx % #data.list) + 1
+	data.idx = ((data.idx - 1 + dir) % #data.list) + 1
 	refresh_equip(self)
 	msg.post(CONTROLLER, "equip_player", {
 		weapon = current_id(self, "weapon"),
@@ -183,23 +214,41 @@ function on_input(self, action_id, action)
 		end
 	end
 
-	-- Group: a setting, locked during battle and not re-selectable.
-	for group_val, btn in pairs(self.group_buttons) do
-		if gui.pick_node(btn, action.x, action.y) then
-			if not battle_locked(self) and group_val ~= self.active_group then
-				flash_node(btn)
-				msg.post(CONTROLLER, "select_group", { group_id = group_val })
-			end
+	-- Battle / wave: settings, locked during battle.
+	if not battle_locked(self) then
+		if gui.pick_node(self.btn_battle_prev, action.x, action.y) then
+			flash_node(self.btn_battle_prev)
+			msg.post(CONTROLLER, "select_battle", { battle = self.active_battle - 1 })
+			return
+		end
+		if gui.pick_node(self.btn_battle_next, action.x, action.y) then
+			flash_node(self.btn_battle_next)
+			msg.post(CONTROLLER, "select_battle", { battle = self.active_battle + 1 })
+			return
+		end
+		if gui.pick_node(self.btn_wave_prev, action.x, action.y) then
+			flash_node(self.btn_wave_prev)
+			msg.post(CONTROLLER, "select_wave", { wave = self.wave - 1 })
+			return
+		end
+		if gui.pick_node(self.btn_wave_next, action.x, action.y) then
+			flash_node(self.btn_wave_next)
+			msg.post(CONTROLLER, "select_wave", { wave = self.wave + 1 })
 			return
 		end
 	end
 
-	-- Loadout cyclers: only while not running.
+	-- Loadout arrows: only while not running.
 	if self.phase ~= "running" then
 		for slot, data in pairs(self.slots) do
-			if gui.pick_node(data.node, action.x, action.y) then
-				flash_node(data.node)
-				cycle_slot(self, slot)
+			if gui.pick_node(data.prev, action.x, action.y) then
+				flash_node(data.prev)
+				cycle_slot(self, slot, -1)
+				return
+			end
+			if gui.pick_node(data.next, action.x, action.y) then
+				flash_node(data.next)
+				cycle_slot(self, slot, 1)
 				return
 			end
 		end

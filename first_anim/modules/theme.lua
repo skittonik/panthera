@@ -94,6 +94,6 @@ M.spawn = {
 }
 
 -- Battle log ----------------------------------------------------------------
-M.log_max_lines = 5
+M.log_max_lines = 9
 
 return M
