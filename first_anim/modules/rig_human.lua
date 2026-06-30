@@ -10,6 +10,7 @@
 --   :muzzle() / :hurt() / :stop()
 
 local panthera = require("panthera.panthera")
+local panthera_internal = require("panthera.panthera_internal")
 local animation = require("first_anim.rigs.human.human_panthera")
 local skins = require("first_anim.modules.skins")
 local weapons = require("first_anim.modules.weapons")
@@ -84,6 +85,16 @@ function R:set_equipment(weapon_id, body_id, head_id)
 	self:set_weapon(weapon_id)
 end
 
+local function stop_overlay(self)
+	if self.overlay then
+		panthera.stop(self.overlay)
+		if self.overlay.previous_animation_id then
+			panthera_internal.reset_animation_state(self.overlay, self.overlay.previous_animation_id)
+			self.overlay.previous_animation_id = nil
+		end
+	end
+end
+
 function R:play(state, opts)
 	opts = opts or {}
 	local clip
@@ -91,6 +102,10 @@ function R:play(state, opts)
 		clip = (self.weapon_def and self.weapon_def.attack_animation) or "attack_impact"
 	else
 		clip = CLIP[state] or state
+	end
+
+	if state == "idle" or state == "walk" or state == "death" then
+		stop_overlay(self)
 	end
 
 	-- Attack is a hard one-shot: its muzzle/hit beats are driven by combat's own
@@ -186,7 +201,7 @@ end
 function R:stop()
 	self.alive = false
 	if self.anim then panthera.stop(self.anim) end
-	if self.overlay then panthera.stop(self.overlay) end
+	stop_overlay(self)
 end
 
 return R

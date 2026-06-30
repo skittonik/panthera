@@ -409,6 +409,7 @@ function M.update(world, dt)
 
 	if not player or not player:is_alive() then
 		world.phase = "finished"
+		panthera.SPEED = 1
 		for _, e in ipairs(world.enemies) do
 			if e:is_alive() then e:ensure_anim("idle", true) end
 		end
@@ -421,6 +422,7 @@ function M.update(world, dt)
 	local target = get_closest_enemy(world, player:get_position())
 	if not target then
 		world.phase = "finished"
+		panthera.SPEED = 1
 		player:ensure_anim("idle", true)
 		emit_phase(world)
 		log(world, "Victory! All enemies defeated!")
