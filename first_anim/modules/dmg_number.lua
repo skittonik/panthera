@@ -1,7 +1,7 @@
 local M = {}
 
 local factory_url = nil
-local YELLOW      = vmath.vector4(1, 0.85, 0.1, 1)
+local WHITE       = vmath.vector4(1, 1, 1, 1)
 local TRANSPARENT = vmath.vector4(0, 0, 0, 0)
 local FLOAT_DY    = 70    -- px to float upward
 local FLOAT_DUR   = 0.65  -- seconds for the rise
@@ -20,7 +20,7 @@ function M.spawn(pos, amount)
     local lurl = msg.url(nil, id, "label")
     label.set_text(lurl, tostring(amount))
     -- Зануляем outline и shadow независимо от дефолтов DF-шрифта
-    go.set(lurl, "color",   YELLOW)
+    go.set(lurl, "color",   WHITE)
     go.set(lurl, "outline", TRANSPARENT)
     go.set(lurl, "shadow",  TRANSPARENT)
     -- Float up

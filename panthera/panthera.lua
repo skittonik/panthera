@@ -286,13 +286,12 @@ function M.update_animation(animation, animation_state, options)
 					local time_overflow = math.max(0, animation_state.current_time - key.start_time)
 					child_state.current_time = time_overflow
 
-					animation_state.childs = animation_state.childs or {}
-					table.insert(animation_state.childs, child_state)
 					local animation_duration = M.get_duration(child_state, key.property_id)
-
 					local key_duration = (key.duration - time_overflow)
-					-- TODO: Do we need set time if key_duration is <= 0?
+
 					if animation_duration > 0 and key_duration > 0 then
+						animation_state.childs = animation_state.childs or {}
+						table.insert(animation_state.childs, child_state)
 						local speed = (options.speed or 1) * animation_state.speed * M.SPEED
 						local play_speed = (animation_duration / key_duration) * speed
 
@@ -304,10 +303,12 @@ function M.update_animation(animation, animation_state, options)
 								panthera_internal.remove_child_animation(animation_state, child_state)
 							end
 						})
+					elseif animation_duration > 0 then
+						panthera_internal.set_animation_state_at_time(child_state, key.property_id, animation_duration, options.callback_event)
 					end
 				end
 
-				-- This is tempalte animations, the node_id is a template to run the new animations
+				-- This is template animations, the node_id is a template to run the new animations
 				if key.node_id ~= "" then
 					local animation_data = panthera_internal.get_animation_data(animation_state)
 					local paths = animation_data and animation_data.metadata.template_animation_paths
@@ -324,26 +325,30 @@ function M.update_animation(animation, animation_state, options)
 					local time_overflow = math.max(0, animation_state.current_time - key.start_time)
 					template_state.current_time = time_overflow
 
-					animation_state.childs = animation_state.childs or {}
-					table.insert(animation_state.childs, template_state)
 					local animation_duration = M.get_duration(template_state, key.property_id)
+					local key_duration = (key.duration - time_overflow)
 
 					if animation_duration > 0 and key.duration > 0 then
-						local speed = (options.speed or 1) * animation_state.speed * M.SPEED
-						local key_duration = (key.duration - time_overflow)
-						local play_speed = (animation_duration / key_duration) * speed
+						if key_duration > 0 then
+							animation_state.childs = animation_state.childs or {}
+							table.insert(animation_state.childs, template_state)
+							local speed = (options.speed or 1) * animation_state.speed * M.SPEED
+							local play_speed = (animation_duration / key_duration) * speed
 
-						M.play(template_state, key.property_id, {
-							-- TODO: is any cases when we want to use false here? Editor works like it false now
-							-- Real case: looped animation should be reset to correct visuals
-							is_skip_init = false, -- Editor works in "false" mode always, so until editor support this, we should use false
-							easing = key.easing,
-							speed = play_speed,
-							callback = function()
-								panthera_internal.remove_child_animation(animation_state, template_state)
-							end,
-							callback_event = options.callback_event
-						})
+							M.play(template_state, key.property_id, {
+								-- TODO: is any cases when we want to use false here? Editor works like it false now
+								-- Real case: looped animation should be reset to correct visuals
+								is_skip_init = false, -- Editor works in "false" mode always, so until editor support this, we should use false
+								easing = key.easing,
+								speed = play_speed,
+								callback = function()
+									panthera_internal.remove_child_animation(animation_state, template_state)
+								end,
+								callback_event = options.callback_event
+							})
+						else
+							panthera_internal.set_animation_state_at_time(template_state, key.property_id, animation_duration, options.callback_event)
+						end
 					end
 				end
 			end

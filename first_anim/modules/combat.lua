@@ -506,7 +506,7 @@ end
 
 function M.set_loadout(world, weapon, body, head)
 	world.loadout = { weapon = weapon, body = body, head = head }
-	if world.phase ~= "running" and world.player then
+	if world.phase ~= "running" and world.player and world.player:is_alive() then
 		world.player:set_equipment(weapon, body, head)
 	end
 end

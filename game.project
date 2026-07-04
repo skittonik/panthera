@@ -21,7 +21,7 @@ developer = Maksim Tuprikov
 custom_resources = /first_anim/data/skins.json, /first_anim/data/weapons.json, /first_anim/data/units.json, /first_anim/data/player.json, /first_anim/data/waves.json, /first_anim/data/enemies.json
 dependencies#0 = https://github.com/Insality/defold-log/archive/refs/heads/develop.zip
 dependencies#1 = https://github.com/Insality/defold-tweener/archive/refs/tags/5.zip
-dependencies#2 = https://github.com/Insality/druid/archive/refs/heads/develop.zip
+dependencies#2 = https://github.com/Insality/druid/archive/refs/tags/1.2.5.zip
 dependencies#3 = https://github.com/Insality/defold-event/archive/refs/heads/develop.zip
 
 [library]
