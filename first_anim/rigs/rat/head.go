@@ -1,0 +1,16 @@
+embedded_components {
+  id: "sprite"
+  type: "sprite"
+  data: "default_animation: \"rat_head\"\n"
+  "material: \"/panthera/materials/sprite.material\"\n"
+  "size {\n"
+  "  x: 201.0\n"
+  "  y: 190.0\n"
+  "}\n"
+  "size_mode: SIZE_MODE_MANUAL\n"
+  "textures {\n"
+  "  sampler: \"texture_sampler\"\n"
+  "  texture: \"/first_anim/rigs/rat/rat.atlas\"\n"
+  "}\n"
+  ""
+}

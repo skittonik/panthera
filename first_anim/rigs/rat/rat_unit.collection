@@ -1,13 +1,8 @@
 name: "rat_unit"
 scale_along_z: 0
-instances {
+collection_instances {
   id: "rat"
-  prototype: "/first_anim/rigs/rat/rat.go"
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
+  collection: "/first_anim/rigs/rat/rat.collection"
 }
 instances {
   id: "hp_bg"

@@ -11,3 +11,4 @@ deployer_version_settings.txt
 
 .cache_deployer
 /.editor_settings
+/automation_bridge
