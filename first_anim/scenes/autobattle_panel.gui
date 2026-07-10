@@ -368,6 +368,45 @@ nodes {
 }
 nodes {
   position {
+    x: 762.0
+    y: 60.0
+  }
+  size {
+    x: 84.0
+    y: 46.0
+  }
+  color {
+    x: 0.22
+    y: 0.25
+    z: 0.3
+  }
+  type: TYPE_BOX
+  id: "btn_run"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+  }
+  scale {
+    x: 0.3
+    y: 0.3
+  }
+  size {
+    x: 84.0
+    y: 46.0
+  }
+  type: TYPE_TEXT
+  text: "RUN"
+  font: "troika"
+  id: "btn_run_lbl"
+  parent: "btn_run"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
     x: 210.0
     y: 140.0
   }
@@ -601,6 +640,31 @@ nodes {
   font: "troika"
   id: "btn_battle_next_lbl"
   parent: "btn_battle_next"
+  inherit_alpha: true
+  shadow_alpha: 0.0
+}
+nodes {
+  position {
+    x: 210.0
+    y: 300.0
+  }
+  scale {
+    x: 0.32
+    y: 0.32
+  }
+  size {
+    x: 640.0
+    y: 46.0
+  }
+  color {
+    x: 0.15
+    y: 0.75
+    z: 0.55
+  }
+  type: TYPE_TEXT
+  text: "POWER  YOU: 0   ENEMIES: 0"
+  font: "troika"
+  id: "lbl_power"
   inherit_alpha: true
   shadow_alpha: 0.0
 }

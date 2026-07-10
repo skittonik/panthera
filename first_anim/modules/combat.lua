@@ -16,6 +16,7 @@
 local panthera = require("panthera.panthera")
 local theme = require("first_anim.modules.theme")
 local config = require("first_anim.modules.config")
+local units = require("first_anim.modules.units")
 local weapons = require("first_anim.modules.weapons")
 local projectile = require("first_anim.modules.projectile")
 local dmg_number = require("first_anim.modules.dmg_number")
@@ -41,6 +42,7 @@ local SHOTGUN_MAX_TARGETS = 5
 -- at spawn. AttackSpeed / Defense stay at base, so archetypes keep their shape.
 local FIGHT_MOD = { 0.8, 1.0, 1.2 } -- fight 1 (easy) / 2 (mid) / 3 (boss)
 local RANDOM_MIN, RANDOM_MAX = 0.85, 1.35 -- the difficulty "swing", rolled per fight
+local MEAN_RANDOM = (RANDOM_MIN + RANDOM_MAX) * 0.5 -- expected roll, used for the GUI preview
 
 local function growth(n)
 	return 1 + 0.05 * (n ^ 0.7)
@@ -48,6 +50,11 @@ end
 
 local function pick(list)
 	return list[math.random(#list)]
+end
+
+-- Movement clip: "run" when the panel's RUN toggle is on, else "walk".
+local function move_anim(world)
+	return world.run_mode and "run" or "walk"
 end
 
 -- Events --------------------------------------------------------------------
@@ -112,7 +119,7 @@ local function spawn_player(world, in_battle)
 	world.player = unit
 
 	if in_battle then
-		unit:ensure_anim("walk", true)
+		unit:ensure_anim(move_anim(world), true)
 	else
 		unit:ensure_anim("idle", true)
 	end
@@ -149,7 +156,7 @@ local function spawn_enemies(world)
 
 		local pos = random_in_zone(go.get_position(point), theme.spawn.spread_x, theme.spawn.spread_y)
 		local unit = Unit.spawn({ unit_type = cfg.unit, pos = pos, is_enemy = true, cfg = cfg })
-		unit:ensure_anim("walk", true)
+		unit:ensure_anim(move_anim(world), true)
 		unit:position_hp_bar()
 		world.enemies[#world.enemies + 1] = unit
 	end
@@ -291,7 +298,7 @@ local function advance(world, unit, target, sim_dt)
 		end
 	else
 		unit.in_range = false
-		unit:ensure_anim("walk", true)
+		unit:ensure_anim(move_anim(world), true)
 		if dist > EPSILON then
 			local speed = unit.move_speed * unit.slow_mult
 			upos.x = upos.x + (dx / dist) * speed * sim_dt
@@ -328,6 +335,56 @@ local function cleanup(world)
 	world.smudges = {}
 end
 
+-- Summed analytic Power of a unit list, for the at-a-glance matchup readout.
+local function total_power(list)
+	local sum = 0
+	for _, u in ipairs(list) do sum = sum + (u.power or 0) end
+	return sum
+end
+
+-- Power of a stat table without spawning a Unit (mirrors Unit:compute_power).
+local function analytic_power(hp, damage, attack_speed, defense, damage_mult)
+	local attack_cooldown = 100 / math.max(attack_speed or 100, 1)
+	local dps = (damage * (damage_mult or 1.0)) / attack_cooldown
+	return math.floor(dps * hp * (1 + (defense or 0) / 100) + 0.5)
+end
+
+local function resolve_damage_mult(unit_type, weapon_skin)
+	local udef = units.get(unit_type)
+	if udef and udef.uses_weapons then
+		local w = weapons.get_weapon_def(weapon_skin)
+		return (w and w.damage_mult) or 1.0
+	end
+	return 1.0
+end
+
+-- Preview Power for the current setup screen (player loadout vs the selected
+-- wave/battle), without spawning anything. Enemy side uses the *expected*
+-- scale roll (MEAN_RANDOM) since the real roll only happens at battle start.
+function M.preview_power(world)
+	local p = world.config.player
+	local player_power = analytic_power(p.hp, p.damage, p.attack_speed, p.defense,
+		resolve_damage_mult(p.unit, world.loadout.weapon))
+
+	local group = world.config.groups[world.active_battle] or world.config.groups[1]
+	local scale = growth(world.wave) * MEAN_RANDOM * (FIGHT_MOD[world.active_battle] or 1.0)
+	local enemy_power = 0
+	for i, entry in ipairs(group.enemies) do
+		local cfg = config.resolve_enemy(world.config, entry, i)
+		local hp = math.max(1, math.floor(cfg.hp * scale + 0.5))
+		local damage = math.max(1, math.floor(cfg.damage * scale + 0.5))
+		enemy_power = enemy_power + analytic_power(hp, damage, cfg.attack_speed, cfg.defense,
+			resolve_damage_mult(cfg.unit, cfg.weapon_skin))
+	end
+
+	return player_power, enemy_power
+end
+
+local function emit_power(world)
+	local player_power, enemy_power = M.preview_power(world)
+	world.emit({ type = "power", player = player_power, enemy = enemy_power })
+end
+
 -- Reset to the editable setup screen: player idle at spawn, no enemies.
 local function setup_idle(world)
 	cleanup(world)
@@ -337,17 +394,12 @@ local function setup_idle(world)
 
 	emit_phase(world)
 	world.emit({ type = "speed", speed = world.speed })
+	world.emit({ type = "run", run = world.run_mode })
 	world.emit({ type = "battle", battle = world.active_battle })
 	world.emit({ type = "wave", wave = world.wave })
 	world.emit({ type = "loadout", weapon = world.loadout.weapon, body = world.loadout.body, head = world.loadout.head })
+	emit_power(world)
 	status(world, "READY - PRESS PLAY", theme.color.status_paused)
-end
-
--- Summed analytic Power of a unit list, for the at-a-glance matchup readout.
-local function total_power(units)
-	local sum = 0
-	for _, u in ipairs(units) do sum = sum + (u.power or 0) end
-	return sum
 end
 
 -- Spawn a fresh battle for the current group and start fighting.
@@ -375,6 +427,7 @@ function M.new(opts)
 		smudges = {},
 		phase = "idle",
 		speed = 1,
+		run_mode = false,
 		active_battle = 1,
 		wave = 1,
 		scale = 1,
@@ -486,11 +539,20 @@ function M.set_speed(world, speed)
 	world.emit({ type = "speed", speed = speed })
 end
 
+-- RUN toggle: swaps the movement clip (walk/run) for every unit. Picked up
+-- automatically on the next advance() frame for anyone currently moving -
+-- no need to force a re-trigger here.
+function M.set_run(world, on)
+	world.run_mode = on
+	world.emit({ type = "run", run = on })
+end
+
 -- Battle = which of the 3 fights (composition + FightModifier). Locked mid-battle.
 function M.set_battle(world, battle)
 	if world.phase == "running" or world.phase == "paused" then return end
 	world.active_battle = math.max(1, math.min(#world.config.groups, battle))
 	world.emit({ type = "battle", battle = world.active_battle })
+	emit_power(world)
 end
 
 -- Wave = difficulty level n driving Growth(n). Unbounded upward. Locked mid-battle.
@@ -498,6 +560,7 @@ function M.set_wave(world, wave)
 	if world.phase == "running" or world.phase == "paused" then return end
 	world.wave = math.max(1, wave)
 	world.emit({ type = "wave", wave = world.wave })
+	emit_power(world)
 end
 
 function M.reset(world)
@@ -509,6 +572,7 @@ function M.set_loadout(world, weapon, body, head)
 	if world.phase ~= "running" and world.player and world.player:is_alive() then
 		world.player:set_equipment(weapon, body, head)
 	end
+	emit_power(world)
 end
 
 return M

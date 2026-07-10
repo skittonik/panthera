@@ -49,6 +49,10 @@ local function refresh_speed(self)
 	end
 end
 
+local function refresh_run(self)
+	paint(self.btn_run, self.run_mode, true)
+end
+
 -- Battle / wave selectors: update labels and dim the arrows while locked.
 local function refresh_select(self)
 	gui.set_text(self.lbl_battle, string.format("BATTLE %d/%d", self.active_battle, BATTLE_COUNT))
@@ -59,6 +63,13 @@ local function refresh_select(self)
 		c.w = alpha
 		gui.set_color(node, c)
 	end
+end
+
+-- Power readout: "YOU: n  ENEMIES: n", tinted green/red by who's ahead.
+local function refresh_power(self)
+	gui.set_text(self.lbl_power, string.format("POWER  YOU: %d   ENEMIES: %d", self.player_power, self.enemy_power))
+	local c = (self.player_power >= self.enemy_power) and theme.color.status_victory or theme.color.status_defeat
+	gui.set_color(self.lbl_power, c)
 end
 
 local function refresh_equip(self)
@@ -84,11 +95,13 @@ function init(self)
 		[2] = gui.get_node("speed_2x"),
 		[4] = gui.get_node("speed_4x"),
 	}
+	self.btn_run = gui.get_node("btn_run")
 
 	-- Battle (which fight) and wave (difficulty n) arrow selectors.
 	self.lbl_battle = gui.get_node("lbl_battle")
 	self.btn_battle_prev = gui.get_node("btn_battle_prev")
 	self.btn_battle_next = gui.get_node("btn_battle_next")
+	self.lbl_power = gui.get_node("lbl_power")
 	self.lbl_wave = gui.get_node("lbl_wave")
 	self.btn_wave_prev = gui.get_node("btn_wave_prev")
 	self.btn_wave_next = gui.get_node("btn_wave_next")
@@ -119,13 +132,18 @@ function init(self)
 	-- Sensible defaults; the controller refines them via messages on boot.
 	self.phase = "idle"
 	self.active_speed = 1
+	self.run_mode = false
 	self.active_battle = 1
 	self.wave = 1
+	self.player_power = 0
+	self.enemy_power = 0
 
 	refresh_play_pause(self)
 	refresh_speed(self)
+	refresh_run(self)
 	refresh_select(self)
 	refresh_equip(self)
+	refresh_power(self)
 end
 
 function on_message(self, message_id, message)
@@ -148,6 +166,10 @@ function on_message(self, message_id, message)
 		self.active_speed = message.speed
 		refresh_speed(self)
 
+	elseif message_id == hash("run_changed") then
+		self.run_mode = message.run
+		refresh_run(self)
+
 	elseif message_id == hash("battle_changed") then
 		self.active_battle = message.battle
 		refresh_select(self)
@@ -155,6 +177,11 @@ function on_message(self, message_id, message)
 	elseif message_id == hash("wave_changed") then
 		self.wave = message.wave
 		refresh_select(self)
+
+	elseif message_id == hash("power_changed") then
+		self.player_power = message.player
+		self.enemy_power = message.enemy
+		refresh_power(self)
 
 	elseif message_id == hash("init_equipment") then
 		self.slots.weapon.idx = index_of(self.slots.weapon.list, message.weapon)
@@ -212,6 +239,13 @@ function on_input(self, action_id, action)
 			end
 			return
 		end
+	end
+
+	-- RUN: plain toggle, unlike speed's mutually-exclusive selection.
+	if gui.pick_node(self.btn_run, action.x, action.y) then
+		flash_node(self.btn_run)
+		msg.post(CONTROLLER, "set_run", { run = not self.run_mode })
+		return
 	end
 
 	-- Battle / wave: settings, locked during battle.

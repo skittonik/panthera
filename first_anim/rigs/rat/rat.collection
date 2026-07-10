@@ -3,8 +3,6 @@ instances {
   id: "shadow"
   prototype: "/first_anim/rigs/rat/shadow.go"
   position {
-    x: 0.0
-    y: 0.0
     z: -0.03
   }
 }
@@ -12,26 +10,25 @@ instances {
   id: "body"
   prototype: "/first_anim/rigs/rat/body.go"
   position {
-    x: 0.0
-    y: 147.5
-    z: 0.0
+    x: -21.0
+    y: 133.5
   }
 }
 instances {
   id: "leg_back_left"
   prototype: "/first_anim/rigs/rat/leg_back_left.go"
   position {
-    x: -72.0
-    y: 60.0
-    z: 0.01
+    x: -38.0
+    y: 74.0
+    z: -0.01
   }
 }
 instances {
   id: "leg_back_right"
   prototype: "/first_anim/rigs/rat/leg_back_right.go"
   position {
-    x: -28.5
-    y: 60.0
+    x: -76.5
+    y: 75.0
     z: 0.011
   }
 }
@@ -39,17 +36,17 @@ instances {
   id: "leg_front_left"
   prototype: "/first_anim/rigs/rat/leg_front_left.go"
   position {
-    x: 55.0
-    y: 60.0
-    z: 0.012
+    x: 82.0
+    y: 75.0
+    z: -0.012
   }
 }
 instances {
   id: "leg_front_right"
   prototype: "/first_anim/rigs/rat/leg_front_right.go"
   position {
-    x: 95.0
-    y: 60.0
+    x: 39.0
+    y: 67.0
     z: 0.013
   }
 }
@@ -57,8 +54,8 @@ instances {
   id: "head"
   prototype: "/first_anim/rigs/rat/head.go"
   position {
-    x: 129.0
-    y: 180.0
+    x: 87.0
+    y: 146.0
     z: 0.02
   }
 }
@@ -73,9 +70,9 @@ embedded_instances {
   id: "hit"
   children: "body"
   children: "head"
-  children: "leg_front_left"
-  children: "leg_front_right"
   children: "leg_back_left"
   children: "leg_back_right"
+  children: "leg_front_left"
+  children: "leg_front_right"
   data: ""
 }

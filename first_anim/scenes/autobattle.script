@@ -24,12 +24,16 @@ local function make_emit(self)
 			msg.post(UI, "set_status", { text = ev.text, color = ev.color })
 		elseif ev.type == "speed" then
 			msg.post(UI, "speed_changed", { speed = ev.speed })
+		elseif ev.type == "run" then
+			msg.post(UI, "run_changed", { run = ev.run })
 		elseif ev.type == "battle" then
 			msg.post(UI, "battle_changed", { battle = ev.battle })
 		elseif ev.type == "wave" then
 			msg.post(UI, "wave_changed", { wave = ev.wave })
 		elseif ev.type == "loadout" then
 			msg.post(UI, "init_equipment", { weapon = ev.weapon, body = ev.body, head = ev.head })
+		elseif ev.type == "power" then
+			msg.post(UI, "power_changed", { player = ev.player, enemy = ev.enemy })
 		end
 	end
 end
@@ -61,6 +65,8 @@ function on_message(self, message_id, message)
 		combat.pause(self.world)
 	elseif message_id == hash("set_speed") then
 		combat.set_speed(self.world, message.speed)
+	elseif message_id == hash("set_run") then
+		combat.set_run(self.world, message.run)
 	elseif message_id == hash("select_battle") then
 		combat.set_battle(self.world, message.battle)
 	elseif message_id == hash("select_wave") then

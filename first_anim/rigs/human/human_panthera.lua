@@ -56,18 +56,28 @@ return {
             },
             -- =========================================================
             -- WALK - two steps, legs pendulum. Loops cleanly.
+            --
+            -- The old cut had every track (legs, body, head, weapon, hand)
+            -- keyed to hit zero velocity at the exact same instants
+            -- (t=0/0.2/0.4/0.6), so the whole rig visibly froze in unison
+            -- four times a cycle - reads as a stiff mechanical tick-tock next
+            -- to the rat's staggered, asymmetric trot. Fix: outsine-in/insine-out
+            -- pairing on the legs (fast lift-off, gentle settle - the rat's
+            -- WALK_LIFT curve) instead of symmetric inoutsine both ways, and a
+            -- small phase lag on head/weapon/hand behind the body so the parts
+            -- never all stop together (classic follow-through/overlap).
             -- =========================================================
             {
                 animation_id = "walk",
                 duration = 0.8,
                 animation_keys = {
                     -- Right leg: full forward at the seam, swings back and returns.
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = 20.0, end_value = -20.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = -20.0, end_value = 20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = 20.0, end_value = -20.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = -20.0, end_value = 20.0, easing = "insine" },
 
                     -- Left leg: opposite phase
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = -20.0, end_value = 20.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = 20.0, end_value = -20.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = -20.0, end_value = 20.0, easing = "insine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = 20.0, end_value = -20.0, easing = "outsine" },
 
                     -- Torso bob: two bobs/cycle
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
@@ -75,33 +85,92 @@ return {
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 67.0, end_value = 73.0, easing = "inoutsine" },
                     { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 73.0, end_value = 67.0, easing = "inoutsine" },
 
-                    -- Head bob (secondary, follows the torso)
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
+                    -- Head bob, lagging the torso by 0.03s (secondary motion drag)
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.03, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.23, duration = 0.2, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.43, duration = 0.2, start_value = 107.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.63, duration = 0.17, start_value = 111.0, end_value = 107.0, easing = "inoutsine" },
 
-                    -- Head counter-tilt sway
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = -1.5, end_value = 1.5, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = 1.5, end_value = -1.5, easing = "inoutsine" },
+                    -- Head counter-tilt sway, same lag
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.03, duration = 0.4, start_value = -1.5, end_value = 1.5, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "rotation_z", start_time = 0.43, duration = 0.37, start_value = 1.5, end_value = -1.5, easing = "inoutsine" },
 
-                    -- Weapon counter-swing
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
+                    -- Weapon counter-swing, lagging the legs by 0.06s (whip-follow)
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.06, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.46, duration = 0.34, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
 
-                    -- Weapon bob (follows the torso)
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    -- Weapon bob (follows the torso, same lag)
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.06, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.26, duration = 0.2, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.46, duration = 0.2, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.66, duration = 0.14, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
 
-                    -- hand_right follows weapon during walk
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.0, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.4, duration = 0.4, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.0, duration = 0.2, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.2, duration = 0.2, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.4, duration = 0.2, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.6, duration = 0.2, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
+                    -- hand_right follows weapon during walk, same lag
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.06, duration = 0.4, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.46, duration = 0.34, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.06, duration = 0.2, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.26, duration = 0.2, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.46, duration = 0.2, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.66, duration = 0.14, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
+                }
+            },
+            -- =========================================================
+            -- RUN - sprint. Same two-step pendulum as walk but at double
+            -- cadence (0.4s vs 0.8s) with a wider stride, plus a sustained
+            -- forward lean on "hit" (everything else parents off it, so
+            -- leaning that one node tips the whole rig - body, head, legs,
+            -- weapon - into the sprint without touching each part). The lean
+            -- oscillates 10-15deg rather than sitting dead still, so the
+            -- torso keeps breathing/shifting instead of freezing mid-tilt.
+            -- =========================================================
+            {
+                animation_id = "run",
+                duration = 0.4,
+                animation_keys = {
+                    -- Forward lean, held all loop (start/end value match so it
+                    -- never snaps back to upright on the loop seam).
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.0, duration = 0.1, start_value = 10.0, end_value = 15.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.1, duration = 0.1, start_value = 15.0, end_value = 10.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.2, duration = 0.1, start_value = 10.0, end_value = 15.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.3, duration = 0.1, start_value = 15.0, end_value = 10.0, easing = "inoutsine" },
+
+                    -- Right leg: wider stride than walk (32deg vs 20deg), fast lift-off / gentle settle.
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 32.0, end_value = -32.0, easing = "outsine" },
+                    { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = -32.0, end_value = 32.0, easing = "insine" },
+
+                    -- Left leg: opposite phase
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = -32.0, end_value = 32.0, easing = "insine" },
+                    { key_type = "tween", node_id = "left_leg", property_id = "rotation_z", start_time = 0.2, duration = 0.2, start_value = 32.0, end_value = -32.0, easing = "outsine" },
+
+                    -- Torso bob: bigger vertical drive than walk, two bobs/cycle
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.0, duration = 0.1, start_value = 65.0, end_value = 75.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.1, duration = 0.1, start_value = 75.0, end_value = 65.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.2, duration = 0.1, start_value = 65.0, end_value = 75.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "body", property_id = "position_y", start_time = 0.3, duration = 0.1, start_value = 75.0, end_value = 65.0, easing = "inoutsine" },
+
+                    -- Head bob, lagging the torso by 0.015s (half the walk lag - same ratio at 2x cadence)
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.015, duration = 0.1, start_value = 103.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.115, duration = 0.1, start_value = 111.0, end_value = 103.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.215, duration = 0.1, start_value = 103.0, end_value = 111.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "head", property_id = "position_y", start_time = 0.315, duration = 0.085, start_value = 111.0, end_value = 103.0, easing = "inoutsine" },
+
+                    -- Weapon counter-swing, lagging the legs by 0.03s
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.03, duration = 0.2, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "rotation_z", start_time = 0.23, duration = 0.17, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
+
+                    -- Weapon bob (follows the torso, same lag)
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.03, duration = 0.1, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.13, duration = 0.1, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.23, duration = 0.1, start_value = 127.0, end_value = 132.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "weapon", property_id = "position_y", start_time = 0.33, duration = 0.07, start_value = 132.0, end_value = 127.0, easing = "inoutsine" },
+
+                    -- hand_right follows weapon during run, same lag
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.03, duration = 0.2, start_value = 6.0, end_value = -6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "rotation_z", start_time = 0.23, duration = 0.17, start_value = -6.0, end_value = 6.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.03, duration = 0.1, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.13, duration = 0.1, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.23, duration = 0.1, start_value = 169.0, end_value = 174.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hand_right", property_id = "position_y", start_time = 0.33, duration = 0.07, start_value = 174.0, end_value = 169.0, easing = "inoutsine" },
                 }
             },
             -- =========================================================

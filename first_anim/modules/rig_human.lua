@@ -21,9 +21,17 @@ local R = {}
 R.__index = R
 
 -- Normalized state -> Panthera clip. "attack" is resolved from the weapon.
-local CLIP = { idle = "default", walk = "walk", death = "death" }
+local CLIP = { idle = "default", walk = "walk", run = "run", death = "death" }
 
 local CROSSFADE = 0.15
+
+-- The human clips were authored independently of the rat rig's hand-animated
+-- timings (idle breathes over 3s vs the rat's 0.9s, walk cycles over 0.8s vs
+-- the rat's 0.34s, death takes 1.4s vs the rat's ~0.85s) - roughly a 1.6-2x
+-- gap across the board, which reads as two different games sharing a
+-- battlefield. Scale every Panthera clip uniformly so human keeps pace with
+-- the rat instead of re-authoring every keyframe.
+local ANIM_SPEED = 1.6
 
 local ANIM_NODES = {
 	"root", "hit", "shadow", "body", "head", "head_pivot",
@@ -61,6 +69,8 @@ function R.new(opts)
 	self.anim_objects = build_anim_objects(p_ids)
 	self.anim = panthera.create_go(animation, nil, self.anim_objects)
 	self.overlay = panthera.create_go(animation, nil, self.anim_objects)
+	self.anim.speed = ANIM_SPEED
+	self.overlay.speed = ANIM_SPEED
 
 	self.alive = true
 
@@ -104,7 +114,7 @@ function R:play(state, opts)
 		clip = CLIP[state] or state
 	end
 
-	if state == "idle" or state == "walk" or state == "death" then
+	if state == "idle" or state == "walk" or state == "run" or state == "death" then
 		stop_overlay(self)
 	end
 
