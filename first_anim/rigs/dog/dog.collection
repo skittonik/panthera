@@ -10,16 +10,16 @@ instances {
   id: "body"
   prototype: "/first_anim/rigs/dog/body.go"
   position {
-    x: -33.0
-    y: 146.0
+    x: -52.0
+    y: 195.0
   }
 }
 instances {
   id: "leg_back_left"
   prototype: "/first_anim/rigs/dog/leg_back_left.go"
   position {
-    x: -59.0
-    y: 81.0
+    x: -28.0
+    y: 277.0
     z: -0.01
   }
 }
@@ -27,8 +27,8 @@ instances {
   id: "leg_back_right"
   prototype: "/first_anim/rigs/dog/leg_back_right.go"
   position {
-    x: -118.0
-    y: 82.0
+    x: -105.0
+    y: 169.0
     z: 0.011
   }
 }
@@ -36,8 +36,8 @@ instances {
   id: "leg_front_left"
   prototype: "/first_anim/rigs/dog/leg_front_left.go"
   position {
-    x: 127.0
-    y: 82.0
+    x: 111.0
+    y: 265.0
     z: -0.012
   }
 }
@@ -45,8 +45,8 @@ instances {
   id: "leg_front_right"
   prototype: "/first_anim/rigs/dog/leg_front_right.go"
   position {
-    x: 60.0
-    y: 73.0
+    x: 40.0
+    y: 199.0
     z: 0.013
   }
 }
@@ -54,8 +54,8 @@ instances {
   id: "head"
   prototype: "/first_anim/rigs/dog/head.go"
   position {
-    x: 135.0
-    y: 160.0
+    x: 156.0
+    y: 299.0
     z: 0.02
   }
 }

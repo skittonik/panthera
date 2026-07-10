@@ -54,8 +54,8 @@ instances {
   id: "head"
   prototype: "/first_anim/rigs/rat/head.go"
   position {
-    x: 87.0
-    y: 146.0
+    x: 97.0
+    y: 126.0
     z: 0.02
   }
 }

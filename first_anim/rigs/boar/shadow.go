@@ -8,9 +8,8 @@ embedded_components {
   "  texture: \"/first_anim/rigs/boar/boar.atlas\"\n"
   "}\n"
   ""
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
+  scale {
+    x: 2.4
+    y: 1.52
   }
 }

@@ -8,9 +8,8 @@ embedded_components {
   "  texture: \"/first_anim/rigs/dog/dog.atlas\"\n"
   "}\n"
   ""
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
+  scale {
+    x: 1.88
+    y: 1.44
   }
 }

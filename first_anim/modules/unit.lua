@@ -107,7 +107,7 @@ function Unit:compute_power()
 end
 
 function Unit:is_alive()
-	return self.hp > 0
+	return self.hp > 0 and not self.destroyed
 end
 
 function Unit:get_position()
@@ -276,6 +276,7 @@ function Unit:apply_damage(amount, ctx, recoil)
 end
 
 function Unit:destroy()
+	self.destroyed = true
 	self.rig:stop()
 	for _, path in pairs(self.p_ids) do
 		go.delete(path, true)
