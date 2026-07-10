@@ -21,9 +21,23 @@ local R = {}
 R.__index = R
 
 -- Normalized state -> Panthera clip. "attack" is resolved from the weapon.
-local CLIP = { idle = "default", walk = "walk", run = "run", death = "death" }
+-- "run" has no clip of its own (see R:play): it's the "walk" clip sped up
+-- and leaned into over time, so switching it in never hard-cuts to a
+-- differently-timed clip.
+local CLIP = { idle = "default", walk = "walk", death = "death" }
 
 local CROSSFADE = 0.15
+
+-- "run" = the walk loop, gradually sped up and leaned forward, instead of a
+-- separate clip: hard-cutting to a different clip (even via crossfade) read
+-- as the legs glitching/dragging, and a one-shot "windup" clip played once
+-- before the switch was even worse - leaned instantly then only started
+-- moving. This way the character is always walking, and just walks faster
+-- and leans more the longer it's been running.
+local RUN_LEAN_DEG = -12 -- negative = forward, see [[feedback-human-rig-lean-direction]]
+local RUN_ACCEL_TIME = 2.5 -- long enough that the lean/speed buildup is visible over several strides, not resolved almost instantly
+local RUN_SPEED_MULT = 1.3 -- top speed = ANIM_SPEED * this, reached at RUN_ACCEL_TIME
+local RUN_RAMP_INTERVAL = 0.05
 
 -- The human clips were authored independently of the rat rig's hand-animated
 -- timings (idle breathes over 3s vs the rat's 0.9s, walk cycles over 0.8s vs
@@ -105,6 +119,20 @@ local function stop_overlay(self)
 	end
 end
 
+-- Cancels the run speed-ramp timer and the lean go.animate, and resets both
+-- to their non-running rest values. Safe to call unconditionally (no-op if
+-- nothing is running) - called whenever any other state is entered so a
+-- half-finished ramp never leaks into idle/walk/attack/death.
+local function stop_run_ramp(self)
+	if self.run_ramp_timer then
+		timer.cancel(self.run_ramp_timer)
+		self.run_ramp_timer = nil
+	end
+	self.anim.speed = ANIM_SPEED
+	local hit = self.p_ids[hash("/human/hit")]
+	if hit then go.cancel_animations(hit, "euler.z") end
+end
+
 function R:play(state, opts)
 	opts = opts or {}
 	local clip
@@ -112,6 +140,10 @@ function R:play(state, opts)
 		clip = (self.weapon_def and self.weapon_def.attack_animation) or "attack_impact"
 	else
 		clip = CLIP[state] or state
+	end
+
+	if state ~= "run" then
+		stop_run_ramp(self)
 	end
 
 	if state == "idle" or state == "walk" or state == "run" or state == "death" then
@@ -144,7 +176,16 @@ function R:play(state, opts)
 		return
 	end
 
-	-- Base loop (idle / walk): crossfade for a smooth blend, except on the first
+	-- Run: play the walk loop (below, same crossfade-in as idle/walk) and
+	-- layer the accelerating lean + speed ramp on top of it, so the visible
+	-- clip never switches out from under the character - it just keeps
+	-- walking, increasingly fast and forward-leaning, until it reaches full
+	-- pace and holds there.
+	if state == "run" then
+		clip = CLIP.walk
+	end
+
+	-- Base loop (idle / walk / run): crossfade for a smooth blend, except on the first
 	-- play (nothing to blend from) or when leaving the terminal death pose, where
 	-- crossfade can't restore the properties death zeroed out - a plain play resets
 	-- them back to node defaults first.
@@ -155,6 +196,31 @@ function R:play(state, opts)
 	end
 	self.has_played = true
 	self.prev_was_death = false
+
+	-- The lean go.animate must start AFTER play()/crossfade() above, not
+	-- before: crossfading OUT of "idle" stops idle's own tweens on "hit"
+	-- (idle keys hit's rotation_z at 0 so a leftover run lean doesn't get
+	-- stuck - see the "default" clip's comment), and that cleanup cancels
+	-- *any* running tween on that property, including a lean started too
+	-- early. Started here, it survives.
+	if state == "run" then
+		local hit = self.p_ids[hash("/human/hit")]
+		if hit then
+			go.animate(hit, "euler.z", go.PLAYBACK_ONCE_FORWARD, RUN_LEAN_DEG, go.EASING_INOUTSINE, RUN_ACCEL_TIME)
+		end
+		-- Elapsed time is tracked via socket.gettime() (matching panthera.lua's
+		-- own internal timer, see M.play) rather than trusting the timer
+		-- callback's time_elapsed argument, which is per-tick, not cumulative.
+		local start_time = socket.gettime()
+		self.run_ramp_timer = timer.delay(RUN_RAMP_INTERVAL, true, function()
+			local t = math.min((socket.gettime() - start_time) / RUN_ACCEL_TIME, 1.0)
+			self.anim.speed = ANIM_SPEED + (ANIM_SPEED * RUN_SPEED_MULT - ANIM_SPEED) * t
+			if t >= 1.0 then
+				timer.cancel(self.run_ramp_timer)
+				self.run_ramp_timer = nil
+			end
+		end)
+	end
 end
 
 function R:muzzle()
@@ -212,6 +278,7 @@ function R:stop()
 	self.alive = false
 	if self.anim then panthera.stop(self.anim) end
 	stop_overlay(self)
+	stop_run_ramp(self)
 end
 
 return R

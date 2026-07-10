@@ -6,13 +6,13 @@
 -- Rig modules are required statically here so the bundler always includes them.
 
 local rig_human = require("first_anim.modules.rig_human")
-local rig_rat = require("first_anim.modules.rig_rat")
+local rig_quadruped = require("first_anim.modules.rig_quadruped")
 
 local M = {}
 
 local RIGS = {
 	human = rig_human,
-	rat = rig_rat,
+	quadruped = rig_quadruped,
 }
 
 local data = nil

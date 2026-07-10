@@ -1,0 +1,16 @@
+embedded_components {
+  id: "sprite"
+  type: "sprite"
+  data: "default_animation: \"boar_body\"\n"
+  "material: \"/panthera/materials/sprite.material\"\n"
+  "size {\n"
+  "  x: 501.0\n"
+  "  y: 401.0\n"
+  "}\n"
+  "size_mode: SIZE_MODE_MANUAL\n"
+  "textures {\n"
+  "  sampler: \"texture_sampler\"\n"
+  "  texture: \"/first_anim/rigs/boar/boar.atlas\"\n"
+  "}\n"
+  ""
+}

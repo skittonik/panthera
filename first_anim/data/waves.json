@@ -2,18 +2,18 @@
   "groups": [
     {
       "id": 1,
-      "name": "Fight 1: Bandit + 2 Rats",
-      "enemies": ["bandit_farm", "rat", "rat"]
+      "name": "Fight 1: 2 Rats",
+      "enemies": ["rat", "rat"]
     },
     {
       "id": 2,
-      "name": "Fight 2: Pack + Sniper",
-      "enemies": ["dog", "dog", "bandit_sniper"]
+      "name": "Fight 2: 2 Dogs",
+      "enemies": ["dog", "dog"]
     },
     {
       "id": 3,
-      "name": "Fight 3: Assault + Boss Burelom",
-      "enemies": ["bandit_assault", "burelom"]
+      "name": "Fight 3: Boar",
+      "enemies": ["boar"]
     }
   ]
 }

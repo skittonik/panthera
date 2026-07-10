@@ -1,0 +1,22 @@
+images {
+  image: "/first_anim/assets/boar_body.png"
+}
+images {
+  image: "/first_anim/assets/boar_head.png"
+}
+images {
+  image: "/first_anim/assets/boar_leg_front_left.png"
+}
+images {
+  image: "/first_anim/assets/boar_leg_front_right.png"
+}
+images {
+  image: "/first_anim/assets/boar_leg_back_left.png"
+}
+images {
+  image: "/first_anim/assets/boar_leg_back_right.png"
+}
+images {
+  image: "/first_anim/assets/shadow.png"
+}
+extrude_borders: 2

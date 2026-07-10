@@ -1,0 +1,24 @@
+name: "boar_unit"
+scale_along_z: 0
+collection_instances {
+  id: "boar"
+  collection: "/first_anim/rigs/boar/boar.collection"
+}
+instances {
+  id: "hp_bg"
+  prototype: "/first_anim/rigs/shared/hp_bg.go"
+  position {
+    x: 0.0
+    y: 420.0
+    z: 0.8
+  }
+}
+instances {
+  id: "hp_fill"
+  prototype: "/first_anim/rigs/shared/hp_fill.go"
+  position {
+    x: -80.0
+    y: 420.0
+    z: 0.81
+  }
+}

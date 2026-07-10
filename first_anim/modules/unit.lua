@@ -1,6 +1,6 @@
 -- unit.lua
 -- A combat unit: stats, HP bar and damage/death handling, with all visuals and
--- animation delegated to a per-type rig (rig_human, rig_rat, ...). This keeps
+-- animation delegated to a per-type rig (rig_human, rig_quadruped, ...). This keeps
 -- the combat code identical across unit types.
 
 local units = require("first_anim.modules.units")
@@ -45,6 +45,7 @@ end
 function Unit.spawn(opts)
 	local udef = units.get(opts.unit_type)
 	local rig = units.get_rig(opts.unit_type).new({
+		unit_type = opts.unit_type,
 		factory_url = "/factories#" .. udef.factory,
 		pos = opts.pos,
 		is_enemy = opts.is_enemy,

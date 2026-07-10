@@ -7,11 +7,27 @@
     "aim_offset_y": 150
   },
   "rat": {
-    "rig": "rat",
+    "rig": "quadruped",
     "factory": "rat_factory",
     "uses_weapons": false,
-    "melee": { "attack_range": 110, "hit_delay": 0.3 },
+    "melee": { "attack_range": 143, "hit_delay": 0.3 },
     "hp_bar_offset_y": 140,
     "aim_offset_y": 55
+  },
+  "dog": {
+    "rig": "quadruped",
+    "factory": "dog_factory",
+    "uses_weapons": false,
+    "melee": { "attack_range": 156, "hit_delay": 0.3 },
+    "hp_bar_offset_y": 170,
+    "aim_offset_y": 70
+  },
+  "boar": {
+    "rig": "quadruped",
+    "factory": "boar_factory",
+    "uses_weapons": false,
+    "melee": { "attack_range": 182, "hit_delay": 0.35 },
+    "hp_bar_offset_y": 210,
+    "aim_offset_y": 90
   }
 }

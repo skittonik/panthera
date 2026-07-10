@@ -10,27 +10,23 @@
   },
   "dog": {
     "name": "Dog",
-    "unit": "rat",
+    "unit": "dog",
     "hp": 50,
     "move_speed": 115,
     "attack_speed": 100,
     "damage": 6,
     "defense": 5,
-    "scale": 1.7,
-    "tint": [0.5, 0.45, 0.4],
-    "hp_bar_offset_y": 170
+    "scale": 1.7
   },
   "boar": {
     "name": "Boar",
-    "unit": "rat",
+    "unit": "boar",
     "hp": 120,
     "move_speed": 75,
     "attack_speed": 60,
     "damage": 12,
     "defense": 20,
-    "scale": 2.2,
-    "tint": [0.35, 0.3, 0.32],
-    "hp_bar_offset_y": 210
+    "scale": 2.2
   },
   "burelom": {
     "name": "Burelom (Boss)",
