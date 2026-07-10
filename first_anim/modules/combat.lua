@@ -52,9 +52,11 @@ local function pick(list)
 	return list[math.random(#list)]
 end
 
--- Movement clip: "run" when the panel's RUN toggle is on, else "walk".
-local function move_anim(world)
-	return world.run_mode and "run" or "walk"
+-- RUN is a setup-screen-only preview of the player's run clip (a look-but-
+-- don't-touch toggle for eyeballing the animation before a fight) - it never
+-- drives real combat movement, which always walks for every unit.
+local function preview_anim(world)
+	return world.run_mode and "run" or "idle"
 end
 
 -- Events --------------------------------------------------------------------
@@ -119,9 +121,9 @@ local function spawn_player(world, in_battle)
 	world.player = unit
 
 	if in_battle then
-		unit:ensure_anim(move_anim(world), true)
+		unit:ensure_anim("walk", true)
 	else
-		unit:ensure_anim("idle", true)
+		unit:ensure_anim(preview_anim(world), true)
 	end
 	unit:position_hp_bar()
 end
@@ -156,7 +158,7 @@ local function spawn_enemies(world)
 
 		local pos = random_in_zone(go.get_position(point), theme.spawn.spread_x, theme.spawn.spread_y)
 		local unit = Unit.spawn({ unit_type = cfg.unit, pos = pos, is_enemy = true, cfg = cfg })
-		unit:ensure_anim(move_anim(world), true)
+		unit:ensure_anim("walk", true)
 		unit:position_hp_bar()
 		world.enemies[#world.enemies + 1] = unit
 	end
@@ -298,7 +300,7 @@ local function advance(world, unit, target, sim_dt)
 		end
 	else
 		unit.in_range = false
-		unit:ensure_anim(move_anim(world), true)
+		unit:ensure_anim("walk", true)
 		if dist > EPSILON then
 			local speed = unit.move_speed * unit.slow_mult
 			upos.x = upos.x + (dx / dist) * speed * sim_dt
@@ -409,6 +411,11 @@ local function begin_battle(world)
 	spawn_enemies(world)
 	world.phase = "running"
 	panthera.SPEED = world.speed
+
+	-- RUN was only a setup-screen preview; reset it so the panel doesn't show
+	-- it "on" through a battle where it has no effect.
+	world.run_mode = false
+	world.emit({ type = "run", run = false })
 
 	emit_phase(world)
 	local group = world.config.groups[world.active_battle] or world.config.groups[1]
@@ -539,12 +546,15 @@ function M.set_speed(world, speed)
 	world.emit({ type = "speed", speed = speed })
 end
 
--- RUN toggle: swaps the movement clip (walk/run) for every unit. Picked up
--- automatically on the next advance() frame for anyone currently moving -
--- no need to force a re-trigger here.
+-- RUN toggle: setup-screen preview only, so it's meaningless (and locked)
+-- once a battle is running/paused - real combat movement always walks.
 function M.set_run(world, on)
+	if world.phase == "running" or world.phase == "paused" then return end
 	world.run_mode = on
 	world.emit({ type = "run", run = on })
+	if world.player and world.player:is_alive() then
+		world.player:ensure_anim(preview_anim(world), true)
+	end
 end
 
 -- Battle = which of the 3 fights (composition + FightModifier). Locked mid-battle.

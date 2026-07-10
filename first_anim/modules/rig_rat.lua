@@ -314,9 +314,7 @@ function R:play(state, opts)
 		stop_ambient_cycle(self)
 		play_death(self)
 		if opts.callback then opts.callback() end
-	elseif state == "walk" or state == "run" then
-		-- No dedicated run cycle for the rat rig; the trot keeps it in sync
-		-- with the RUN toggle instead of freezing into the idle branch below.
+	elseif state == "walk" then
 		stop_ambient_cycle(self)
 		start_walk_cycle(self)
 		if opts.callback then opts.callback() end

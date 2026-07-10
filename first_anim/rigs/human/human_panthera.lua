@@ -129,10 +129,13 @@ return {
                 animation_keys = {
                     -- Forward lean, held all loop (start/end value match so it
                     -- never snaps back to upright on the loop seam).
-                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.0, duration = 0.1, start_value = 10.0, end_value = 15.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.1, duration = 0.1, start_value = 15.0, end_value = 10.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.2, duration = 0.1, start_value = 10.0, end_value = 15.0, easing = "inoutsine" },
-                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.3, duration = 0.1, start_value = 15.0, end_value = 10.0, easing = "inoutsine" },
+                    -- NB: negative rotation_z on "hit" = forward lean for this
+                    -- rig (positive tips it backward) - confirmed visually,
+                    -- do not flip this sign back without checking in-game.
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.0, duration = 0.1, start_value = -10.0, end_value = -15.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.1, duration = 0.1, start_value = -15.0, end_value = -10.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.2, duration = 0.1, start_value = -10.0, end_value = -15.0, easing = "inoutsine" },
+                    { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.3, duration = 0.1, start_value = -15.0, end_value = -10.0, easing = "inoutsine" },
 
                     -- Right leg: wider stride than walk (32deg vs 20deg), fast lift-off / gentle settle.
                     { key_type = "tween", node_id = "right_leg", property_id = "rotation_z", start_time = 0.0, duration = 0.2, start_value = 32.0, end_value = -32.0, easing = "outsine" },
