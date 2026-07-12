@@ -33,6 +33,18 @@ local SPECIES_BODY_H = {
 	boar = 401,
 }
 
+-- Per-species leg-length-to-body-height ratio relative to rat's (the tuning
+-- baseline for WALK_SWING_DEG/DEATH_LEG_SPLAY below). dog_leg_*.png are ~2.9x
+-- longer relative to dog_body.png than rat's legs are to rat_body.png (avg
+-- leg px / body_h: rat 76.5/205=0.37, dog 244/224=1.09), so the same rotation
+-- angle sweeps the dog's feet through a much larger arc than intended.
+-- Scaling rotation-based leg tracks by 1/ratio keeps the on-screen foot
+-- excursion consistent across species instead of each inheriting rat's tuning
+-- verbatim. boar's ratio (~0.42) is close enough to rat's to need no override.
+local SPECIES_LEG_SWING_MULT = {
+	dog = 0.34,
+}
+
 local WALK_SWING_DEG = 24
 local WALK_LIFT = 12
 local WALK_STEP_TIME = 0.17
@@ -119,9 +131,14 @@ function R.new(opts)
 	-- math, so a rotation that reads as "down"/"forward" on the unflipped art
 	-- reads as the opposite once hflip is on (the rotated quad still turns
 	-- the same physical way, but the visual snout/paw landmark is now drawn
-	-- on the other edge of it). Multiply any canonical (unflipped-reference)
-	-- directional angle by this before applying it to a hflipped part.
-	self.rot_sign = -flip
+	-- on the other edge of it). Multiply any canonical (unflipped-reference,
+	-- i.e. authored-for-player) directional angle by this before applying it
+	-- to a part: identity for the never-flipped player (flip=+1), negated for
+	-- the hflipped enemy (flip=-1) - so this tracks self.flip, not -self.flip
+	-- (rat death's head-drop went the wrong way for the player until this was
+	-- corrected: the old -flip sign matched the enemy case, not the player's).
+	self.rot_sign = flip
+	self.leg_swing_mult = SPECIES_LEG_SWING_MULT[species] or 1.0
 	-- root is the *logical* position unit.lua reads/writes every frame for
 	-- movement; it must never be scaled or animated by this rig.
 	self.root_path = p_ids[hash("/" .. species .. "/root")]
@@ -222,10 +239,11 @@ local function trot_phase(self, token, fwd, back)
 	-- unmirrored (player) facing. self.flip carries that correction: +1 keeps
 	-- the raw angle, -1 (enemy) points the swing at the enemy's actual front
 	-- (-x, since its legs now sit on the negative side).
+	local swing = WALK_SWING_DEG * self.leg_swing_mult
 	for _, id in ipairs(fwd) do
 		local path = self.leg_paths[id]
 		local rest_y = self.leg_rest_y[id]
-		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, WALK_SWING_DEG * self.flip, go.EASING_OUTSINE, WALK_STEP_TIME)
+		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, swing * self.flip, go.EASING_OUTSINE, WALK_STEP_TIME)
 		go.animate(path, "position.y", go.PLAYBACK_ONCE_FORWARD, rest_y + WALK_LIFT,
 			go.EASING_OUTSINE, WALK_STEP_TIME * 0.5, 0, function()
 				go.animate(path, "position.y", go.PLAYBACK_ONCE_FORWARD, rest_y,
@@ -234,7 +252,7 @@ local function trot_phase(self, token, fwd, back)
 	end
 	for _, id in ipairs(back) do
 		local path = self.leg_paths[id]
-		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, -WALK_SWING_DEG * self.flip, go.EASING_INOUTSINE, WALK_STEP_TIME)
+		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, -swing * self.flip, go.EASING_INOUTSINE, WALK_STEP_TIME)
 	end
 	go.animate(self.body_path, "position.y", go.PLAYBACK_ONCE_FORWARD, self.body_rest_y - WALK_BODY_BOB * 0.5,
 		go.EASING_OUTSINE, WALK_STEP_TIME * 0.5, 0, function()
@@ -303,7 +321,7 @@ local function play_death(self)
 		local path = self.leg_paths[id]
 		go.cancel_animations(path, "euler.z")
 		go.cancel_animations(path, "position.y")
-		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, DEATH_LEG_SPLAY[id] * self.flip,
+		go.animate(path, "euler.z", go.PLAYBACK_ONCE_FORWARD, DEATH_LEG_SPLAY[id] * self.flip * self.leg_swing_mult,
 			go.EASING_OUTQUAD, 0.26, 0.03)
 	end
 
@@ -320,10 +338,11 @@ end
 local function start_walk_cycle(self)
 	self.walk_token = self.walk_token + 1
 	local token = self.walk_token
-	go.set(self.leg_paths["leg_front_left"], "euler.z", -WALK_SWING_DEG * self.flip)
-	go.set(self.leg_paths["leg_back_right"], "euler.z", -WALK_SWING_DEG * self.flip)
-	go.set(self.leg_paths["leg_front_right"], "euler.z", WALK_SWING_DEG * self.flip)
-	go.set(self.leg_paths["leg_back_left"], "euler.z", WALK_SWING_DEG * self.flip)
+	local swing = WALK_SWING_DEG * self.leg_swing_mult
+	go.set(self.leg_paths["leg_front_left"], "euler.z", -swing * self.flip)
+	go.set(self.leg_paths["leg_back_right"], "euler.z", -swing * self.flip)
+	go.set(self.leg_paths["leg_front_right"], "euler.z", swing * self.flip)
+	go.set(self.leg_paths["leg_back_left"], "euler.z", swing * self.flip)
 	trot_phase(self, token, DIAG_A, DIAG_B)
 end
 
@@ -368,10 +387,14 @@ function R:play(state, opts)
 		-- lunge's full-cycle timing.
 		local pull = -self.flip * ATTACK_WINDUP_PULL
 		local charge = self.flip * ATTACK_CHARGE_DIST
+		local shadow = self.shadow_path
 		go.cancel_animations(self.hit_path, "position.x")
+		if shadow then go.cancel_animations(shadow, "position.x") end
 		go.cancel_animations(self.head_path, "euler.z")
 		go.set(self.hit_path, "position.x", 0)
+		if shadow then go.set(shadow, "position.x", 0) end
 		go.set(self.head_path, "euler.z", 0)
+		-- Shadow rides the same charge as "hit" so it stays tied to the body during the ram.
 		go.animate(self.hit_path, "position.x", go.PLAYBACK_ONCE_FORWARD, pull,
 			go.EASING_OUTSINE, ATTACK_WINDUP_TIME, 0, function()
 				go.animate(self.hit_path, "position.x", go.PLAYBACK_ONCE_FORWARD, charge,
@@ -380,6 +403,16 @@ function R:play(state, opts)
 							go.EASING_OUTQUAD, ATTACK_RETURN_TIME, 0, opts.callback)
 					end)
 			end)
+		if shadow then
+			go.animate(shadow, "position.x", go.PLAYBACK_ONCE_FORWARD, pull,
+				go.EASING_OUTSINE, ATTACK_WINDUP_TIME, 0, function()
+					go.animate(shadow, "position.x", go.PLAYBACK_ONCE_FORWARD, charge,
+						go.EASING_INQUAD, ATTACK_CHARGE_TIME, 0, function()
+							go.animate(shadow, "position.x", go.PLAYBACK_ONCE_FORWARD, 0,
+								go.EASING_OUTQUAD, ATTACK_RETURN_TIME)
+						end)
+				end)
+		end
 		go.animate(self.head_path, "euler.z", go.PLAYBACK_ONCE_FORWARD, -ATTACK_HEAD_TILT_DEG * self.rot_sign,
 			go.EASING_OUTSINE, ATTACK_WINDUP_TIME + ATTACK_CHARGE_TIME, 0, function()
 				go.animate(self.head_path, "euler.z", go.PLAYBACK_ONCE_FORWARD, 0, go.EASING_OUTQUAD, ATTACK_RETURN_TIME)
@@ -415,13 +448,21 @@ function R:recoil(_)
 		fx.flash_single(path)
 	end
 	local base = self.base_scale
+	local shadow = self.shadow_path
 	go.cancel_animations(self.hit_path, "scale.x")
+	if shadow then go.cancel_animations(shadow, "scale.x") end
 	-- Reset to base before the squash so a pingpong always returns to base,
 	-- never to a mid-squash value (which would accumulate and leave the rig
 	-- standing crooked after repeated splash hits).
 	go.set_scale(vmath.vector3(base, base, 1.0), self.hit_path)
 	go.animate(self.hit_path, "scale.x", go.PLAYBACK_ONCE_PINGPONG, base * 0.85,
 		go.EASING_OUTQUAD, 0.12)
+	-- Shadow squashes with "hit" so it stays tied to the body on knockback.
+	if shadow then
+		go.set(shadow, "scale.x", base)
+		go.animate(shadow, "scale.x", go.PLAYBACK_ONCE_PINGPONG, base * 0.85,
+			go.EASING_OUTQUAD, 0.12)
+	end
 end
 
 function R:stop()

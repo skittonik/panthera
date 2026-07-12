@@ -343,6 +343,15 @@ return {
                     { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.07, duration = 0.21, start_value = 4.0, end_value = -1.5, easing = "outcubic" },
                     { key_type = "tween", node_id = "hit", property_id = "rotation_z", start_time = 0.28, duration = 0.27, start_value = -1.5, end_value = 0.0, easing = "inoutsine" },
 
+                    -- Shadow rides the same flinch as "hit" (position only - matches R:recoil()'s convention)
+                    { key_type = "tween", node_id = "shadow", property_id = "position_x", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -12.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "position_x", start_time = 0.07, duration = 0.23, start_value = -12.0, end_value = 2.0, easing = "outcubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "position_x", start_time = 0.3, duration = 0.25, start_value = 2.0, end_value = 0.0, easing = "inoutsine" },
+
+                    { key_type = "tween", node_id = "shadow", property_id = "position_y", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = -2.0, easing = "outquad" },
+                    { key_type = "tween", node_id = "shadow", property_id = "position_y", start_time = 0.07, duration = 0.23, start_value = -2.0, end_value = 0.5, easing = "outcubic" },
+                    { key_type = "tween", node_id = "shadow", property_id = "position_y", start_time = 0.3, duration = 0.25, start_value = 0.5, end_value = 0.0, easing = "inoutsine" },
+
                     -- Head snaps harder than the body, pivoting about the neck
                     { key_type = "tween", node_id = "head_pivot", property_id = "rotation_z", start_time = 0.0, duration = 0.07, start_value = 0.0, end_value = 6.0, easing = "outquad" },
                     { key_type = "tween", node_id = "head_pivot", property_id = "rotation_z", start_time = 0.07, duration = 0.23, start_value = 6.0, end_value = -2.0, easing = "outcubic" },
