@@ -336,38 +336,6 @@ function M.start_animation_key(animation_state, key, options)
 end
 
 
----Play animation as a child of the current animation state, allowing multiple animations to run independently and simultaneously.
----
----This creates a detached animation that runs in parallel with the main animation state without affecting it.
----The child animation will be automatically cleaned up when it completes.
----@param animation_state panthera.animation The parent animation state object
----@param animation_id string The ID of the animation to play as a detached child
----@param options panthera.options? Options for the detached animation playback
-function M.play_detached(animation_state, animation_id, options)
-	options = options or EMPTY_OPTIONS
-
-	local child_state = M.clone_state(animation_state)
-	if not child_state then
-		return
-	end
-
-	animation_state.childs = animation_state.childs or {}
-	table.insert(animation_state.childs, child_state)
-
-	M.play(child_state, animation_id, {
-		is_skip_init = options.is_skip_init,
-		speed = options.speed,
-		is_loop = options.is_loop,
-		callback = function(...)
-			if options.callback then
-				options.callback(...)
-			end
-			panthera_internal.remove_child_animation(animation_state, child_state)
-		end
-	})
-end
-
-
 ---Set the current time of an animation. This function stops any currently playing animation.
 ---@param animation_state panthera.animation The animation state object returned by `create_go` or `create_gui`.
 ---@param animation_id string The ID of the animation to modify.

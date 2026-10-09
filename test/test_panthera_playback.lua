@@ -164,34 +164,23 @@ return function()
 		end)
 
 
-		it("A detached animation runs beside the main one", function()
+		-- Fork: play_detached is removed, a second animation track is a cloned state of its own
+		it("A cloned state runs beside the main one", function()
 			local state, nodes = utils.create_scene(project)
+			local overlay = panthera.clone_state(state)
 			local finished = 0
+			assert(panthera.play_detached == nil, "play_detached is not part of the fork API")
 
 			panthera.play(state, "move")
-			panthera.play_detached(state, "blink", { callback = function() finished = finished + 1 end })
+			panthera.play(overlay, "blink", { callback = function() finished = finished + 1 end })
 
 			utils.play_frames(12) -- blink is 0.1s, it is over
-			assert(finished == 1, "the detached callback fired, got " .. finished)
-			assert(utils.near(nodes.box.scale_x, 1), "the detached animation ran, got " .. tostring(nodes.box.scale_x))
+			assert(finished == 1, "the overlay callback fired, got " .. finished)
+			assert(utils.near(nodes.box.scale_x, 1), "the overlay animation ran, got " .. tostring(nodes.box.scale_x))
 			assert(panthera.is_playing(state) == true, "the main animation is untouched")
 			assert(nodes.box.position_x > 0, "the main animation kept running")
 
 			panthera.stop(state)
-		end)
-
-
-		it("Stopping the parent stops its detached children", function()
-			local state, nodes = utils.create_scene(project)
-			panthera.play(state, "move")
-			panthera.play_detached(state, "move")
-			assert(#state.childs == 1, "the detached child is tracked, got " .. #state.childs)
-
-			utils.play_frames(10)
-			panthera.stop(state)
-			local at_stop = nodes.box.position_x
-			utils.play_frames(30)
-			assert(nodes.box.position_x == at_stop, "nothing keeps animating after the stop")
 			assert(test_engine.timer_count() == 0, "every timer is cancelled, got " .. test_engine.timer_count())
 		end)
 
