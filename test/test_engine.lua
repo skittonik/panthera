@@ -35,10 +35,10 @@ function M.mock()
 
 	mock.mock(timer)
 
-	timer.delay.replace(function(_, is_repeating, callback)
+	timer.delay.replace(function(delay, is_repeating, callback)
 		timer_counter = timer_counter + 1
 		next_order = next_order + 1
-		timers[timer_counter] = { callback = callback, is_repeating = is_repeating, order = next_order }
+		timers[timer_counter] = { callback = callback, is_repeating = is_repeating, order = next_order, delay = delay, elapsed = 0 }
 		return timer_counter
 	end)
 
@@ -84,6 +84,9 @@ function M.create_adapter()
 		trigger_animation_key = function(node, property_id, value)
 			node[property_id] = value
 		end,
+		get_node_property = function(node, property_id)
+			return node[property_id]
+		end,
 		stop_tween = function(node, property_id)
 			tweens[tween_id(node, property_id)] = nil
 		end,
@@ -125,8 +128,16 @@ function M.step(dt)
 
 	for index = 1, #ordered do
 		local entry = ordered[index]
+		-- A one shot timer waits for its delay, a repeating one fires every frame
+		local handle = entry.handle
+		local is_waiting = false
+		if not handle.is_repeating and handle.delay and handle.delay > 0 then
+			handle.elapsed = handle.elapsed + dt
+			is_waiting = handle.elapsed < handle.delay - 1e-9
+		end
+
 		-- An earlier callback of this frame could have cancelled it
-		if timers[entry.timer_id] then
+		if timers[entry.timer_id] and not is_waiting then
 			entry.handle.callback(nil, entry.timer_id, dt)
 			if not entry.handle.is_repeating then
 				timers[entry.timer_id] = nil

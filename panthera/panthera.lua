@@ -23,6 +23,7 @@ local panthera_internal = require("panthera.panthera_internal")
 ---@field get_node fun(node_id: string): node Function to get node by node_id
 ---@field animation_id string? Current animation ID
 ---@field previous_animation_id string? Previous animation ID
+---@field target_animation_id string? Animation a running `crossfade` blends into, until it starts playing
 ---@field animation_path string Animation path to JSON file
 ---@field animation_keys_index number Animation keys index
 ---@field events table? List of events triggered in this animation loop
@@ -188,6 +189,7 @@ function M.play_tweener(animation_state, animation_id, options)
 		timer.cancel(animation_state.timer_id)
 		animation_state.timer_id = nil
 	end
+	animation_state.target_animation_id = nil
 
 	animation_state.timer_id = tweener.tween(easing, from, to, total_duration, function(time, is_final_call)
 		panthera_internal.apply_sample(animation_state, animation.animation_id, time, options.callback_event)
@@ -385,7 +387,8 @@ function M.stop(animation_state)
 		animation_state.timer_id = nil
 	end
 
-	local previous_animation_id = animation_state.animation_id
+	-- During a crossfade nothing plays yet, the blend tweens belong to the target
+	local previous_animation_id = animation_state.animation_id or animation_state.target_animation_id
 	animation_state.previous_animation_id = previous_animation_id
 
 	-- Stop all tweens started by animation
@@ -394,6 +397,7 @@ function M.stop(animation_state)
 	end
 
 	animation_state.animation_id = nil
+	animation_state.target_animation_id = nil
 	animation_state.current_time = 0
 	animation_state.animation_keys_index = 1
 
@@ -510,7 +514,8 @@ end
 ---@param start_time number? Time to start from, the time left in the state by default
 ---@return boolean is_playing False if the animation is over already
 function M._start_playback(animation_state, animation, options, sample_depth, start_time)
-	if animation_state.animation_id then
+	-- A pending crossfade is stopped too, or its timer would start the target over this one
+	if animation_state.animation_id or animation_state.target_animation_id then
 		M.stop(animation_state)
 	end
 
@@ -589,6 +594,138 @@ function M._create_clip_state(animation_state, key)
 		return animation_state.get_node(key.node_id .. "/" .. node_id)
 	end
 	return panthera_internal.create_animation_state(template_path, animation_state.adapter, get_node)
+end
+
+
+-- Fork (skittonik/panthera): crossfade is not in upstream, see FORK.md
+
+---Blend from the current pose to the start of a target animation, then play the target.
+---
+---Every tween property of the target is tweened to its first key value, every tween property
+---the current animation (with its running clips) drives and the target does not stays at the
+---value it has now. Then the target plays with `is_skip_init`, from the blended pose.
+---`stop`, `play` or another `crossfade` during the blend cancels the pending play.
+---@param animation_state panthera.animation The animation state object
+---@param target_anim_id string The ID of the target animation to blend into
+---@param duration number? The blend duration in seconds (default: 0.15)
+---@param play_options panthera.options? Options for playing the target animation after crossfade completes: `is_loop`, `speed`, `callback`, `callback_event`
+---@return boolean result True if the crossfade was successfully initiated, false otherwise
+function M.crossfade(animation_state, target_anim_id, duration, play_options)
+	assert(animation_state, "Can't crossfade animation, animation_state is nil")
+	play_options = play_options or EMPTY_OPTIONS
+	duration = duration or 0.15
+
+	local animation, animation_data = M._find_animation(animation_state, target_anim_id)
+	if not animation_data then
+		M._log_missing_animation(animation_state, animation_data, target_anim_id, "Can't crossfade animation, animation_data is nil")
+		return false
+	end
+	if not animation then
+		M._log_missing_animation(animation_state, animation_data, target_anim_id, "Can't crossfade animation, target animation not found")
+		return false
+	end
+
+	-- 1. Start values of the target: the earliest tween key of each node and property
+	local targets = {}
+	local keys = animation.animation_keys
+	for index = 1, #keys do
+		local key = keys[index]
+		if key.key_type == panthera_internal.KEY_TYPE.TWEEN then
+			local id = key.node_id .. "/" .. key.property_id
+			local target = targets[id]
+			if not target or key.start_time < target.start_time then
+				targets[id] = {
+					node = panthera_internal.get_node(animation_state, key.node_id),
+					property_id = key.property_id,
+					value = key.start_value,
+					start_time = key.start_time,
+				}
+			end
+		end
+	end
+
+	-- 2. Properties of the current animation the target does not drive rest where they are.
+	-- Resolve the current animation before the state is tagged with the target
+	local current_animation_id = animation_state.animation_id or animation_state.target_animation_id
+	M._collect_active_properties(animation_state, current_animation_id, "", targets)
+
+	-- 3. Stop the current animation, nodes keep their current poses. Tag the state after the
+	-- stop, which clears the tag: during the blend `stop` and `play` see the pending target
+	M.stop(animation_state)
+	animation_state.target_animation_id = target_anim_id
+
+	-- 4. Blend with the engine tweens
+	local adapter = animation_state.adapter
+	local easing = adapter.get_easing("outquad")
+	for _, target in pairs(targets) do
+		if target.node and target.value ~= nil then
+			adapter.tween_animation_key(target.node, target.property_id, easing, duration, target.value)
+		end
+	end
+
+	-- 5. Play the target from the blended pose, `is_skip_init` keeps it from snapping back
+	animation_state.timer_id = timer.delay(duration, false, function()
+		animation_state.timer_id = nil
+		animation_state.target_animation_id = nil
+
+		M.play(animation_state, target_anim_id, {
+			is_loop = play_options.is_loop,
+			speed = play_options.speed,
+			callback = play_options.callback,
+			callback_event = play_options.callback_event,
+			is_skip_init = true,
+		})
+	end)
+
+	return true
+end
+
+
+---Add the tween properties an animation of the state and its running clips drive, at their
+---current values. Present ids are kept
+---@private
+---@param animation_state panthera.animation
+---@param animation_id string|nil
+---@param prefix string Keeps the node ids of a template clip apart from the ones of its parent
+---@param result table<string, table>
+function M._collect_active_properties(animation_state, animation_id, prefix, result)
+	local animation_data = animation_id and panthera_internal.get_animation_data(animation_state)
+	local group_keys = animation_data and animation_data.group_animation_keys[animation_id]
+	if group_keys then
+		local adapter = animation_state.adapter
+		for node_id, node_keys in pairs(group_keys) do
+			for property_id, property_keys in pairs(node_keys) do
+				local id = prefix .. node_id .. "/" .. property_id
+				local first_key = property_keys[1]
+				if not result[id] and first_key and first_key.key_type == panthera_internal.KEY_TYPE.TWEEN then
+					local node = panthera_internal.get_node(animation_state, node_id)
+					if node then
+						local value = adapter.get_node_property and adapter.get_node_property(node, property_id)
+						if value == nil then
+							-- Time before any key: the initial value
+							value = panthera_internal.get_node_value_at_time(animation_state, animation_id, node_id, property_id, -1)
+						end
+						result[id] = { node = node, property_id = property_id, value = value }
+					end
+				end
+			end
+		end
+	end
+
+	local clips = animation_state.clips
+	if not clips then
+		return
+	end
+
+	for index = 1, #clips do
+		local clip_state = clips[index]
+		-- A nested clip shares the node ids of its parent, a template clip resolves its own
+		local clip_prefix = prefix
+		if clip_state.get_node ~= animation_state.get_node then
+			clip_prefix = prefix .. tostring(clip_state) .. "/"
+		end
+		M._collect_active_properties(clip_state, clip_state.animation_id, clip_prefix, result)
+	end
 end
 
 
