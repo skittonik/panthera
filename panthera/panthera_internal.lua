@@ -9,6 +9,7 @@ local tweener = require("tweener.tweener")
 ---@field set_node_property fun(node: node, property_id: string, value: number|string): boolean Function to set node property. Return true if success
 ---@field stop_tween fun(node: node, property_id: string): nil Function to stop tween animation key
 ---@field is_node_valid fun(node: node): boolean Function to check if node is valid
+---@field get_node_property (fun(node: node, property_id: string): any)? Function to read the current tween property value, nil for trigger properties. Used by `panthera.crossfade`
 
 ---@class panthera.logger
 ---@field trace fun(logger: panthera.logger, message: string, data: any|nil)
