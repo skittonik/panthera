@@ -41,5 +41,4 @@ A merge needs no force push. Resolve the conflicts against the upstream change a
 table above true. Run the tests before pushing: build with Bob with `--settings test/test.ini`
 and run the engine on the result, as `.github/workflows/ci_workflow.yml` does.
 
-The autobattle prototype that used to live in this fork moved out; its last state here is the
-tag `archive/autobattle-rework`.
+An autobattle game prototype used to live in this fork; it was removed on 2026-10-09.
